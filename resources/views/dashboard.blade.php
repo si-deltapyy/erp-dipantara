@@ -20,6 +20,11 @@
                         </span>
                     </h1>
 
+                    orderan : {{ $countPreOrdersActive }} <br>
+                    orderan selesai : {{ $countPreOrdersCompleted }} <br>
+                    orderan diproses : {{ $countPreOrdersProcessed }} <br>
+                    hutang ke mitra : {{ $countDebtorsToMitra }} <br>
+                    hutang dari pembeli : {{ $countDebtorsFromBuyer }} <br>
                 </div>
             </div>
         </div>

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('pre_order_number');
             $table->date('pre_order_date');
             $table->date('pre_order_closing_date');
+            $table->enum('pre_order_status', ['pending', 'on_process', 'delivered','completed'])->default('pending');
             $table->bigInteger('product_id')->unsigned();
             $table->bigInteger('buyer_id')->unsigned();
             $table->integer('quantity');

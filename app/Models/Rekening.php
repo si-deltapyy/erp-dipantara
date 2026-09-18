@@ -16,4 +16,9 @@ class Rekening extends Model
     {
         return $this->hasMany(Transaction::class);
     }
+
+    function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
 }

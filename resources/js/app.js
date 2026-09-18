@@ -1,7 +1,7 @@
 import './bootstrap';
+import '../css/app.css'; // Pastikan CSS Tailwind diimpor di sini
 
-import Alpine from 'alpinejs';
+import { createApp } from 'vue';
+import App from './components/App.vue';
 
-window.Alpine = Alpine;
-
-Alpine.start();
+createApp(App).mount('#app');
