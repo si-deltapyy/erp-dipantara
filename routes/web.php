@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Home', [
-        'title' => 'Laravel + Vue 3 + Inertia',
-        'message' => 'Integrasi berhasil tanpa perlu file Blade tambahan!'
+    return Inertia::render('Landing', [
+        'title' => 'Dipantara - Sistem Manajemen Pesanan & Keuangan Kayu',
+        'message' => 'Selamat datang di Dipantara, sistem manajemen pesanan dan keuangan kayu yang membantu bisnis kayu mengelola stok, pesanan, dan keuangan secara efisien.',
     ]);
 });
 
