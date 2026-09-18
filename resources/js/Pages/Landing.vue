@@ -61,58 +61,6 @@ import MainLayout from '@/Layouts/MainLayout.vue';
                         </div>
                     </div>
 
-                    <!-- Right Column: Interactive Visual Showcase -->
-                    <div class="relative lg:col-span-5">
-                        <div class="relative mx-auto w-full max-w-lg lg:max-w-none">
-                            
-                            <!-- Main Dashboard Preview Card -->
-                            <div class="rounded-2xl border border-slate-200/80 bg-white/90 p-6 shadow-2xl backdrop-blur-xl">
-                                <!-- Top Bar Mockup -->
-                                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-                                    <div class="flex items-center gap-2">
-                                        <span class="h-3 w-3 rounded-full bg-rose-400"></span>
-                                        <span class="h-3 w-3 rounded-full bg-amber-400"></span>
-                                        <span class="h-3 w-3 rounded-full bg-emerald-400"></span>
-                                    </div>
-                                    <span class="text-xs font-medium text-slate-400">woodflow-dashboard.internal</span>
-                                </div>
-
-                                <!-- Card Content Preview -->
-                                <div class="mt-5 space-y-4">
-                                    <div class="rounded-xl bg-slate-50 p-4 border border-slate-100">
-                                        <p class="text-xs font-medium text-slate-500">Total Ringkasan Kas Bulan Ini</p>
-                                        <p class="mt-1 text-2xl font-bold text-slate-900">Rp 148.500.000</p>
-                                        <span class="mt-1 inline-flex items-center text-xs font-semibold text-emerald-600">
-                                            ↑ 12.5% dibanding bulan lalu
-                                        </span>
-                                    </div>
-
-                                    <div class="grid grid-cols-2 gap-3">
-                                        <div class="rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
-                                            <span class="text-xs text-slate-500">Pesanan Aktif</span>
-                                            <p class="text-lg font-bold text-[#1e5b3d]">24 Pesanan</p>
-                                        </div>
-                                        <div class="rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
-                                            <span class="text-xs text-slate-[#1e5b3d]">Stok Meranti</span>
-                                            <p class="text-lg font-bold text-slate-800">1.420 m³</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Floating Badge 1: Status Order -->
-                            <div class="absolute -bottom-6 -left-6 rounded-xl border border-slate-100 bg-white p-4 shadow-xl hidden sm:flex items-center gap-3">
-                                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-[#e7efe9] text-[#1e5b3d]">
-                                    📦
-                                </div>
-                                <div>
-                                    <p class="text-xs font-semibold text-slate-400">Status Pengiriman</p>
-                                    <p class="text-sm font-bold text-slate-800">Kayu Jati SP-214 (Dikirim)</p>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
 
                 </div>
             </div>
