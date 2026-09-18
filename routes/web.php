@@ -4,9 +4,13 @@ use App\Http\Controllers\Dashboard;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SpkController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', function () {
-    return view('welcome');
+    return Inertia::render('Home', [
+        'title' => 'Laravel + Vue 3 + Inertia',
+        'message' => 'Integrasi berhasil tanpa perlu file Blade tambahan!'
+    ]);
 });
 
 Route::get('/dashboard',[Dashboard::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
