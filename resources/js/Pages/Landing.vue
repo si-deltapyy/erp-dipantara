@@ -16,19 +16,19 @@ import MainLayout from '@/Layouts/MainLayout.vue';
                         <!-- Badge -->
                         <div class="inline-flex items-center gap-2 rounded-full border border-[#1e5b3d]/15 bg-[#e7efe9]/60 px-4 py-1.5 backdrop-blur-md">
                             <span class="flex h-2 w-2 rounded-full bg-[#1e5b3d]"></span>
-                            <span class="text-xs font-bold uppercase tracking-wider text-[#1e5b3d]">🌲 WoodFlow Operating System</span>
+                            <span class="text-xs font-bold uppercase tracking-wider text-[#1e5b3d]">Staging Page</span>
                         </div>
 
                         <!-- Headline -->
                         <h1 class="mt-6 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-6xl sm:leading-[1.1]">
-                            Kelola Pesanan & 
+                            Cek
                             <span class="relative whitespace-nowrap text-[#1e5b3d]">
                                 <span class="relative z-10">Keuangan Kayu</span>
                                 <svg class="absolute -bottom-2 left-0 -z-10 h-3 w-full fill-[#1e5b3d]/20" viewBox="0 0 100 20" preserveAspectRatio="none">
                                     <path d="M0,15 Q50,5 100,15 T200,15" stroke="currentColor" stroke-width="4" fill="none" />
                                 </svg>
                             </span>
-                            Lebih Terintegrasi.
+                            Testing
                         </h1>
 
                         <!-- Subheadline -->
