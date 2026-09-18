@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>@yield('title', 'WoodFlow - Sistem Manajemen Pesanan & Keuangan Kayu')</title>
+    <meta name="description" content="@yield('description', 'WoodFlow adalah sistem manajemen pesanan dan keuangan kayu yang membantu bisnis kayu mengelola stok, pesanan, dan keuangan secara efisien.')">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

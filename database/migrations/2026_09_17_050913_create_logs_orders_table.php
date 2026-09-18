@@ -13,10 +13,9 @@ return new class extends Migration
     {
         Schema::create('logs_orders', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('order_id')->unsigned();
-            $table->bigInteger('pre_order_id')->unsigned();
-            $table->bigInteger('log_payment_id')->unsigned();
-
+            $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
+            $table->foreignId('pre_order_id')->constrained('pre_orders')->onDelete('cascade');
+            $table->foreignId('log_payment_id')->constrained('logs_payments')->onDelete('cascade');
             $table->timestamps();
         });
     }
