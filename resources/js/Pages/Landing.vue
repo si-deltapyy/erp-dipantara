@@ -56,7 +56,7 @@ import MainLayout from '@/Layouts/MainLayout.vue';
                             </div>
                             <div class="flex items-center gap-2">
                                 <svg class="h-5 w-5 text-[#1e5b3d]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                <span>Laporan Otomatis</span>
+                                <span></span>
                             </div>
                         </div>
                     </div>
