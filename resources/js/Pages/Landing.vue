@@ -23,7 +23,7 @@ import MainLayout from '@/Layouts/MainLayout.vue';
                         <h1 class="mt-6 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-6xl sm:leading-[1.1]">
                             Cek
                             <span class="relative whitespace-nowrap text-[#1e5b3d]">
-                                <span class="relative z-10">Keuangan Kayu</span>
+                                <span class="relative z-10">Cek Branch Staging CI/CD</span>
                                 <svg class="absolute -bottom-2 left-0 -z-10 h-3 w-full fill-[#1e5b3d]/20" viewBox="0 0 100 20" preserveAspectRatio="none">
                                     <path d="M0,15 Q50,5 100,15 T200,15" stroke="currentColor" stroke-width="4" fill="none" />
                                 </svg>
