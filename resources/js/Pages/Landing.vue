@@ -28,7 +28,7 @@ import MainLayout from '@/Layouts/MainLayout.vue';
                                     <path d="M0,15 Q50,5 100,15 T200,15" stroke="currentColor" stroke-width="4" fill="none" />
                                 </svg>
                             </span>
-                            Testing
+                            Testing 123
                         </h1>
 
                         <!-- Subheadline -->
