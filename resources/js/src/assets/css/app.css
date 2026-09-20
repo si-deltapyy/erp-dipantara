@@ -1,0 +1,40 @@
+@config '../../../../../tailwind.frontend.config.js';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        @apply m-0 bg-canvas font-sans text-ink antialiased;
+    }
+    button,
+    a,
+    select {
+        @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary;
+    }
+    button,
+    select {
+        @apply min-h-11;
+    }
+}
+
+@layer components {
+    .panel {
+        @apply rounded-md border border-line bg-white p-6 shadow-panel;
+    }
+    .primary-button {
+        @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-strong disabled:cursor-wait disabled:opacity-60;
+    }
+    .icon-button {
+        @apply inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-muted hover:bg-primary-light hover:text-primary;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}
