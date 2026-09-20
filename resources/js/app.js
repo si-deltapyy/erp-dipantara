@@ -1,7 +1,11 @@
-import './bootstrap';
+import '../css/app.css'
+import './bootstrap'
 
-import Alpine from 'alpinejs';
-
-window.Alpine = Alpine;
-
-Alpine.start();
+if (document.querySelector('script[data-page="app"]')) {
+    void import('./inertia')
+} else if (!window.Alpine) {
+    void import('alpinejs').then(({ default: Alpine }) => {
+        window.Alpine = Alpine
+        Alpine.start()
+    })
+}

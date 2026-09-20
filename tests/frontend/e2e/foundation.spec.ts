@@ -31,11 +31,20 @@ test('loads the shell and resolves nested refresh without console errors', async
 })
 
 test('preserves the landing and legacy authentication routes', async ({ page }) => {
+    const errors: string[] = []
+    page.on('pageerror', (error) => errors.push(error.message))
+    await page.goto('/')
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+    if ((page.viewportSize()?.width ?? 1440) < 768) await page.locator('header button').click()
+    await page.getByRole('link', { name: 'Masuk', exact: true }).filter({ visible: true }).click()
+    await expect(page).toHaveURL(/\/login$/)
+    await expect(page.getByLabel('Email')).toBeVisible()
     for (const path of ['/', '/login', '/dashboard', '/profile']) {
         const response = await page.goto(path)
         expect(response?.status()).toBe(200)
         if (['/dashboard', '/profile'].includes(path)) await expect(page).toHaveURL(/\/login$/)
     }
+    expect(errors).toEqual([])
 })
 
 test('supports keyboard navigation and returns focus when the drawer closes', async ({

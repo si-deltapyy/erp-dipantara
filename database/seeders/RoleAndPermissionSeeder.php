@@ -16,11 +16,29 @@ class RoleAndPermissionSeeder extends Seeder
 
         // 1. Buat Daftar Permission
         $permissions = [
+            'approve orders',
+            'reject orders',
             'view users',
-            'create users',
-            'edit users',
-            'delete users',
-            'manage posts',
+            'manage products',
+            'manage mitras',
+            'manage graders',
+            'manage rekenings',
+            'manage pre-orders',
+            'manage orders',
+            'manage gradings',
+            'manage logs payments',
+            'manage logs orders',
+            'approve payments',
+            'reject payments',
+            'approve gradings',
+            'reject gradings',
+            'make payments',
+            'view reports',
+            'make invoices',
+            'make transactions',
+            'make grading reports',
+            'make orders',
+            'make gradings',
         ];
 
         foreach ($permissions as $permission) {
@@ -32,6 +50,33 @@ class RoleAndPermissionSeeder extends Seeder
         $adminRole->givePermissionTo(Permission::all());
 
         $userRole = Role::create(['name' => 'user']);
-        $userRole->givePermissionTo(['view users']);
+        $userRole->givePermissionTo([
+            'make payments',
+            'make orders',
+        ]);
+
+        $graderRole = Role::create(['name' => 'grader']);
+        $graderRole->givePermissionTo([
+            'make gradings',
+            'view reports',
+            'make grading reports',
+        ]);
+
+        $makerRole = Role::create(['name' => 'maker']);
+        $makerRole->givePermissionTo([
+            'make orders',
+            'make invoices',
+            'make transactions',
+        ]);
+
+        $supervisorRole = Role::create(['name' => 'supervisor']);
+        $supervisorRole->givePermissionTo([
+            'approve orders',
+            'reject orders',
+            'approve payments',
+            'reject payments',
+            'approve gradings',
+            'reject gradings',
+        ]);
     }
 }
