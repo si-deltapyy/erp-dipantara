@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>@yield('title', 'WoodFlow - Sistem Manajemen Pesanan & Keuangan Kayu')</title>
+    <meta name="description" content="@yield('description', 'WoodFlow adalah sistem manajemen pesanan dan keuangan kayu yang membantu bisnis kayu mengelola stok, pesanan, dan keuangan secara efisien.')">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -59,6 +60,12 @@
                     <a href="{{ route('dashboard') }}" class="rounded-xl bg-[#1e5b3d] px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-[#1e5b3d]/20 transition hover:bg-[#16472f]">
                         Dashboard
                     </a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-bold text-slate-700 shadow-sm transition hover:border-[#1e5b3d] hover:text-[#1e5b3d]">
+                            Logout
+                        </button>
+                    </form>
                 @else
                     <a href="{{ route('login') }}" class="rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:text-[#1e5b3d]">
                         Masuk
