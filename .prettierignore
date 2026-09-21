@@ -1,0 +1,6 @@
+node_modules
+vendor
+public/build
+package-lock.json
+playwright-report
+test-results

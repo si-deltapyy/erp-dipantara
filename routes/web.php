@@ -24,3 +24,5 @@ Route::middleware('auth')->group(function () {
 Route::get('/generate/spk', [SpkController::class, 'printPdf'])->name('generate.spk');
 
 require __DIR__.'/auth.php';
+
+Route::view('/app/{path?}', 'app')->where('path', '.*')->name('app');
