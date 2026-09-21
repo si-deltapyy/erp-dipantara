@@ -6,13 +6,6 @@ use App\Http\Controllers\SpkController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Landing', [
-        'title' => 'Dipantara - Sistem Manajemen Pesanan & Keuangan Kayu',
-        'message' => 'Selamat datang di Dipantara, sistem manajemen pesanan dan keuangan kayu yang membantu bisnis kayu mengelola stok, pesanan, dan keuangan secara efisien.',
-    ]);
-});
-
 Route::get('/dashboard',[Dashboard::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -24,3 +17,5 @@ Route::middleware('auth')->group(function () {
 Route::get('/generate/spk', [SpkController::class, 'printPdf'])->name('generate.spk');
 
 require __DIR__.'/auth.php';
+
+Route::view('/app/{path?}', 'app')->where('path', '.*')->name('app');
