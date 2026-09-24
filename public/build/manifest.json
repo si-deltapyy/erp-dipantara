@@ -1,6 +1,10 @@
 {
+  "_runtime-dom.esm-bundler-BAFcWaLp.js": {
+    "file": "assets/runtime-dom.esm-bundler-BAFcWaLp.js",
+    "name": "runtime-dom.esm-bundler"
+  },
   "resources/css/app.css": {
-    "file": "assets/app-ji0mKmM3.css",
+    "file": "assets/app-By87n9Nj.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -9,12 +13,51 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-DH1gRqn7.js",
+    "file": "assets/app-DJiE-mO0.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
+    "imports": [
+      "_runtime-dom.esm-bundler-BAFcWaLp.js"
+    ],
     "css": [
-      "assets/app-ji0mKmM3.css"
+      "assets/app-By87n9Nj.css"
+    ]
+  },
+  "resources/js/src/main.ts": {
+    "file": "assets/main-CZRU5WqJ.js",
+    "name": "main",
+    "src": "resources/js/src/main.ts",
+    "isEntry": true,
+    "imports": [
+      "_runtime-dom.esm-bundler-BAFcWaLp.js"
+    ],
+    "dynamicImports": [
+      "resources/js/src/views/home/HomePage.vue",
+      "resources/js/src/views/errors/NotFoundPage.vue"
+    ],
+    "css": [
+      "assets/main-CKphr8se.css"
+    ]
+  },
+  "resources/js/src/views/errors/NotFoundPage.vue": {
+    "file": "assets/NotFoundPage-CBiTS00G.js",
+    "name": "NotFoundPage",
+    "src": "resources/js/src/views/errors/NotFoundPage.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/src/main.ts",
+      "_runtime-dom.esm-bundler-BAFcWaLp.js"
+    ]
+  },
+  "resources/js/src/views/home/HomePage.vue": {
+    "file": "assets/HomePage-Ba5FSJkO.js",
+    "name": "HomePage",
+    "src": "resources/js/src/views/home/HomePage.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/src/main.ts",
+      "_runtime-dom.esm-bundler-BAFcWaLp.js"
     ]
   }
 }

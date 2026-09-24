@@ -6,7 +6,13 @@ use App\Http\Controllers\SpkController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/dashboard',[Dashboard::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/barcode-preview', [\App\Http\Controllers\QrWoodController::class, 'showBarcode'])->name('barcode.preview');
+
+// Route::get('/dashboard',[Dashboard::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -18,4 +24,4 @@ Route::get('/generate/spk', [SpkController::class, 'printPdf'])->name('generate.
 
 require __DIR__.'/auth.php';
 
-Route::view('/app/{path?}', 'app')->where('path', '.*')->name('app');
+Route::view('/dipantara/{path?}', 'app')->where('path', '.*')->name('app');
