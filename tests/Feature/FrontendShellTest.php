@@ -15,7 +15,7 @@ class FrontendShellTest extends TestCase
 
     public function test_shell_does_not_capture_other_routes(): void
     {
-        $this->get('/')->assertOk()->assertInertia(fn ($page) => $page->component('Landing'));
+        $this->get('/')->assertOk()->assertInertia(fn ($page) => $page->component('LandingPage', false));
         $this->get('/login')->assertOk();
         $this->get('/profile')->assertRedirect('/login');
         $this->get('/dashboard')->assertRedirect('/login');
