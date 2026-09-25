@@ -1,17 +1,22 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, defineAsyncComponent } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import AppBrand from '@/components/layout/AppBrand.vue'
 import AppNavigation from '@/components/layout/AppNavigation.vue'
 import MobileNavigation from '@/components/layout/MobileNavigation.vue'
 import AppIcon from '@/components/ui/AppIcon.vue'
-import { mockEnabled } from '@/core/constants/environment'
+import { mockEnabled, businessMockEnabled } from '@/core/constants/environment'
 
+import SessionActions from '@/views/auth/components/SessionActions.vue'
 const { t } = useI18n()
 const route = useRoute()
 const mobileOpen = ref(false)
 const pageTitle = computed(() => t(route.meta.titleKey))
+const DemoPanel =
+    import.meta.env.DEV && businessMockEnabled
+        ? defineAsyncComponent(() => import('@/views/development/components/DemoPanel.vue'))
+        : undefined
 </script>
 
 <template>
@@ -49,7 +54,7 @@ const pageTitle = computed(() => t(route.meta.titleKey))
                 <p class="truncate text-sm font-semibold">{{ pageTitle }}</p>
             </div>
             <span
-                v-if="mockEnabled"
+                v-if="mockEnabled || businessMockEnabled"
                 class="ml-auto rounded-full bg-primary-light px-3 py-1.5 text-xs font-semibold text-primary-strong"
                 >{{ t('shell.mock') }}</span
             >
@@ -58,12 +63,14 @@ const pageTitle = computed(() => t(route.meta.titleKey))
                 class="ml-auto rounded-full bg-canvas px-3 py-1.5 text-xs font-semibold text-muted"
                 >{{ t('shell.stage') }}</span
             >
+            <SessionActions />
         </header>
         <main
             id="main-content"
             tabindex="-1"
             class="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-8 sm:py-10"
         >
+            <DemoPanel v-if="DemoPanel" class="mb-6" />
             <RouterView />
         </main>
         <footer class="flex flex-wrap justify-between gap-2 px-4 py-6 text-xs text-muted sm:px-8">

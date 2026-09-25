@@ -1,7 +1,15 @@
 import { test, expect } from '@playwright/test'
 import type { Page } from '@playwright/test'
+import { liveLogin } from './live-session-helpers'
 
 const production = process.env.E2E_PRODUCTION === 'true'
+
+test.beforeEach(async ({ page }) => {
+    if (!production)
+        await page.addInitScript(() =>
+            sessionStorage.setItem('woodflow.mock.session', 'admin-demo'),
+        )
+})
 
 async function expectNoOverflow(page: Page): Promise<void> {
     const overflow = await page.evaluate(
@@ -18,6 +26,7 @@ test('loads the shell and resolves nested refresh without console errors', async
     page.on('console', (message) => {
         if (message.type() === 'error') errors.push(message.text())
     })
+    if (production) await liveLogin(page)
     await page.goto('/app')
     await expect(page.getByRole('heading', { name: 'Ruang kerja operasional kayu.' })).toBeVisible()
     await expectNoOverflow(page)
@@ -51,6 +60,7 @@ test('supports keyboard navigation and returns focus when the drawer closes', as
     page,
 }, info) => {
     test.skip(info.project.name !== 'mobile', 'Mobile drawer only')
+    if (production) await liveLogin(page)
     await page.goto('/app')
     const trigger = page.getByRole('button', { name: 'Buka navigasi' })
     await trigger.focus()

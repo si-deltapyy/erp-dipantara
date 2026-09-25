@@ -4,7 +4,7 @@ import { createHttpClient } from './http-client'
 
 it.each([
     [401, 'unauthenticated'],
-    [419, 'unauthenticated'],
+    [419, 'csrf'],
     [403, 'forbidden'],
     [404, 'not-found'],
     [409, 'conflict'],

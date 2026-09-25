@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, watch, onScopeDispose } from 'vue'
+import { ref, onScopeDispose } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useDialog } from '@/composables/useDialog'
 import AppBrand from './AppBrand.vue'
 import AppNavigation from './AppNavigation.vue'
 import AppIcon from '@/components/ui/AppIcon.vue'
@@ -9,48 +10,19 @@ const props = defineProps<{ open: boolean }>()
 const emit = defineEmits<{ close: [] }>()
 const { t } = useI18n()
 const dialog = ref<HTMLDialogElement>()
-let previousOverflow = ''
-
+const { retainFocus } = useDialog(dialog, () => props.open)
 function close(): void {
-    dialog.value?.close()
     emit('close')
-}
-
-function synchronize(): void {
-    if (props.open) {
-        previousOverflow = document.body.style.overflow
-        document.body.style.overflow = 'hidden'
-        dialog.value?.showModal()
-        return
-    }
-    dialog.value?.close()
-    document.body.style.overflow = previousOverflow
 }
 
 function handleBreakpoint(event: MediaQueryListEvent): void {
     if (event.matches) close()
 }
 
-function retainFocus(event: KeyboardEvent): void {
-    if (event.key !== 'Tab') return
-    const controls = dialog.value?.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')
-    const first = controls?.[0]
-    const last = controls?.[controls.length - 1]
-    if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault()
-        last?.focus()
-    } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault()
-        first?.focus()
-    }
-}
-
 const desktop = window.matchMedia('(min-width: 1024px)')
 desktop.addEventListener('change', handleBreakpoint)
-watch(() => props.open, synchronize, { flush: 'post' })
 onScopeDispose(() => {
     desktop.removeEventListener('change', handleBreakpoint)
-    document.body.style.overflow = previousOverflow
 })
 </script>
 
