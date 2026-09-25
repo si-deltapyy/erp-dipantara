@@ -3,8 +3,15 @@
 use App\Http\Controllers\Dashboard;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SpkController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+Route::get('/', function (Request $request) {
+    return Inertia::render('LandingPage', [
+        'auth' => ['user' => $request->user() ? ['id' => (string) $request->user()->id] : null],
+    ]);
+});
 
 Route::get('/dashboard',[Dashboard::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -18,4 +25,4 @@ Route::get('/generate/spk', [SpkController::class, 'printPdf'])->name('generate.
 
 require __DIR__.'/auth.php';
 
-Route::view('/app/{path?}', 'app')->where('path', '.*')->name('app');
+Route::view('/app/{path?}', 'frontend')->where('path', '.*')->name('app');

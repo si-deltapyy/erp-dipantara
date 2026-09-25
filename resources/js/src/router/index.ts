@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
-import { mockEnabled } from '@/core/constants/environment'
+import type { DevelopmentCapability } from '@/core/types/session'
+import { accessRules } from './access-rules'
+import { authRoutes } from './auth-routes'
+import { masterDataRoutes } from './master-data'
 import { i18n } from '@/locales'
 
 const routes: RouteRecordRaw[] = [
@@ -8,23 +11,21 @@ const routes: RouteRecordRaw[] = [
         path: '/',
         name: 'home',
         component: () => import('@/views/home/HomePage.vue'),
-        meta: { titleKey: 'navigation.home' },
+        meta: {
+            titleKey: 'navigation.home',
+            requiresAuth: true,
+            ...accessRules.home,
+        },
     },
 ]
 
-if (mockEnabled) {
-    routes.push({
-        path: '/development/mock',
-        name: 'mock-lab',
-        component: () => import('@/views/development/MockLabPage.vue'),
-        meta: { titleKey: 'navigation.lab' },
-    })
-}
+routes.push(...authRoutes, ...masterDataRoutes)
+
 routes.push({
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: () => import('@/views/errors/NotFoundPage.vue'),
-    meta: { titleKey: 'notFound.title' },
+    meta: { titleKey: 'notFound.title', layout: 'auth' },
 })
 
 export const router = createRouter({
@@ -34,11 +35,15 @@ export const router = createRouter({
 })
 
 router.afterEach((route) => {
-    document.title = `${i18n.global.t(route.meta.titleKey)} · WoodFlow`
+    document.title = `${i18n.global.t(route.meta.titleKey ?? 'brand.name')} · WoodFlow`
 })
 
 declare module 'vue-router' {
     interface RouteMeta {
         titleKey: string
+        layout?: 'auth' | 'app'
+        requiresAuth?: boolean
+        requiredPermissions?: readonly string[]
+        developmentCapability?: DevelopmentCapability
     }
 }
