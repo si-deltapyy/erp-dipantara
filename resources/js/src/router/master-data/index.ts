@@ -3,6 +3,16 @@ import { accessRules } from '../access-rules'
 
 export const masterDataRoutes: readonly RouteRecordRaw[] = [
     {
+        path: '/master-data/bank-accounts',
+        name: 'bank-accounts',
+        component: () => import('@/views/master-data/bank-accounts/BankAccountListPage.vue'),
+        meta: {
+            titleKey: 'bank-accounts.title',
+            requiresAuth: true,
+            ...accessRules['bank-accounts'],
+        },
+    },
+    {
         path: '/master-data/timber-products',
         name: 'timber-products',
         component: () => import('@/views/master-data/timber-products/TimberProductListPage.vue'),

@@ -1,3 +1,4 @@
+import { bankAccountFixtures } from '../bank-account-fixtures'
 import { timberProductFixtures } from '../timber-product-fixtures'
 import { demoSchemaVersion, demoStores } from './schema'
 import { DemoStorageError, normalizeStorageError } from './storage-error'
@@ -33,6 +34,9 @@ export function openDemoDatabase(options: DatabaseOptions = {}): Promise<IDBData
             for (const store of demoStores)
                 if (!request.result.objectStoreNames.contains(store))
                     request.result.createObjectStore(store, { keyPath: 'id' })
+            if (event.oldVersion > 0 && event.oldVersion < 5)
+                for (const account of bankAccountFixtures)
+                    request.transaction?.objectStore('bank-accounts').put(account)
             if (event.oldVersion > 0 && event.oldVersion < 4)
                 for (const product of timberProductFixtures)
                     request.transaction?.objectStore('timber-products').put(product)

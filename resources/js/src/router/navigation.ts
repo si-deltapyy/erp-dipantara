@@ -9,6 +9,12 @@ export const navigation: readonly NavigationEntry[] = [
     { name: 'home', label: 'navigation.home', icon: 'home', ...accessRules.home },
     { name: 'mitras', label: 'mitras.title', icon: 'layers', ...accessRules.mitras },
     {
+        name: 'bank-accounts',
+        label: 'bank-accounts.title',
+        icon: 'layers',
+        ...accessRules['bank-accounts'],
+    },
+    {
         name: 'timber-products',
         label: 'timber-products.title',
         icon: 'layers',

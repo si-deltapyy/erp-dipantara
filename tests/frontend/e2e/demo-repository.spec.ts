@@ -172,13 +172,15 @@ test('requires explicit reset for incompatible datasets and reports blocked or u
             (transaction) => transaction.get('metadata', 'dataset'),
         )
         await repository.reset()
-        const blocker = await new Promise<IDBDatabase>((resolve) => {
-            const request = indexedDB.open(options.name, 4)
+        const blocker = await new Promise<IDBDatabase>((resolve, reject) => {
+            const request = indexedDB.open(options.name)
             request.onsuccess = () => resolve(request.result)
+            request.onerror = () => reject(request.error)
         })
         const upgradeFactory = new Proxy(indexedDB, {
             get(target, property) {
-                if (property === 'open') return (name: string) => target.open(name, 5)
+                if (property === 'open')
+                    return (name: string) => target.open(name, blocker.version + 1)
                 return Reflect.get(target, property)
             },
         })

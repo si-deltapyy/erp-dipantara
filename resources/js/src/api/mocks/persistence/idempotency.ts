@@ -10,7 +10,7 @@ export interface MutationIdentity {
     readonly payloadHash: string
 }
 export async function hashMutationPayload(
-    payload: Readonly<Record<string, string | number>>,
+    payload: Readonly<Record<string, string | number | null>>,
 ): Promise<string> {
     const canonical = JSON.stringify(
         Object.fromEntries(

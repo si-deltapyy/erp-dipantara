@@ -34,6 +34,8 @@ test('creates, searches, edits and reloads Mitras with accessible draft validati
     await page.getByRole('button', { name: 'Simpan Mitra', exact: true }).click()
     await page.getByLabel('Cari Mitra', { exact: true }).fill('Mitra Uji Revisi')
     await page.getByRole('button', { name: 'Cari', exact: true }).click()
+    await expect(page).toHaveURL(/search=Mitra\+Uji\+Revisi/)
+    await expect(page.getByRole('cell', { name: 'Mitra Uji Revisi', exact: true })).toBeVisible()
     await page.reload()
     await expect(page.getByRole('cell', { name: '001234', exact: true })).toBeVisible()
     await expectNoOverflow(page)

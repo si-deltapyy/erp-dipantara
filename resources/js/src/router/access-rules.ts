@@ -4,6 +4,7 @@ export interface AccessRule {
     readonly developmentCapability?: DevelopmentCapability
 }
 export const accessRules = {
+    'bank-accounts': { requiredPermissions: ['bank-accounts.read.all'] },
     'timber-products': { requiredPermissions: ['timber-products.read.all'] },
     mitras: { requiredPermissions: ['mitras.read.all'] },
     buyers: { requiredPermissions: ['buyers.read.all'] },
