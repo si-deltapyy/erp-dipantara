@@ -71,3 +71,32 @@ test('route alternatives preserve required permissions and never bypass by role'
     ).toBe(false)
     expect(canAccess(user, ['missing'], undefined, alternatives)).toBe(false)
 })
+
+test('preserves read-only Maker actions and server ownership on Admin submit', async () => {
+    const source = purchaseOrderFixtures[25]
+    if (!source) throw new Error('Missing foreign PO fixture')
+    const client = axios.create()
+    vi.spyOn(client, 'get').mockResolvedValue({ data: { data: source } })
+    const submitted = {
+        ...source,
+        version: source.version + 1,
+        status: 'submitted',
+        submittedByUserId: 'admin-demo',
+    }
+    const post = vi.spyOn(client, 'post').mockResolvedValue({ data: { data: submitted } })
+    const api = createHttpPurchaseOrders(client)
+    const signal = new AbortController().signal
+    expect((await api.get(source.id, signal)).allowedActions).toEqual([])
+    const result = await api.submit(
+        source.id,
+        { version: source.version },
+        {
+            signal,
+            idempotencyKey: 'admin-submit',
+        },
+    )
+    expect(result.createdByUserId).toBe('multiple-demo')
+    expect(result.submittedByUserId).toBe('admin-demo')
+    expect(result.allowedActions).toEqual([])
+    expect(post.mock.calls[0]?.[1]).toEqual({ version: source.version })
+})

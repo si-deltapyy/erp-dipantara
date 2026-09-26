@@ -14,6 +14,7 @@ test('shows the permitted menu and keeps selected labels beyond the initial look
     ).toBeVisible()
     if (info.project.name === 'mobile') await page.keyboard.press('Escape')
     await page.getByRole('link', { name: 'Tambah PO', exact: true }).click()
+    await expect(page.getByRole('button', { name: 'Muat pilihan berikutnya' })).toHaveCount(2)
     await page.getByRole('button', { name: 'Muat pilihan berikutnya' }).first().click()
     await page.getByLabel('Buyer', { exact: true }).selectOption('demo-buyer-24')
     await page.getByRole('button', { name: 'Muat pilihan berikutnya' }).last().click()

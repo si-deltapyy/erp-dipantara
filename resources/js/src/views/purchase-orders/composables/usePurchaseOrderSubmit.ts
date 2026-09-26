@@ -36,6 +36,16 @@ export function usePurchaseOrderSubmit(
     const canSubmit = computed(
         () => !!order.value && canActOnPurchaseOrder(store.user, order.value, 'submit'),
     )
+    watch([() => store.user?.id, () => order.value?.id], () => {
+        active?.abort()
+        active = undefined
+        identity = ''
+        key = crypto.randomUUID()
+        pending.value = false
+        confirming.value = false
+        error.value = ''
+        uncertain.value = false
+    })
     watch(order, (current) => {
         const snapshot = recovery.snapshot
         if (
@@ -91,17 +101,9 @@ export function usePurchaseOrderSubmit(
                 }
             await session.handleRequestFailure(cause)
         } finally {
-            pending.value = false
+            if (active === request) pending.value = false
         }
     }
-    watch(
-        () => store.user?.id,
-        () => {
-            active?.abort()
-            error.value = ''
-            uncertain.value = false
-        },
-    )
     onScopeDispose(() => active?.abort())
     return { pending, confirming, error, uncertain, canSubmit, submit }
 }
