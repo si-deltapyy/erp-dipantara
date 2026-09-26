@@ -20,7 +20,12 @@ export function registerSessionGuard(
         if (store.status !== 'authenticated')
             return { name: 'login', query: { returnTo: '/app' + to.fullPath } }
         if (
-            !canAccess(store.user, to.meta.requiredPermissions ?? [], to.meta.developmentCapability)
+            !canAccess(
+                store.user,
+                to.meta.requiredPermissions ?? [],
+                to.meta.developmentCapability,
+                to.meta.anyPermissions,
+            )
         )
             return { name: 'forbidden' }
         return true

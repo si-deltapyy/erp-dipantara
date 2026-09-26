@@ -10,7 +10,11 @@ test('rolls back the record, metadata, audit and receipt when a timber mutation 
 }) => {
     await page.goto('/app')
     const result = await page.evaluate(async () => {
-        const base = 'http://127.0.0.1:5174/resources/js/src/api/mocks/'
+        const base = new URL(
+            '/resources/js/src/api/mocks/',
+            document.querySelector<HTMLScriptElement>('script[src*="/@vite/client"]')?.src ??
+                location.origin,
+        ).href
         const { DemoRepository } = (await import(
             base + 'persistence/demo-repository.ts'
         )) as typeof DemoModule

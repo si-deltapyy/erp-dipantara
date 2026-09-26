@@ -10,7 +10,11 @@ test('hides write actions when only the read permission remains', async ({ page 
     await login(page, 'admin@woodflow.test', path)
     await expect(page.getByRole('button', { name: 'Tambah Grader', exact: true })).toBeVisible()
     await page.evaluate(async () => {
-        const moduleUrl = 'http://127.0.0.1:5174/resources/js/src/stores/session.ts'
+        const moduleUrl = new URL(
+            '/resources/js/src/stores/session.ts',
+            document.querySelector<HTMLScriptElement>('script[src*="/@vite/client"]')?.src ??
+                location.origin,
+        ).href
         const { useSessionStore } = (await import(moduleUrl)) as typeof SessionStoreModule
         const mount = document.querySelector('#app') as Element & { __vue_app__: App }
         const store = mount.__vue_app__.runWithContext(() => useSessionStore())

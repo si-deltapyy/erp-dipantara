@@ -13,7 +13,11 @@ test('enforces atomic version checks, scope, idempotency, and reset generations 
     page,
 }) => {
     const result = await page.evaluate(async () => {
-        const base = 'http://127.0.0.1:5174/resources/js/src/'
+        const base = new URL(
+            '/resources/js/src/',
+            document.querySelector<HTMLScriptElement>('script[src*="/@vite/client"]')?.src ??
+                location.origin,
+        ).href
         const { DemoRepository } = (await import(
             base + 'api/mocks/persistence/demo-repository.ts'
         )) as typeof DemoRepositoryModule
@@ -76,7 +80,11 @@ test('rolls back multi-store writes and a partial reset on failure while retaini
     page,
 }) => {
     const result = await page.evaluate(async () => {
-        const base = 'http://127.0.0.1:5174/resources/js/src/api/mocks/persistence/'
+        const base = new URL(
+            '/resources/js/src/api/mocks/persistence/',
+            document.querySelector<HTMLScriptElement>('script[src*="/@vite/client"]')?.src ??
+                location.origin,
+        ).href
         const { DemoRepository } = (await import(
             base + 'demo-repository.ts'
         )) as typeof DemoRepositoryModule
@@ -141,7 +149,11 @@ test('requires explicit reset for incompatible datasets and reports blocked or u
     page,
 }) => {
     const result = await page.evaluate(async () => {
-        const base = 'http://127.0.0.1:5174/resources/js/src/api/mocks/persistence/'
+        const base = new URL(
+            '/resources/js/src/api/mocks/persistence/',
+            document.querySelector<HTMLScriptElement>('script[src*="/@vite/client"]')?.src ??
+                location.origin,
+        ).href
         const { DemoRepository } = (await import(
             base + 'demo-repository.ts'
         )) as typeof DemoRepositoryModule

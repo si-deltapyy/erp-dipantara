@@ -3,6 +3,7 @@ import type { RouteRecordRaw } from 'vue-router'
 import type { DevelopmentCapability } from '@/core/types/session'
 import { accessRules } from './access-rules'
 import { authRoutes } from './auth-routes'
+import { purchaseOrderRoutes } from './purchase-orders'
 import { masterDataRoutes } from './master-data'
 import { i18n } from '@/locales'
 
@@ -19,7 +20,7 @@ const routes: RouteRecordRaw[] = [
     },
 ]
 
-routes.push(...authRoutes, ...masterDataRoutes)
+routes.push(...authRoutes, ...masterDataRoutes, ...purchaseOrderRoutes)
 
 routes.push({
     path: '/:pathMatch(.*)*',
@@ -44,6 +45,7 @@ declare module 'vue-router' {
         layout?: 'auth' | 'app'
         requiresAuth?: boolean
         requiredPermissions?: readonly string[]
+        anyPermissions?: readonly string[]
         developmentCapability?: DevelopmentCapability
     }
 }

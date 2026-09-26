@@ -1,3 +1,4 @@
+import type { PurchaseOrder } from '@/core/types/purchase-order'
 import type { Grader } from '@/core/types/grader'
 import type { BankAccount } from '@/core/types/bank-account'
 import type { TimberProduct } from '@/core/types/timber-product'
@@ -5,6 +6,8 @@ import type { Mitra } from '@/core/types/mitra'
 import type { Buyer } from '@/core/types/buyer'
 
 export const demoStores = [
+    'purchase-orders',
+    'purchaseOrderMutations',
     'graders',
     'graderMutations',
     'bank-accounts',
@@ -22,7 +25,7 @@ export const demoStores = [
     'timberProductMutations',
 ] as const
 export type DemoStore = (typeof demoStores)[number]
-export const demoSchemaVersion = 6
+export const demoSchemaVersion = 7
 export const demoDatasetVersion = 1
 export interface DatasetMetadata {
     readonly id: 'dataset'
@@ -58,6 +61,8 @@ export interface MutationReceipt {
     readonly result: DemoSample
 }
 export interface DemoTables {
+    readonly 'purchase-orders': PurchaseOrder
+    readonly purchaseOrderMutations: PurchaseOrderMutationReceipt
     readonly graders: Grader
     readonly graderMutations: GraderMutationReceipt
     readonly 'bank-accounts': BankAccount
@@ -70,7 +75,7 @@ export interface DemoTables {
     readonly buyerMutations: BuyerMutationReceipt
     readonly metadata: DatasetMetadata
     readonly samples: DemoSample
-    readonly audit: DemoAudit | MasterDataAudit
+    readonly audit: DemoAudit | MasterDataAudit | PurchaseOrderAudit
     readonly blobs: DemoBlob
     readonly mutations: MutationReceipt
 }
@@ -115,4 +120,19 @@ export interface GraderMutationReceipt {
     readonly payloadHash: string
     readonly expiresAt: number
     readonly result: Grader
+}
+
+export interface PurchaseOrderMutationReceipt {
+    readonly id: string
+    readonly payloadHash: string
+    readonly expiresAt: number
+    readonly result: PurchaseOrder
+}
+export interface PurchaseOrderAudit {
+    readonly id: string
+    readonly resource: 'purchase-orders'
+    readonly recordId: string
+    readonly actorId: string
+    readonly version: number
+    readonly action: 'create' | 'update' | 'submit'
 }

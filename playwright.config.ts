@@ -3,6 +3,7 @@ import { randomBytes } from 'node:crypto'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 
+const vitePort = process.env.E2E_VITE_PORT ?? '5174'
 const production = process.env.E2E_PRODUCTION === 'true'
 if (production) {
     process.env.E2E_AUTH_PASSWORD ??= randomBytes(24).toString('hex')
@@ -54,8 +55,8 @@ export default defineConfig({
         ...(!production
             ? [
                   {
-                      command: 'npm run dev -- --host 127.0.0.1 --port 5174 --strictPort',
-                      url: 'http://127.0.0.1:5174/@vite/client',
+                      command: `npm run dev -- --host 127.0.0.1 --port ${vitePort} --strictPort`,
+                      url: `http://127.0.0.1:${vitePort}/@vite/client`,
                       reuseExistingServer: false,
                       env: { VITE_API_MODE: 'mock', APP_URL: 'http://127.0.0.1:8011' },
                   },

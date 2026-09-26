@@ -51,6 +51,7 @@ function watchSessionRoute(router: Router, store: ReturnType<typeof useSessionSt
                     store.user,
                     route.meta.requiredPermissions ?? [],
                     route.meta.developmentCapability,
+                    route.meta.anyPermissions,
                 )
             )
                 void router.replace({ name: 'forbidden' })

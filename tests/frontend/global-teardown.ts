@@ -13,7 +13,8 @@ export default function clearTestHotFile(): void {
             if (existsSync(database + suffix)) unlinkSync(database + suffix)
     }
     const hotFile = resolve('public/hot')
-    if (existsSync(hotFile) && readFileSync(hotFile, 'utf8').trim() === 'http://127.0.0.1:5174') {
+    const viteOrigin = `http://127.0.0.1:${process.env.E2E_VITE_PORT ?? '5174'}`
+    if (existsSync(hotFile) && readFileSync(hotFile, 'utf8').trim() === viteOrigin) {
         unlinkSync(hotFile)
     }
 }

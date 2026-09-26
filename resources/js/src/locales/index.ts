@@ -1,5 +1,6 @@
 import { createI18n } from 'vue-i18n'
 import id from './id'
+import purchaseOrders from './purchase-orders'
 import foundation from './foundation'
 import demo from './demo'
 import buyers from './buyers'
@@ -15,6 +16,7 @@ export const i18n = createI18n({
     messages: {
         id: {
             ...id,
+            ...purchaseOrders,
             ...foundation,
             ...demo,
             ...buyers,

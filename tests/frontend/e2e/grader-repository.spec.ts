@@ -13,7 +13,11 @@ test('serializes duplicate emails, provisioning replay, locked edits and stale g
 }) => {
     await page.goto('/app')
     const result = await page.evaluate(async () => {
-        const base = 'http://127.0.0.1:5174/resources/js/src/'
+        const base = new URL(
+            '/resources/js/src/',
+            document.querySelector<HTMLScriptElement>('script[src*="/@vite/client"]')?.src ??
+                location.origin,
+        ).href
         const { GraderRepository } = (await import(
             base + 'api/mocks/persistence/grader-repository.ts'
         )) as typeof RepositoryModule

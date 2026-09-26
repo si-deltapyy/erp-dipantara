@@ -13,7 +13,12 @@ const store = useSessionStore()
 const links = computed(() =>
     navigation.filter((entry) => {
         if (!mockEnabled && entry.developmentCapability) return false
-        return canAccess(store.user, entry.requiredPermissions, entry.developmentCapability)
+        return canAccess(
+            store.user,
+            entry.requiredPermissions,
+            entry.developmentCapability,
+            entry.anyPermissions,
+        )
     }),
 )
 </script>

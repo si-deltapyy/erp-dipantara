@@ -10,7 +10,11 @@ test('aborts delayed writes during reset and disposal without changing the new d
 }) => {
     await page.goto('/app/login')
     const result = await page.evaluate(async () => {
-        const base = 'http://127.0.0.1:5174/resources/js/src/api/mocks/'
+        const base = new URL(
+            '/resources/js/src/api/mocks/',
+            document.querySelector<HTMLScriptElement>('script[src*="/@vite/client"]')?.src ??
+                location.origin,
+        ).href
         const { DemoRuntime } = (await import(base + 'demo-runtime.ts')) as typeof DemoRuntimeModule
         const { DemoRepository } = (await import(
             base + 'persistence/demo-repository.ts'

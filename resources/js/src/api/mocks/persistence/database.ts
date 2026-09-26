@@ -1,3 +1,4 @@
+import { purchaseOrderFixtures } from '../purchase-order-fixtures'
 import { graderFixtures } from '../grader-fixtures'
 import { bankAccountFixtures } from '../bank-account-fixtures'
 import { timberProductFixtures } from '../timber-product-fixtures'
@@ -35,6 +36,9 @@ export function openDemoDatabase(options: DatabaseOptions = {}): Promise<IDBData
             for (const store of demoStores)
                 if (!request.result.objectStoreNames.contains(store))
                     request.result.createObjectStore(store, { keyPath: 'id' })
+            if (event.oldVersion > 0 && event.oldVersion < 7)
+                for (const order of purchaseOrderFixtures)
+                    request.transaction?.objectStore('purchase-orders').put(order)
             if (event.oldVersion > 0 && event.oldVersion < 6)
                 for (const grader of graderFixtures)
                     request.transaction?.objectStore('graders').put(grader)

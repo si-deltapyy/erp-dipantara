@@ -4,11 +4,16 @@ export function canAccess(
     user: SessionUser | null,
     required: readonly string[],
     developmentCapability?: DevelopmentCapability,
+    anyPermissions: readonly string[] = [],
 ): boolean {
     if (!user) return false
     if (developmentCapability && !user.developmentCapabilities.includes(developmentCapability))
         return false
-    return required.every((permission) => user.permissions.includes(permission))
+    return (
+        required.every((permission) => user.permissions.includes(permission)) &&
+        (!anyPermissions.length ||
+            anyPermissions.some((permission) => user.permissions.includes(permission)))
+    )
 }
 export function internalDestination(value: unknown): string {
     if (typeof value !== 'string' || !value.startsWith('/app/')) return '/'

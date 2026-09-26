@@ -9,14 +9,20 @@ export interface MutationIdentity {
     readonly key: string
     readonly payloadHash: string
 }
+function canonicalPayload(value: unknown): unknown {
+    if (Array.isArray(value)) return value.map(canonicalPayload)
+    if (value !== null && typeof value === 'object')
+        return Object.fromEntries(
+            Object.entries(value)
+                .sort(([left], [right]) => left.localeCompare(right))
+                .map(([key, child]) => [key, canonicalPayload(child)]),
+        )
+    return value
+}
 export async function hashMutationPayload(
-    payload: Readonly<Record<string, string | number | null>>,
+    payload: Readonly<Record<string, unknown>>,
 ): Promise<string> {
-    const canonical = JSON.stringify(
-        Object.fromEntries(
-            Object.entries(payload).sort(([left], [right]) => left.localeCompare(right)),
-        ),
-    )
+    const canonical = JSON.stringify(canonicalPayload(payload))
     const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(canonical))
     return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('')
 }

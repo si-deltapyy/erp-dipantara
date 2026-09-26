@@ -9,7 +9,11 @@ test('upgrades version two without deleting existing data and rolls back failed 
 }) => {
     await page.goto('/app')
     const result = await page.evaluate(async () => {
-        const base = 'http://127.0.0.1:5174/resources/js/src/api/mocks/persistence/'
+        const base = new URL(
+            '/resources/js/src/api/mocks/persistence/',
+            document.querySelector<HTMLScriptElement>('script[src*="/@vite/client"]')?.src ??
+                location.origin,
+        ).href
         const { DemoRepository } = (await import(
             base + 'demo-repository.ts'
         )) as typeof DemoRepositoryModule
