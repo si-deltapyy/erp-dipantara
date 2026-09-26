@@ -3,6 +3,7 @@ import id from './id'
 import foundation from './foundation'
 import demo from './demo'
 import buyers from './buyers'
+import graders from './graders'
 import timberProducts from './timber-products'
 import mitras from './mitras'
 import bankAccounts from './bank-accounts'
@@ -17,6 +18,7 @@ export const i18n = createI18n({
             ...foundation,
             ...demo,
             ...buyers,
+            ...graders,
             ...mitras,
             ...timberProducts,
             ...bankAccounts,

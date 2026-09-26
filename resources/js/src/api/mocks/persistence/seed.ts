@@ -1,3 +1,4 @@
+import { graderFixtures } from '../grader-fixtures'
 import { bankAccountFixtures } from '../bank-account-fixtures'
 import { timberProductFixtures } from '../timber-product-fixtures'
 import type { DemoTransaction } from './transaction'
@@ -38,6 +39,7 @@ export async function seedDataset(
         revision,
     }
     await transaction.put('metadata', metadata)
+    for (const grader of graderFixtures) await transaction.put('graders', grader)
     for (const account of bankAccountFixtures) await transaction.put('bank-accounts', account)
     for (const sample of demoSamples) await transaction.put('samples', sample)
     for (const mitra of mitraFixtures) await transaction.put('mitras', mitra)

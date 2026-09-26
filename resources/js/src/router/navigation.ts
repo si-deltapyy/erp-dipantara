@@ -7,6 +7,7 @@ export interface NavigationEntry extends AccessRule {
 }
 export const navigation: readonly NavigationEntry[] = [
     { name: 'home', label: 'navigation.home', icon: 'home', ...accessRules.home },
+    { name: 'graders', label: 'graders.title', icon: 'layers', ...accessRules.graders },
     { name: 'mitras', label: 'mitras.title', icon: 'layers', ...accessRules.mitras },
     {
         name: 'bank-accounts',

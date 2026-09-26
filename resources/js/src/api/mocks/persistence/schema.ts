@@ -1,9 +1,12 @@
+import type { Grader } from '@/core/types/grader'
 import type { BankAccount } from '@/core/types/bank-account'
 import type { TimberProduct } from '@/core/types/timber-product'
 import type { Mitra } from '@/core/types/mitra'
 import type { Buyer } from '@/core/types/buyer'
 
 export const demoStores = [
+    'graders',
+    'graderMutations',
     'bank-accounts',
     'bankAccountMutations',
     'metadata',
@@ -19,7 +22,7 @@ export const demoStores = [
     'timberProductMutations',
 ] as const
 export type DemoStore = (typeof demoStores)[number]
-export const demoSchemaVersion = 5
+export const demoSchemaVersion = 6
 export const demoDatasetVersion = 1
 export interface DatasetMetadata {
     readonly id: 'dataset'
@@ -55,6 +58,8 @@ export interface MutationReceipt {
     readonly result: DemoSample
 }
 export interface DemoTables {
+    readonly graders: Grader
+    readonly graderMutations: GraderMutationReceipt
     readonly 'bank-accounts': BankAccount
     readonly bankAccountMutations: BankAccountMutationReceipt
     readonly 'timber-products': TimberProduct
@@ -78,7 +83,7 @@ export interface BuyerMutationReceipt {
 
 export interface MasterDataAudit {
     readonly id: string
-    readonly resource: 'bank-accounts' | 'buyers' | 'mitras' | 'timber-products'
+    readonly resource: 'graders' | 'bank-accounts' | 'buyers' | 'mitras' | 'timber-products'
     readonly recordId: string
     readonly actorId: string
     readonly version: number
@@ -103,4 +108,11 @@ export interface BankAccountMutationReceipt {
     readonly payloadHash: string
     readonly expiresAt: number
     readonly result: BankAccount
+}
+
+export interface GraderMutationReceipt {
+    readonly id: string
+    readonly payloadHash: string
+    readonly expiresAt: number
+    readonly result: Grader
 }

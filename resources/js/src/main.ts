@@ -9,6 +9,7 @@ import { configureSession } from '@/composables/configureSession'
 import { createHttpSession } from '@/api/adapters/session-http'
 import { configureTimberProducts } from '@/composables/configureTimberProducts'
 import { configureBankAccounts } from '@/composables/configureBankAccounts'
+import { configureGraders } from '@/composables/configureGraders'
 import { configureMitras } from '@/composables/configureMitras'
 import { configureBuyers } from '@/composables/configureBuyers'
 
@@ -27,6 +28,7 @@ async function start(): Promise<void> {
     }
     await configureBuyers(app, pinia)
     await configureMitras(app, pinia)
+    await configureGraders(app, pinia)
     await configureBankAccounts(app, pinia)
     await configureTimberProducts(app, pinia)
     app.use(router).mount('#app')
