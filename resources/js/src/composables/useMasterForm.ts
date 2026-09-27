@@ -52,7 +52,8 @@ export function useMasterForm<Input extends object>(
                 messages[0] ?? `${options.resource}.invalid`,
             ]),
         ) as Partial<Record<keyof Input, string>>
-        uncertain.value = failure.kind === 'network'
+        uncertain.value =
+            uncertain.value || failure.kind === 'network' || failure.kind === 'unexpected'
         if (failure.kind === 'csrf' && store.user)
             options.recover({ ...draft.value }, key, store.user.id)
         await session.handleRequestFailure(cause)
@@ -62,6 +63,7 @@ export function useMasterForm<Input extends object>(
         errors.value = options.validate(draft.value)
         if (Object.keys(errors.value).length) return
         const payload = JSON.stringify(draft.value)
+        if (uncertain.value && lastPayload && lastPayload !== payload) return
         if (lastPayload && lastPayload !== payload) key = crypto.randomUUID()
         lastPayload = payload
         request = new AbortController()

@@ -1,3 +1,4 @@
+import { orderRoutes } from './orders'
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import type { DevelopmentCapability } from '@/core/types/session'
@@ -20,7 +21,7 @@ const routes: RouteRecordRaw[] = [
     },
 ]
 
-routes.push(...authRoutes, ...masterDataRoutes, ...purchaseOrderRoutes)
+routes.push(...orderRoutes, ...authRoutes, ...masterDataRoutes, ...purchaseOrderRoutes)
 
 routes.push({
     path: '/:pathMatch(.*)*',
@@ -36,7 +37,7 @@ export const router = createRouter({
 })
 
 router.afterEach((route) => {
-    document.title = `${i18n.global.t(route.meta.titleKey ?? 'brand.name')} · WoodFlow`
+    document.title = `${i18n.global.t(route.meta.titleKey ?? 'brand.name')} Â· WoodFlow`
 })
 
 declare module 'vue-router' {

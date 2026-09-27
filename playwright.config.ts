@@ -40,6 +40,7 @@ export default defineConfig({
                 : 'php artisan serve --host=127.0.0.1 --port=8011',
             url: 'http://127.0.0.1:8011/app',
             reuseExistingServer: false,
+            timeout: 120000,
             env: {
                 APP_ENV: 'testing',
                 APP_DEBUG: 'false',
@@ -58,6 +59,7 @@ export default defineConfig({
                       command: `npm run dev -- --host 127.0.0.1 --port ${vitePort} --strictPort`,
                       url: `http://127.0.0.1:${vitePort}/@vite/client`,
                       reuseExistingServer: false,
+                      timeout: 120000,
                       env: { VITE_API_MODE: 'mock', APP_URL: 'http://127.0.0.1:8011' },
                   },
               ]

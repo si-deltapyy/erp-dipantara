@@ -1,3 +1,4 @@
+import type { Order } from '@/core/types/order'
 import type { DocumentAudit, DocumentReceipt, StoredDocument } from './document-schema'
 import type { PurchaseOrder } from '@/core/types/purchase-order'
 import type { Grader } from '@/core/types/grader'
@@ -7,6 +8,8 @@ import type { Mitra } from '@/core/types/mitra'
 import type { Buyer } from '@/core/types/buyer'
 
 export const demoStores = [
+    'orders',
+    'orderMutations',
     'documents',
     'documentMutations',
     'purchase-orders',
@@ -28,7 +31,7 @@ export const demoStores = [
     'timberProductMutations',
 ] as const
 export type DemoStore = (typeof demoStores)[number]
-export const demoSchemaVersion = 8
+export const demoSchemaVersion = 9
 export const demoDatasetVersion = 1
 export interface DatasetMetadata {
     readonly id: 'dataset'
@@ -64,6 +67,8 @@ export interface MutationReceipt {
     readonly result: DemoSample
 }
 export interface DemoTables {
+    readonly orders: Order
+    readonly orderMutations: OrderMutationReceipt
     readonly documents: StoredDocument
     readonly documentMutations: DocumentReceipt
     readonly 'purchase-orders': PurchaseOrder
@@ -80,7 +85,7 @@ export interface DemoTables {
     readonly buyerMutations: BuyerMutationReceipt
     readonly metadata: DatasetMetadata
     readonly samples: DemoSample
-    readonly audit: DemoAudit | MasterDataAudit | PurchaseOrderAudit | DocumentAudit
+    readonly audit: DemoAudit | MasterDataAudit | PurchaseOrderAudit | DocumentAudit | OrderAudit
     readonly blobs: DemoBlob
     readonly mutations: MutationReceipt
 }
@@ -141,4 +146,19 @@ export interface PurchaseOrderAudit {
     readonly version: number
     readonly action: 'create' | 'update' | 'submit' | 'approve' | 'reject'
     readonly reason?: string
+}
+
+export interface OrderMutationReceipt {
+    readonly id: string
+    readonly payloadHash: string
+    readonly expiresAt: number
+    readonly result: Order
+}
+export interface OrderAudit {
+    readonly id: string
+    readonly resource: 'orders'
+    readonly recordId: string
+    readonly actorId: string
+    readonly version: number
+    readonly action: string
 }
