@@ -1,5 +1,6 @@
 import type {
     PurchaseOrder,
+    PurchaseOrderRejection,
     PurchaseOrderInput,
     PurchaseOrderUpdate,
     PurchaseOrderQuery,
@@ -100,6 +101,7 @@ export function parsePurchaseOrder(value: unknown): PurchaseOrder {
             'id',
             'version',
             'status',
+            'rejectionReason',
             'totalAmount',
             'createdAt',
             'updatedAt',
@@ -126,6 +128,10 @@ export function parsePurchaseOrder(value: unknown): PurchaseOrder {
             ),
         })),
         status,
+        rejectionReason:
+            record.rejectionReason === null
+                ? null
+                : text(record.rejectionReason, 'rejectionReason', 2000),
         totalAmount: parseMoney(record.totalAmount, 'totalAmount'),
         createdAt: parseTimestamp(record.createdAt, 'createdAt'),
         updatedAt: parseTimestamp(record.updatedAt, 'updatedAt'),
@@ -144,4 +150,13 @@ export function parsePurchaseOrderVersion(value: unknown): { version: number } {
     const record = parseObject(value, 'submit')
     requireKeys(record, ['version'], 'submit')
     return { version: parseInteger(record.version, 'version') }
+}
+
+export function parsePurchaseOrderRejection(value: unknown): PurchaseOrderRejection {
+    const record = parseObject(value, 'reject')
+    requireKeys(record, ['version', 'reason'], 'reject')
+    return {
+        version: parseInteger(record.version, 'version'),
+        reason: text(record.reason, 'reason', 2000).trim(),
+    }
 }

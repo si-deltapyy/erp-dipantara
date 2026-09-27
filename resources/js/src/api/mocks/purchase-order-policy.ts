@@ -6,7 +6,7 @@ import { ApiError } from '@/core/types/api-error'
 
 export function requirePurchaseOrderPermission(
     actor: SessionUser | null,
-    action: 'read' | 'create' | 'update' | 'submit',
+    action: 'read' | 'create' | 'update' | 'submit' | 'approve' | 'reject',
 ): SessionUser {
     if (!actor) throw new ApiError('unauthenticated')
     if (!hasBusinessPermission(actor, `purchase-orders.${action}`)) throw new ApiError('forbidden')
@@ -25,6 +25,12 @@ export function presentPurchaseOrder(
                   (action) =>
                       evaluateRecordAccess(actor, `purchase-orders.${action}`, order) === 'allowed',
               )
-            : [],
+            : order.status === 'submitted'
+              ? (['approve', 'reject'] as const).filter(
+                    (action) =>
+                        evaluateRecordAccess(actor, `purchase-orders.${action}`, order) ===
+                        'allowed',
+                )
+              : [],
     }
 }

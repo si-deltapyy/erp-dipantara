@@ -26,6 +26,7 @@ export interface PurchaseOrder extends PurchaseOrderInput, RecordMetadata {
     readonly buyerName: string
     readonly lines: readonly (PurchaseOrderLineInput & { readonly timberProductName: string })[]
     readonly status: PurchaseOrderStatus
+    readonly rejectionReason: string | null
     readonly totalAmount: string
     readonly createdAt: string
     readonly updatedAt: string
@@ -34,6 +35,11 @@ export interface PurchaseOrder extends PurchaseOrderInput, RecordMetadata {
 export interface PurchaseOrderUpdate extends PurchaseOrderInput {
     readonly version: number
 }
+export interface PurchaseOrderRejection {
+    readonly version: number
+    readonly reason: string
+}
+export type PurchaseOrderReviewAction = 'approve' | 'reject'
 export interface PurchaseOrderQuery extends MasterListQuery {
     readonly buyerId?: string
     readonly status?: PurchaseOrderStatus
@@ -55,6 +61,16 @@ export interface PurchaseOrdersApi {
     submit(
         id: string,
         input: { readonly version: number },
+        options: PurchaseOrderWriteOptions,
+    ): Promise<PurchaseOrder>
+    approve(
+        id: string,
+        input: { readonly version: number },
+        options: PurchaseOrderWriteOptions,
+    ): Promise<PurchaseOrder>
+    reject(
+        id: string,
+        input: PurchaseOrderRejection,
         options: PurchaseOrderWriteOptions,
     ): Promise<PurchaseOrder>
     subscribe(listener: () => void): () => void

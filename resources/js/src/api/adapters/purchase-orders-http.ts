@@ -1,3 +1,5 @@
+import { ApiError } from '@/core/types/api-error'
+import type { PurchaseOrder } from '@/core/types/purchase-order'
 import type { AxiosInstance } from 'axios'
 import type { PurchaseOrdersApi, PurchaseOrderWriteOptions } from '@/core/types/purchase-order'
 import { createHttpClient } from '@/services/http-client'
@@ -9,6 +11,7 @@ import {
     parsePurchaseOrderUpdate,
     parsePurchaseOrderQuery,
     parsePurchaseOrderVersion,
+    parsePurchaseOrderRejection,
 } from '@/api/purchase-order-mapper'
 
 const endpoint = '/api/v1/purchase-orders'
@@ -74,6 +77,36 @@ export function createHttpPurchaseOrders(
                 parsePurchaseOrder,
             ).data
         },
+        async approve(id, input, options) {
+            return parseReviewResponse(
+                (
+                    await client.post<unknown>(
+                        `${path(id)}/approve`,
+                        parsePurchaseOrderVersion(input),
+                        config(options),
+                    )
+                ).data,
+            )
+        },
+        async reject(id, input, options) {
+            return parseReviewResponse(
+                (
+                    await client.post<unknown>(
+                        `${path(id)}/reject`,
+                        parsePurchaseOrderRejection(input),
+                        config(options),
+                    )
+                ).data,
+            )
+        },
         subscribe: () => () => undefined,
+    }
+}
+
+function parseReviewResponse(value: unknown): PurchaseOrder {
+    try {
+        return parseDetail(value, parsePurchaseOrder).data
+    } catch {
+        throw new ApiError('unexpected')
     }
 }

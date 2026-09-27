@@ -100,3 +100,50 @@ test('preserves read-only Maker actions and server ownership on Admin submit', a
     expect(result.allowedActions).toEqual([])
     expect(post.mock.calls[0]?.[1]).toEqual({ version: source.version })
 })
+
+test('sends review versions and reasons without ownership fields and validates rejection responses', async () => {
+    const source = purchaseOrderFixtures[1]
+    if (!source) throw new Error('Missing PO fixture')
+    const client = axios.create()
+    const post = vi
+        .spyOn(client, 'post')
+        .mockResolvedValueOnce({ data: { data: { ...source, status: 'approved', version: 2 } } })
+        .mockResolvedValueOnce({
+            data: {
+                data: {
+                    ...source,
+                    status: 'rejected',
+                    version: 2,
+                    rejectionReason: 'Perbaiki jumlah',
+                },
+            },
+        })
+    const api = createHttpPurchaseOrders(client)
+    const options = { signal: new AbortController().signal, idempotencyKey: 'review-one' }
+    expect((await api.approve(source.id, { version: 1 }, options)).status).toBe('approved')
+    expect(
+        (await api.reject(source.id, { version: 1, reason: ' Perbaiki jumlah ' }, options))
+            .rejectionReason,
+    ).toBe('Perbaiki jumlah')
+    expect(post.mock.calls[0]).toEqual([
+        `/api/v1/purchase-orders/${source.id}/approve`,
+        { version: 1 },
+        { signal: options.signal, headers: { 'Idempotency-Key': 'review-one' } },
+    ])
+    expect(post.mock.calls[1]?.[1]).toEqual({ version: 1, reason: 'Perbaiki jumlah' })
+    post.mockRejectedValueOnce(new Error('network'))
+    await expect(api.approve(source.id, { version: 1 }, options)).rejects.toThrow('network')
+    expect(post).toHaveBeenCalledTimes(3)
+})
+
+test('treats malformed review success as uncertain rather than a rejected input', async () => {
+    const client = axios.create()
+    vi.spyOn(client, 'post').mockResolvedValue({ data: { data: {} } })
+    await expect(
+        createHttpPurchaseOrders(client).approve(
+            'demo',
+            { version: 1 },
+            { signal: new AbortController().signal, idempotencyKey: 'invalid-response' },
+        ),
+    ).rejects.toMatchObject({ kind: 'unexpected' })
+})

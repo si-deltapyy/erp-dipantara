@@ -42,7 +42,9 @@ export function createMockPurchaseOrders(
                 'quantity' in cause.fieldErrors
             )
                 throw new ApiError('validation', {
-                    'lines.0.quantity': ['purchase-orders.invalid'],
+                    [mutation.action === 'reject' ? 'reason' : 'lines.0.quantity']: [
+                        'purchase-orders.invalid',
+                    ],
                 })
             throw cause
         }
@@ -62,6 +64,8 @@ export function createMockPurchaseOrders(
         create: (input, options) => mutate({ action: 'create', input }, options),
         update: (id, input, options) => mutate({ action: 'update', id, input }, options),
         submit: (id, input, options) => mutate({ action: 'submit', id, input }, options),
+        approve: (id, input, options) => mutate({ action: 'approve', id, input }, options),
+        reject: (id, input, options) => mutate({ action: 'reject', id, input }, options),
         subscribe: (listener) => runtime.subscribe(listener),
     }
 }

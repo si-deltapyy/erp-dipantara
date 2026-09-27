@@ -3,6 +3,7 @@ import type {
     PurchaseOrder,
     PurchaseOrderInput,
     PurchaseOrderUpdate,
+    PurchaseOrderRejection,
 } from '@/core/types/purchase-order'
 import type { SessionUser } from '@/core/types/session'
 import { ApiError } from '@/core/types/api-error'
@@ -14,9 +15,13 @@ import type { DemoTransaction } from './transaction'
 import type { DatasetMetadata } from './schema'
 
 export interface PurchaseOrderMutation {
-    readonly action: 'create' | 'update' | 'submit'
+    readonly action: 'create' | 'update' | 'submit' | 'approve' | 'reject'
     readonly id?: string
-    readonly input: PurchaseOrderInput | PurchaseOrderUpdate | { readonly version: number }
+    readonly input:
+        | PurchaseOrderInput
+        | PurchaseOrderUpdate
+        | PurchaseOrderRejection
+        | { readonly version: number }
     readonly key: string
     readonly hash: string
 }
@@ -26,7 +31,7 @@ export async function writePurchaseOrder(
     actor: SessionUser,
     mutation: PurchaseOrderMutation,
 ): Promise<PurchaseOrder> {
-    const path = `/api/v1/purchase-orders${mutation.id ? `/${mutation.id}` : ''}${mutation.action === 'submit' ? '/submit' : ''}`
+    const path = `/api/v1/purchase-orders${mutation.id ? `/${mutation.id}` : ''}${['submit', 'approve', 'reject'].includes(mutation.action) ? `/${mutation.action}` : ''}`
     const receiptId = JSON.stringify([
         actor.id,
         mutation.action === 'update' ? 'PUT' : 'POST',
@@ -45,7 +50,9 @@ export async function writePurchaseOrder(
     }
     if (
         previous &&
-        (!isEditablePurchaseOrder(previous) ||
+        (!(mutation.action === 'approve' || mutation.action === 'reject'
+            ? previous.status === 'submitted'
+            : isEditablePurchaseOrder(previous)) ||
             !('version' in mutation.input) ||
             previous.version !== mutation.input.version)
     )
@@ -64,6 +71,7 @@ export async function writePurchaseOrder(
         actorId: actor.id,
         version: order.version,
         action: mutation.action,
+        ...('reason' in mutation.input ? { reason: mutation.input.reason } : {}),
     })
     await transaction.put('purchaseOrderMutations', {
         id: receiptId,
@@ -90,11 +98,18 @@ function makeOrder(
     previous?: PurchaseOrder,
 ): PurchaseOrder {
     const now = new Date().toISOString()
-    if (mutation.action === 'submit' && previous)
+    if (['submit', 'approve', 'reject'].includes(mutation.action) && previous)
         return {
             ...previous,
-            status: 'submitted',
-            submittedByUserId: parseId(actor.id),
+            status:
+                mutation.action === 'approve'
+                    ? 'approved'
+                    : mutation.action === 'reject'
+                      ? 'rejected'
+                      : 'submitted',
+            rejectionReason: 'reason' in mutation.input ? mutation.input.reason : null,
+            submittedByUserId:
+                mutation.action === 'submit' ? parseId(actor.id) : previous.submittedByUserId,
             version: previous.version + 1,
             updatedAt: now,
             allowedActions: [],
@@ -106,6 +121,7 @@ function makeOrder(
         number: input.number,
         orderDate: input.orderDate,
         notes: input.notes,
+        rejectionReason: previous?.rejectionReason ?? null,
         lines: input.lines.map((line) => ({ ...line, timberProductName: '' })),
         buyerName: '',
         id: previous?.id ?? crypto.randomUUID(),

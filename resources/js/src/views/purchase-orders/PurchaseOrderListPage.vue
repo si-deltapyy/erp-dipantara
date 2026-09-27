@@ -22,6 +22,7 @@ const {
     changePage,
     applyFilters,
     canCreate,
+    canReview,
 } = usePurchaseOrderList()
 </script>
 <template>
@@ -39,6 +40,15 @@ const {
                 >{{ t('purchase-orders.add') }}</RouterLink
             >
         </header>
+        <RouterLink
+            v-if="canReview"
+            :to="{
+                name: 'purchase-orders',
+                query: { ...$route.query, status: 'submitted', page: undefined },
+            }"
+            class="secondary-button"
+            >{{ t('purchase-orders.reviewQueue') }}</RouterLink
+        >
         <div class="panel space-y-5">
             <form class="space-y-4" @submit.prevent="applyFilters">
                 <div class="grid gap-4 lg:grid-cols-2">

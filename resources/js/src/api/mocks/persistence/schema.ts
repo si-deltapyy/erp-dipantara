@@ -134,5 +134,6 @@ export interface PurchaseOrderAudit {
     readonly recordId: string
     readonly actorId: string
     readonly version: number
-    readonly action: 'create' | 'update' | 'submit'
+    readonly action: 'create' | 'update' | 'submit' | 'approve' | 'reject'
+    readonly reason?: string
 }

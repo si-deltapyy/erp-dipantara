@@ -7,6 +7,7 @@ import type { PageResponse } from '@/core/types/contracts'
 import { useSession } from '@/composables/useSession'
 import { useSessionStore } from '@/stores/session'
 import { normalizeApiError, isRequestCancelled } from '@/services/api-error'
+import { hasBusinessPermission } from '@/core/domain/record-policy'
 import { canCreatePurchaseOrder } from '@/core/domain/purchase-order-policy'
 import { usePurchaseOrderApi } from './usePurchaseOrderApi'
 
@@ -19,6 +20,7 @@ interface PurchaseOrderListState {
     sort: Ref<string>
     loading: Ref<boolean>
     error: Ref<string>
+    canReview: ComputedRef<boolean>
     canCreate: ComputedRef<boolean>
     refresh(): Promise<void>
     changePage(page: number): Promise<void>
@@ -115,6 +117,11 @@ export function usePurchaseOrderList(): PurchaseOrderListState {
         refresh,
         changePage,
         applyFilters,
+        canReview: computed(
+            () =>
+                hasBusinessPermission(store.user, 'purchase-orders.approve') ||
+                hasBusinessPermission(store.user, 'purchase-orders.reject'),
+        ),
         canCreate: computed(() => canCreatePurchaseOrder(store.user)),
     }
 }

@@ -8,6 +8,7 @@ import {
     parsePurchaseOrderUpdate,
     parsePurchaseOrderQuery,
     parsePurchaseOrderVersion,
+    parsePurchaseOrderRejection,
 } from '@/api/purchase-order-mapper'
 import { parseId } from '@/api/contracts/value-parsers'
 import { presentPurchaseOrder, requirePurchaseOrderPermission } from '../purchase-order-policy'
@@ -108,7 +109,9 @@ export class PurchaseOrderRepository {
                 ? parsePurchaseOrderInput(mutation.input)
                 : mutation.action === 'update'
                   ? parsePurchaseOrderUpdate(mutation.input)
-                  : parsePurchaseOrderVersion(mutation.input)
+                  : mutation.action === 'reject'
+                    ? parsePurchaseOrderRejection(mutation.input)
+                    : parsePurchaseOrderVersion(mutation.input)
         const hash = await hashMutationPayload({ ...input, generation })
         return runDemoTransaction(
             this.options,

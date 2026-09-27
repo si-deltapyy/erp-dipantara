@@ -18,5 +18,10 @@ export async function resolvePurchaseOrderLabels(
             return { ...line, timberProductName: timber.name }
         }),
     )
-    return { ...order, buyerName: buyer.companyName, lines }
+    return {
+        ...order,
+        rejectionReason: order.rejectionReason ?? null,
+        buyerName: buyer.companyName,
+        lines,
+    }
 }

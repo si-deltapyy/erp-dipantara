@@ -5,6 +5,7 @@ import {
     parsePurchaseOrderInput,
     parsePurchaseOrderQuery,
     parsePurchaseOrderVersion,
+    parsePurchaseOrderRejection,
 } from './purchase-order-mapper'
 import { purchaseOrderDraft } from '@/core/domain/purchase-order-draft'
 import { calculatePurchaseOrderTotal } from './mocks/purchase-order-total'
@@ -72,4 +73,21 @@ test('hashes nested values canonically without losing array order or flat compat
         byte.toString(16).padStart(2, '0'),
     ).join('')
     expect(await hashMutationPayload({ z: 2, a: 'one' })).toBe(expected)
+})
+
+test('requires the readonly rejection reason and validates reject input', () => {
+    expect(() => parsePurchaseOrder({ ...order, rejectionReason: undefined })).toThrow()
+    expect(() => parsePurchaseOrder({ ...order, rejectionReason: 'x'.repeat(2001) })).toThrow()
+    expect(() =>
+        parsePurchaseOrderInput({ ...purchaseOrderDraft(order), rejectionReason: 'forged' }),
+    ).toThrow()
+    for (const reason of ['', '   ', 'x'.repeat(2001)])
+        expect(() => parsePurchaseOrderRejection({ version: 1, reason })).toThrow()
+    expect(parsePurchaseOrderRejection({ version: 1, reason: ' revise ' })).toEqual({
+        version: 1,
+        reason: 'revise',
+    })
+    expect(() =>
+        parsePurchaseOrderRejection({ version: 1, reason: 'revise', createdByUserId: 'forged' }),
+    ).toThrow()
 })

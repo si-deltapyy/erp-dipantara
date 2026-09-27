@@ -8,6 +8,7 @@ import { createHttpPurchaseOrders } from '@/api/adapters/purchase-orders-http'
 import { adapterModes } from '@/core/constants/environment'
 import { selectDomainAdapter } from '@/api/adapter-selection'
 import { demoRuntimeKey } from './useDemoRuntime'
+import { evaluateRecordAccess } from '@/core/domain/record-policy'
 import { useSessionStore } from '@/stores/session'
 
 export async function configurePurchaseOrders(app: App, pinia: Pinia): Promise<void> {
@@ -26,13 +27,25 @@ export async function configurePurchaseOrders(app: App, pinia: Pinia): Promise<v
     app.provide(purchaseOrdersApiKey, api)
     const recovery = usePurchaseOrderRecoveryStore(pinia)
     const stop = watch(
-        () => [session.status, session.user?.id],
+        () => [session.status, session.user],
         () => {
             if (
                 session.status === 'guest' ||
-                (session.user && recovery.snapshot?.actorId !== session.user.id)
+                (session.user &&
+                    ((recovery.snapshot && recovery.snapshot.actorId !== session.user.id) ||
+                        (recovery.review && recovery.review.actorId !== session.user.id)))
             )
                 recovery.$reset()
+            if (
+                session.status === 'authenticated' &&
+                recovery.review &&
+                evaluateRecordAccess(
+                    session.user,
+                    `purchase-orders.${recovery.review.action}`,
+                    recovery.review.order,
+                ) !== 'allowed'
+            )
+                recovery.review = null
         },
     )
     app.onUnmount(stop)

@@ -1,16 +1,31 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, reactive } from 'vue'
+import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useSessionStore } from '@/stores/session'
 import { canActOnPurchaseOrder } from '@/core/domain/purchase-order-policy'
 import { usePurchaseOrderDetail } from './composables/usePurchaseOrderDetail'
 import { usePurchaseOrderSubmit } from './composables/usePurchaseOrderSubmit'
 import { formatPurchaseOrderMoney } from './purchase-order-format'
+import { usePurchaseOrderReview } from './composables/usePurchaseOrderReview'
+import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
+import PurchaseOrderReviewDialog from './components/PurchaseOrderReviewDialog.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppConfirmDialog from '@/components/ui/AppConfirmDialog.vue'
 const { t } = useI18n()
 const session = useSessionStore()
+const route = useRoute()
 const { order, loading, error, refresh } = usePurchaseOrderDetail()
+const review = reactive(usePurchaseOrderReview(order, refresh, () => route.params.id))
+const discard = reactive(
+    useUnsavedChanges(
+        () => session.status === 'authenticated' && !!review.reason.trim(),
+        () => session.status === 'authenticated' && review.pending,
+    ),
+)
+function closeReview(): void {
+    discard.requestDiscard(() => review.close())
+}
 const {
     pending,
     confirming,
@@ -68,6 +83,10 @@ const canEdit = computed(
                     </div>
                 </dl>
             </div>
+            <div v-if="order.rejectionReason" class="panel space-y-2">
+                <h2 class="font-semibold">{{ t('purchase-orders.rejectionReason') }}</h2>
+                <p class="whitespace-pre-wrap break-words">{{ order.rejectionReason }}</p>
+            </div>
             <div class="panel space-y-4">
                 <h2 class="font-semibold">{{ t('purchase-orders.lines') }}</h2>
                 <div
@@ -87,7 +106,26 @@ const canEdit = computed(
                     t('purchase-orders.refresh')
                 }}</AppButton>
             </div>
+            <div v-if="review.error && !review.action" role="alert" class="panel space-y-3">
+                <p>{{ t(review.error) }}</p>
+                <AppButton variant="secondary" @click="review.reload">{{
+                    t('purchase-orders.refresh')
+                }}</AppButton>
+            </div>
             <div class="flex flex-wrap justify-end gap-3">
+                <AppButton
+                    v-if="review.canApprove"
+                    :disabled="review.pending"
+                    @click="review.open('approve')"
+                    >{{ t('purchase-orders.approve') }}</AppButton
+                >
+                <AppButton
+                    v-if="review.canReject"
+                    variant="secondary"
+                    :disabled="review.pending"
+                    @click="review.open('reject')"
+                    >{{ t('purchase-orders.reject') }}</AppButton
+                >
                 <RouterLink
                     v-if="canEdit && !pending && !uncertain"
                     :to="{
@@ -103,6 +141,25 @@ const canEdit = computed(
                 }}</AppButton>
             </div>
         </template>
+        <PurchaseOrderReviewDialog
+            v-model:reason="review.reason"
+            :action="review.action"
+            :reason-error="review.reasonError"
+            :error="review.error"
+            :pending="review.pending"
+            :uncertain="review.uncertain"
+            :blocked="review.blocked"
+            @close="closeReview"
+            @confirm="review.submit"
+            @reload="review.reload"
+        />
+        <AppConfirmDialog
+            :open="discard.confirming"
+            :title="t('purchase-orders.discardTitle')"
+            :description="t('purchase-orders.discardDescription')"
+            @confirm="discard.confirm"
+            @cancel="discard.cancel"
+        />
         <AppConfirmDialog
             :open="confirming"
             :title="t('purchase-orders.submit')"

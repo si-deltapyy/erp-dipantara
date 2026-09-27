@@ -23,6 +23,7 @@ export const purchaseOrderFixtures: readonly PurchaseOrder[] = Array.from(
                 },
             ],
             notes: null,
+            rejectionReason: status === 'rejected' ? 'Lengkapi rincian pesanan simulasi.' : null,
             status,
             totalAmount: '300000.00',
             version: 1,

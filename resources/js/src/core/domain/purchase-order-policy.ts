@@ -11,10 +11,12 @@ export function isEditablePurchaseOrder(order: PurchaseOrder): boolean {
 export function canActOnPurchaseOrder(
     actor: SessionUser | null,
     order: PurchaseOrder,
-    action: 'update' | 'submit',
+    action: 'update' | 'submit' | 'approve' | 'reject',
 ): boolean {
     return (
-        isEditablePurchaseOrder(order) &&
+        (action === 'approve' || action === 'reject'
+            ? order.status === 'submitted'
+            : isEditablePurchaseOrder(order)) &&
         order.allowedActions.includes(action) &&
         evaluateRecordAccess(actor, `purchase-orders.${action}`, order) === 'allowed'
     )
