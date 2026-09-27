@@ -1,3 +1,4 @@
+import { parseWorkflowVersion, parseWorkflowRejection } from '@/api/contracts/workflow-parsers'
 import type { AxiosInstance } from 'axios'
 import type { Order, OrdersApi, OrderWriteOptions } from '@/core/types/order'
 import { ApiError } from '@/core/types/api-error'
@@ -34,6 +35,39 @@ export function createHttpOrders(client: AxiosInstance = createHttpClient()): Or
             return mutationResponse(
                 (await client.put<unknown>(path(id), parseOrderInput(input, true), config(options)))
                     .data,
+            )
+        },
+        async submit(id, input, options) {
+            return mutationResponse(
+                (
+                    await client.post<unknown>(
+                        `${path(id)}/submit`,
+                        parseWorkflowVersion(input),
+                        config(options),
+                    )
+                ).data,
+            )
+        },
+        async approve(id, input, options) {
+            return mutationResponse(
+                (
+                    await client.post<unknown>(
+                        `${path(id)}/approve`,
+                        parseWorkflowVersion(input),
+                        config(options),
+                    )
+                ).data,
+            )
+        },
+        async reject(id, input, options) {
+            return mutationResponse(
+                (
+                    await client.post<unknown>(
+                        `${path(id)}/reject`,
+                        parseWorkflowRejection(input),
+                        config(options),
+                    )
+                ).data,
             )
         },
         subscribe: () => () => undefined,

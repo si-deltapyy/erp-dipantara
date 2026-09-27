@@ -1,6 +1,7 @@
 export default {
     orders: {
         title: 'Order',
+        incomplete: 'Lengkapi alokasi seluruh kebutuhan kayu sebelum mengajukan order.',
         dp: 'Status DP',
         dpUnavailable: 'Belum tersedia',
         parent: 'Buka PO',

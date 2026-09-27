@@ -1,3 +1,4 @@
+import { parseWorkflowVersion, parseWorkflowRejection } from '@/api/contracts/workflow-parsers'
 import type { Order, OrderQuery } from '@/core/types/order'
 import type { PageResponse } from '@/core/types/contracts'
 import type { SessionUser } from '@/core/types/session'
@@ -99,11 +100,16 @@ export class OrderRepository {
         const actor = requireOrderPermission(user, mutation.action)
         if (mutation.action !== 'create') parseId(mutation.id)
         if (!mutation.key.trim() || mutation.key.length > 100) throw new ApiError('validation')
-        const input = parseOrderInput(mutation.input, mutation.action === 'update')
+        const input =
+            mutation.action === 'create' || mutation.action === 'update'
+                ? parseOrderInput(mutation.input, mutation.action === 'update')
+                : mutation.action === 'reject'
+                  ? parseWorkflowRejection(mutation.input)
+                  : parseWorkflowVersion(mutation.input)
         const hash = await hashMutationPayload({ ...input, generation })
         return runDemoTransaction(
             this.options,
-            [...readStores, 'audit', 'orderMutations'],
+            [...readStores, 'audit', 'orderMutations', 'assignments', 'graders'],
             'readwrite',
             async (transaction) => {
                 const metadata = await requireDataset(transaction)

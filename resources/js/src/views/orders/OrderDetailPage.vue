@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import OrderAssignments from './components/OrderAssignments.vue'
 import { hasBusinessPermission } from '@/core/domain/record-policy'
-import { computed } from 'vue'
+import { computed, reactive } from 'vue'
+import { useRoute } from 'vue-router'
+import { useOrderReview } from './composables/useOrderReview'
+import { useOrderSubmit } from './composables/useOrderSubmit'
+import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
+import AppReviewDialog from '@/components/ui/AppReviewDialog.vue'
+import AppConfirmDialog from '@/components/ui/AppConfirmDialog.vue'
 import { useI18n } from 'vue-i18n'
 import { useSessionStore } from '@/stores/session'
 import { canActOnOrder } from '@/core/domain/order-policy'
@@ -10,6 +16,19 @@ import AppButton from '@/components/ui/AppButton.vue'
 const { t } = useI18n()
 const session = useSessionStore()
 const { order, loading, error, refresh } = useOrderDetail()
+const route = useRoute()
+const review = reactive(useOrderReview(order, refresh, () => route.params.id))
+const submission = reactive(useOrderSubmit(order))
+const discard = reactive(
+    useUnsavedChanges(
+        () => session.status === 'authenticated' && !!review.reason.trim(),
+        () => session.status === 'authenticated' && (review.pending || submission.pending),
+    ),
+)
+function closeReview(): void {
+    discard.requestDiscard(() => review.close())
+}
+
 const editable = computed(() => !!order.value && canActOnOrder(session.user, order.value, 'update'))
 </script>
 <template>
@@ -37,7 +56,7 @@ const editable = computed(() => !!order.value && canActOnOrder(session.user, ord
                 </p>
                 <div class="flex flex-wrap gap-3">
                     <RouterLink
-                        v-if="editable"
+                        v-if="editable && !submission.pending && !submission.uncertain"
                         :to="{ name: 'order-edit', params: { id: order.id }, query: $route.query }"
                         class="primary-button"
                         >{{ t('orders.edit') }}</RouterLink
@@ -51,6 +70,41 @@ const editable = computed(() => !!order.value && canActOnOrder(session.user, ord
                     >
                 </div>
             </div>
+
+            <div v-if="submission.error" class="panel space-y-3" role="alert">
+                <p>{{ t(submission.error) }}</p>
+                <p v-if="submission.uncertain">{{ t('orders.uncertain') }}</p>
+                <AppButton v-if="!submission.uncertain" variant="secondary" @click="refresh">{{
+                    t('orders.refresh')
+                }}</AppButton>
+            </div>
+            <div v-if="review.error && !review.action" class="panel space-y-3" role="alert">
+                <p>{{ t(review.error) }}</p>
+                <AppButton variant="secondary" @click="review.reload">{{
+                    t('orders.refresh')
+                }}</AppButton>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <AppButton
+                    v-if="submission.canSubmit"
+                    :pending="submission.pending"
+                    @click="submission.confirming = true"
+                    >{{
+                        t(submission.uncertain ? 'orders.retryWrite' : 'orders.submit')
+                    }}</AppButton
+                ><AppButton
+                    v-if="review.canApprove"
+                    :disabled="review.pending"
+                    @click="review.open('approve')"
+                    >{{ t('orders.approve') }}</AppButton
+                ><AppButton
+                    v-if="review.canReject"
+                    variant="secondary"
+                    :disabled="review.pending"
+                    @click="review.open('reject')"
+                    >{{ t('orders.reject') }}</AppButton
+                >
+            </div>
             <OrderAssignments
                 v-if="hasBusinessPermission(session.user, 'assignments.read')"
                 :key="order.id"
@@ -58,5 +112,34 @@ const editable = computed(() => !!order.value && canActOnOrder(session.user, ord
                 @changed="refresh"
             />
         </template>
+        <AppReviewDialog
+            v-model:reason="review.reason"
+            resource="orders"
+            reason-id="order-rejection-reason"
+            :action="review.action"
+            :reason-error="review.reasonError"
+            :error="review.error"
+            :pending="review.pending"
+            :uncertain="review.uncertain"
+            :blocked="review.blocked"
+            @close="closeReview"
+            @confirm="review.submit"
+            @reload="review.reload"
+        />
+        <AppConfirmDialog
+            :open="discard.confirming"
+            :title="t('orders.discardTitle')"
+            :description="t('orders.discardDescription')"
+            @confirm="discard.confirm"
+            @cancel="discard.cancel"
+        />
+        <AppConfirmDialog
+            :open="submission.confirming"
+            :title="t('orders.submit')"
+            :description="t('orders.submitDescription')"
+            :pending="submission.pending"
+            @confirm="submission.submit"
+            @cancel="submission.confirming = false"
+        />
     </section>
 </template>

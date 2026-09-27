@@ -66,3 +66,23 @@ it('rejects malformed successful writes as uncertain and rejects extra input bef
     ).rejects.toMatchObject({ kind: 'validation' })
     expect(post).not.toHaveBeenCalled()
 })
+
+it('sends versioned workflow actions and persistent rejection reasons', async () => {
+    const client = axios.create()
+    const post = vi.spyOn(client, 'post').mockResolvedValue({
+        data: { data: { ...order, status: 'rejected', rejectionReason: 'Correct allocation' } },
+    })
+    const api = createHttpOrders(client)
+    const options = { signal: new AbortController().signal, idempotencyKey: 'review-key' }
+    await api.submit('order-one', { version: 3 }, options)
+    await api.approve('order-one', { version: 4 }, options)
+    expect(
+        (await api.reject('order-one', { version: 4, reason: 'Correct allocation' }, options))
+            .rejectionReason,
+    ).toBe('Correct allocation')
+    expect(post.mock.calls.map((call) => [call[0], call[1]])).toEqual([
+        ['/api/v1/orders/order-one/submit', { version: 3 }],
+        ['/api/v1/orders/order-one/approve', { version: 4 }],
+        ['/api/v1/orders/order-one/reject', { version: 4, reason: 'Correct allocation' }],
+    ])
+})

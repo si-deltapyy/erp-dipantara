@@ -16,10 +16,11 @@ export function presentOrder(order: Order, actor: SessionUser, generation: strin
     return {
         ...order,
         snapshotGeneration: generation,
-        allowedActions:
-            isEditableOrder(order) &&
-            evaluateRecordAccess(actor, 'orders.update', order) === 'allowed'
-                ? ['update']
-                : [],
+        allowedActions: (isEditableOrder(order)
+            ? (['update', 'submit'] as const)
+            : order.status === 'submitted'
+              ? (['approve', 'reject'] as const)
+              : []
+        ).filter((action) => evaluateRecordAccess(actor, `orders.${action}`, order) === 'allowed'),
     }
 }

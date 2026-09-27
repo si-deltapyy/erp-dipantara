@@ -1,3 +1,4 @@
+import type { WorkflowApi } from './workflow'
 import type { PageResponse, RecordMetadata } from './contracts'
 import type { MasterListQuery } from './master-list'
 import type { PurchaseOrderWriteOptions } from './purchase-order'
@@ -22,7 +23,7 @@ export interface OrderQuery extends MasterListQuery {
     readonly status?: OrderStatus
 }
 export type OrderWriteOptions = PurchaseOrderWriteOptions
-export interface OrdersApi {
+export interface OrdersApi extends WorkflowApi<Order> {
     list(query: OrderQuery, signal: AbortSignal): Promise<PageResponse<Order>>
     get(id: string, signal: AbortSignal): Promise<Order>
     create(input: OrderInput, options: OrderWriteOptions): Promise<Order>
