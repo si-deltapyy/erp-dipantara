@@ -1,3 +1,4 @@
+import type { Grading } from '@/core/types/grading'
 import type { Assignment } from '@/core/types/assignment'
 import type { Order } from '@/core/types/order'
 import type { DocumentAudit, DocumentReceipt, StoredDocument } from './document-schema'
@@ -9,6 +10,8 @@ import type { Mitra } from '@/core/types/mitra'
 import type { Buyer } from '@/core/types/buyer'
 
 export const demoStores = [
+    'gradings',
+    'gradingMutations',
     'assignments',
     'assignmentMutations',
     'orders',
@@ -34,7 +37,7 @@ export const demoStores = [
     'timberProductMutations',
 ] as const
 export type DemoStore = (typeof demoStores)[number]
-export const demoSchemaVersion = 10
+export const demoSchemaVersion = 11
 export const demoDatasetVersion = 1
 export interface DatasetMetadata {
     readonly id: 'dataset'
@@ -70,6 +73,8 @@ export interface MutationReceipt {
     readonly result: DemoSample
 }
 export interface DemoTables {
+    readonly gradings: Grading
+    readonly gradingMutations: GradingMutationReceipt
     readonly assignments: Assignment
     readonly assignmentMutations: AssignmentMutationReceipt
     readonly orders: Order
@@ -90,7 +95,8 @@ export interface DemoTables {
     readonly buyerMutations: BuyerMutationReceipt
     readonly metadata: DatasetMetadata
     readonly samples: DemoSample
-    readonly audit: DemoAudit | MasterDataAudit | PurchaseOrderAudit | DocumentAudit | OrderAudit
+    readonly audit:
+        DemoAudit | MasterDataAudit | PurchaseOrderAudit | DocumentAudit | OrderAudit | GradingAudit
     readonly blobs: DemoBlob
     readonly mutations: MutationReceipt
 }
@@ -173,4 +179,20 @@ export interface AssignmentMutationReceipt {
     readonly payloadHash: string
     readonly expiresAt: number
     readonly result: Assignment
+}
+
+export interface GradingMutationReceipt {
+    readonly id: string
+    readonly payloadHash: string
+    readonly expiresAt: number
+    readonly result: Grading
+}
+export interface GradingAudit {
+    readonly id: string
+    readonly resource: 'gradings'
+    readonly recordId: string
+    readonly actorId: string
+    readonly version: number
+    readonly action: string
+    readonly reason?: string
 }

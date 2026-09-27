@@ -3,11 +3,16 @@ import { canonicalDecimal, isTimberDimension } from '@/core/domain/timber-measur
 const simulatedPi = 3_141_592_653_589_793n
 const volumeDivisor = 40_000_000_000_000_000_000n
 
-export function simulateTimberVolume(diameterCm: string, lengthM: string): string | null {
+export function simulateTimberVolume(
+    diameterCm: string,
+    lengthM: string,
+    quantity = 1,
+): string | null {
     if (!isTimberDimension(diameterCm) || !isTimberDimension(lengthM)) return null
+    if (!Number.isSafeInteger(quantity) || quantity < 1) return null
     const diameter = BigInt(canonicalDecimal(diameterCm, 2).replace('.', ''))
     const length = BigInt(canonicalDecimal(lengthM, 2).replace('.', ''))
-    const numerator = simulatedPi * diameter * diameter * length
+    const numerator = simulatedPi * diameter * diameter * length * BigInt(quantity)
     const rounded = (numerator + volumeDivisor / 2n) / volumeDivisor
     return `${rounded / 1_000_000n}.${String(rounded % 1_000_000n).padStart(6, '0')}`
 }

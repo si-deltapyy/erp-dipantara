@@ -1,0 +1,15 @@
+import type { ReviewSnapshot } from '@/core/types/workflow'
+import { defineStore } from 'pinia'
+import type { Grading, GradingInput } from '@/core/types/grading'
+export const useGradingRecoveryStore = defineStore('grading-recovery', {
+    state: (): {
+        review: ReviewSnapshot<Grading> | null
+        submission: { actorId: string; record: Grading; idempotencyKey: string } | null
+        snapshot: {
+            actorId: string
+            grading?: Grading
+            draft: GradingInput
+            idempotencyKey: string
+        } | null
+    } => ({ snapshot: null, review: null, submission: null }),
+})

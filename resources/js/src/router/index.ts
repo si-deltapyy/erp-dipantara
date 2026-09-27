@@ -1,3 +1,4 @@
+import { gradingRoutes } from './gradings'
 import { orderRoutes } from './orders'
 import { assignmentRoutes } from './assignments'
 import { createRouter, createWebHistory } from 'vue-router'
@@ -23,6 +24,7 @@ const routes: RouteRecordRaw[] = [
 ]
 
 routes.push(
+    ...gradingRoutes,
     ...assignmentRoutes,
     ...orderRoutes,
     ...authRoutes,

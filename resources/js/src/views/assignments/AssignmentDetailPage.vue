@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { evaluateRecordAccess } from '@/core/domain/record-policy'
+import { useSessionStore } from '@/stores/session'
 import { useI18n } from 'vue-i18n'
 import { useRecordDetail } from '@/composables/useRecordDetail'
 import { useAssignmentApi } from '@/views/orders/composables/useAssignmentApi'
 import AppButton from '@/components/ui/AppButton.vue'
 const { t } = useI18n()
+const session = useSessionStore()
 const {
     record: assignment,
     loading,
@@ -52,6 +55,14 @@ const {
                     <dd>{{ assignment.gradingReference.gradeCodes.join(', ') }}</dd>
                 </div>
             </dl>
+            <RouterLink
+                v-if="
+                    evaluateRecordAccess(session.user, 'gradings.create', assignment) === 'allowed'
+                "
+                :to="{ name: 'grading-new', query: { assignmentId: assignment.id } }"
+                class="primary-button"
+                >{{ t('gradings.add') }}</RouterLink
+            >
         </article>
     </section>
 </template>
