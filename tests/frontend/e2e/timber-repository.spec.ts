@@ -38,7 +38,10 @@ test('enforces price redaction, assignment scopes, concurrency, replay and reset
         const api = createMockTimberProducts(
             runtime,
             () => actor,
-            new TimberProductRepository(options),
+            new TimberProductRepository(options, () => [
+                { timberProductId: 'demo-timber-01', graderUserId: 'grader-one' },
+                { timberProductId: 'demo-timber-02', graderUserId: 'grader-two' },
+            ]),
         )
         const signal = new AbortController().signal
         const query = { page: 1, perPage: 100, search: '', sort: '-createdAt' as const }

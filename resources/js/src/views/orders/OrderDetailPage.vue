@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import OrderAssignments from './components/OrderAssignments.vue'
+import { hasBusinessPermission } from '@/core/domain/record-policy'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSessionStore } from '@/stores/session'
@@ -49,6 +51,12 @@ const editable = computed(() => !!order.value && canActOnOrder(session.user, ord
                     >
                 </div>
             </div>
+            <OrderAssignments
+                v-if="hasBusinessPermission(session.user, 'assignments.read')"
+                :key="order.id"
+                :order="order"
+                @changed="refresh"
+            />
         </template>
     </section>
 </template>

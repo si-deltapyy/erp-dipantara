@@ -1,3 +1,4 @@
+import { resolveTimberLinks } from './assignment-links'
 import type {
     TimberProduct,
     TimberProductInput,
@@ -15,17 +16,13 @@ import { runDemoTransaction } from './transaction'
 import type { DatabaseOptions } from './database'
 import { hashMutationPayload } from './idempotency'
 import { writeTimberProduct } from './timber-product-mutation'
-import {
-    canLookupTimberProduct,
-    timberProductTransactionFixtures,
-} from '../timber-product-lookup-scope'
+import { canLookupTimberProduct } from '../timber-product-lookup-scope'
 import type { TimberProductTransactionLink } from '../timber-product-lookup-scope'
 
 export class TimberProductRepository {
     constructor(
         private readonly options: DatabaseOptions = {},
-        private readonly transactionLinks: () => readonly TimberProductTransactionLink[] = () =>
-            timberProductTransactionFixtures,
+        private readonly transactionLinks?: () => readonly TimberProductTransactionLink[],
     ) {}
     async list(
         user: SessionUser | null,
@@ -37,20 +34,18 @@ export class TimberProductRepository {
         const filter = parseTimberProductQuery(query)
         return runDemoTransaction(
             this.options,
-            ['metadata', 'timber-products'],
+            ['metadata', 'timber-products', 'assignments'],
             'readonly',
             async (transaction) => {
                 const metadata = await requireDataset(transaction)
+                const links = lookup
+                    ? (this.transactionLinks?.() ?? (await resolveTimberLinks(transaction)))
+                    : []
                 const search = filter.search.trim().toLocaleLowerCase('id')
                 const matches = (await transaction.list('timber-products'))
                     .filter(
                         (timberProduct) =>
-                            !lookup ||
-                            canLookupTimberProduct(
-                                timberProduct.id,
-                                actor,
-                                this.transactionLinks(),
-                            ),
+                            !lookup || canLookupTimberProduct(timberProduct.id, actor, links),
                     )
                     .filter((timberProduct) =>
                         (lookup

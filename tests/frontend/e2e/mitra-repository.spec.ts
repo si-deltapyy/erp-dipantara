@@ -42,7 +42,14 @@ test('enforces scope, version, atomic replay and reset generation at the adapter
         )) as typeof ResponseModule
         const options = { name: 'mitra-policy-' + crypto.randomUUID() }
         const demo = new DemoRepository(options)
-        const repository = new MitraRepository(options)
+        const repository = new MitraRepository(options, () => [
+            { mitraId: 'demo-mitra-01', ownerUserId: 'user-demo', assignedUserIds: ['grader-one'] },
+            {
+                mitraId: 'demo-mitra-02',
+                ownerUserId: 'multiple-demo',
+                assignedUserIds: ['grader-two'],
+            },
+        ])
         const runtime = new DemoRuntime(demo)
         let actor = sessionFixtures.find((user) => user.email === 'admin@woodflow.test') ?? null
         const api = createMockMitras(runtime, () => actor, repository)

@@ -1,3 +1,4 @@
+import { resolveMitraLinks } from './assignment-links'
 import type { Mitra, MitraInput, MitraQuery, MitraUpdate } from '@/core/types/mitra'
 import type { PageResponse } from '@/core/types/contracts'
 import type { SessionUser } from '@/core/types/session'
@@ -10,14 +11,13 @@ import { runDemoTransaction } from './transaction'
 import type { DatabaseOptions } from './database'
 import { hashMutationPayload } from './idempotency'
 import { writeMitra } from './mitra-mutation'
-import { canLookupMitra, mitraTransactionFixtures } from '../mitra-lookup-scope'
+import { canLookupMitra } from '../mitra-lookup-scope'
 import type { MitraTransactionLink } from '../mitra-lookup-scope'
 
 export class MitraRepository {
     constructor(
         private readonly options: DatabaseOptions = {},
-        private readonly transactionLinks: () => readonly MitraTransactionLink[] = () =>
-            mitraTransactionFixtures,
+        private readonly transactionLinks?: () => readonly MitraTransactionLink[],
     ) {}
     async list(
         user: SessionUser | null,
@@ -29,16 +29,16 @@ export class MitraRepository {
         const filter = parseMitraQuery(query)
         return runDemoTransaction(
             this.options,
-            ['metadata', 'mitras'],
+            ['metadata', 'mitras', 'orders', 'purchase-orders', 'assignments'],
             'readonly',
             async (transaction) => {
                 const metadata = await requireDataset(transaction)
+                const links = lookup
+                    ? (this.transactionLinks?.() ?? (await resolveMitraLinks(transaction)))
+                    : []
                 const search = filter.search.trim().toLocaleLowerCase('id')
                 const matches = (await transaction.list('mitras'))
-                    .filter(
-                        (mitra) =>
-                            !lookup || canLookupMitra(mitra.id, actor, this.transactionLinks()),
-                    )
+                    .filter((mitra) => !lookup || canLookupMitra(mitra.id, actor, links))
                     .filter((mitra) =>
                         (lookup ? [mitra.name] : [mitra.name, mitra.phone, mitra.address]).some(
                             (field) => field.toLocaleLowerCase('id').includes(search),

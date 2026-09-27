@@ -1,3 +1,4 @@
+import assignments from './assignments'
 import orders from './orders'
 import { createI18n } from 'vue-i18n'
 import id from './id'
@@ -19,6 +20,7 @@ export const i18n = createI18n({
         id: {
             ...id,
             ...orders,
+            ...assignments,
             ...documents,
             ...purchaseOrders,
             ...foundation,

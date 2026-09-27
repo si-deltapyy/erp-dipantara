@@ -1,12 +1,15 @@
+import { mitrasApiKey } from '@/api/mitras-api'
+import { gradersApiKey } from '@/api/graders-api'
 import type { ComputedRef } from 'vue'
 import { inject, ref, shallowRef, onScopeDispose, watch, computed } from 'vue'
 import type { Ref } from 'vue'
-import { purchaseOrdersApiKey } from '@/api/purchase-orders-api'
+import { buyersApiKey } from '@/api/buyers-api'
+import { timberProductsApiKey } from '@/api/timber-products-api'
 import { useSession } from '@/composables/useSession'
 import { useSessionStore } from '@/stores/session'
 import { normalizeApiError, isRequestCancelled } from '@/services/api-error'
 
-interface ApprovedPurchaseOrderLookupState {
+interface MasterLookupState {
     search: Ref<string>
     options: ComputedRef<{ value: string; label: string }[]>
     loading: Ref<boolean>
@@ -15,12 +18,19 @@ interface ApprovedPurchaseOrderLookupState {
     load(reset?: boolean): Promise<void>
 }
 
-export function useApprovedPurchaseOrderLookup(
+export function useMasterLookup(
+    kind: 'buyer' | 'timber' | 'mitra' | 'grader',
     selected: Readonly<Ref<{ id: string; label: string }>>,
-): ApprovedPurchaseOrderLookupState {
-    const injected = inject(purchaseOrdersApiKey)
-    if (!injected) throw new Error('Purchase orders API is not configured')
-    const api = injected
+): MasterLookupState {
+    const buyers = inject(buyersApiKey)
+    const timber = inject(timberProductsApiKey)
+    if (!buyers || !timber) throw new Error('Master lookup APIs are not configured')
+    const mitras = inject(mitrasApiKey)
+    const graders = inject(gradersApiKey)
+    const selectedApi =
+        kind === 'buyer' ? buyers : kind === 'timber' ? timber : kind === 'mitra' ? mitras : graders
+    if (!selectedApi) throw new Error('Master lookup API is not configured')
+    const api = selectedApi
     const session = useSession()
     const store = useSessionStore()
     const search = ref('')
@@ -38,22 +48,12 @@ export function useApprovedPurchaseOrderLookup(
         loading.value = true
         error.value = ''
         try {
-            const response = await api.list(
-                {
-                    page: next,
-                    perPage: 20,
-                    search: search.value.trim(),
-                    sort: 'createdAt',
-                    status: 'approved',
-                },
+            const response = await api.lookup(
+                { page: next, perPage: 20, search: search.value.trim(), sort: 'createdAt' },
                 request.signal,
             )
             if (request.signal.aborted) return
-            const entries = response.data.map((order) => ({
-                id: order.id,
-                label: order.number + ' / ' + order.buyerName,
-            }))
-            choices.value = reset ? entries : [...choices.value, ...entries]
+            choices.value = reset ? response.data : [...choices.value, ...response.data]
             page.value = next
             total.value = response.meta.total
         } catch (cause) {

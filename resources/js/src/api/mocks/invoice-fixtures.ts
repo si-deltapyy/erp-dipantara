@@ -1,0 +1,25 @@
+import { parseInvoice } from '@/api/invoice-mapper'
+export const invoiceFixtures = [
+    parseInvoice({
+        id: 'synthetic-payable-01',
+        purchaseOrderId: 'demo-po-03',
+        mitraId: 'demo-mitra-01',
+        direction: 'payable',
+        kind: 'down_payment',
+        invoiceDate: '2026-09-27',
+        terms: [{ label: 'Termin Mitra simulasi', amount: '100000.00', dueDate: null }],
+        notes: null,
+        status: 'issued',
+        number: 'DEMO-INV-MITRA-01',
+        totalAmount: '100000.00',
+        outstandingAmount: '100000.00',
+        revisionNumber: 1,
+        documentId: null,
+        createdAt: '2026-09-27T00:00:00Z',
+        updatedAt: '2026-09-27T00:00:00Z',
+        createdByUserId: 'maker-demo',
+        submittedByUserId: null,
+        version: 1,
+        allowedActions: [],
+    }),
+]

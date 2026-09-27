@@ -1,3 +1,4 @@
+import type { Assignment } from '@/core/types/assignment'
 import type { Order } from '@/core/types/order'
 import type { DocumentAudit, DocumentReceipt, StoredDocument } from './document-schema'
 import type { PurchaseOrder } from '@/core/types/purchase-order'
@@ -8,6 +9,8 @@ import type { Mitra } from '@/core/types/mitra'
 import type { Buyer } from '@/core/types/buyer'
 
 export const demoStores = [
+    'assignments',
+    'assignmentMutations',
     'orders',
     'orderMutations',
     'documents',
@@ -31,7 +34,7 @@ export const demoStores = [
     'timberProductMutations',
 ] as const
 export type DemoStore = (typeof demoStores)[number]
-export const demoSchemaVersion = 9
+export const demoSchemaVersion = 10
 export const demoDatasetVersion = 1
 export interface DatasetMetadata {
     readonly id: 'dataset'
@@ -67,6 +70,8 @@ export interface MutationReceipt {
     readonly result: DemoSample
 }
 export interface DemoTables {
+    readonly assignments: Assignment
+    readonly assignmentMutations: AssignmentMutationReceipt
     readonly orders: Order
     readonly orderMutations: OrderMutationReceipt
     readonly documents: StoredDocument
@@ -156,9 +161,16 @@ export interface OrderMutationReceipt {
 }
 export interface OrderAudit {
     readonly id: string
-    readonly resource: 'orders'
+    readonly resource: 'orders' | 'assignments'
     readonly recordId: string
     readonly actorId: string
     readonly version: number
     readonly action: string
+}
+
+export interface AssignmentMutationReceipt {
+    readonly id: string
+    readonly payloadHash: string
+    readonly expiresAt: number
+    readonly result: Assignment
 }
