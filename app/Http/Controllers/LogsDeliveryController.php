@@ -1,65 +1,39 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\LogsDelivery;
+use App\Models\PreOrders;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class LogsDeliveryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $deliveries = LogsDelivery::with('order.preOrder')->get();
+        return response()->json(['status' => 'success', 'data' => $deliveries]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request): JsonResponse
     {
-        //
-    }
+        $validated = $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'sakr_number' => 'required|string',
+            'sakr_type' => 'required|in:petani_ke_dipantara,dipantara_ke_buyer', // 2 Jenis SAKR
+            'delivery_date' => 'required|date',
+            'driver_name' => 'required|string',
+            'vehicle_plate' => 'required|string',
+            'quantity' => 'required|integer',
+            'notes' => 'nullable|string'
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $delivery = LogsDelivery::create($validated);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(LogsDelivery $logsDelivery)
-    {
-        //
-    }
+        // Otomatis update status pre_orders menjadi delivered
+        if ($delivery->order && $delivery->order->pre_order_id) {
+            PreOrders::where('id', $delivery->order->pre_order_id)->update(['pre_order_status' => 'delivered']);
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(LogsDelivery $logsDelivery)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, LogsDelivery $logsDelivery)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(LogsDelivery $logsDelivery)
-    {
-        //
+        return response()->json(['status' => 'success', 'message' => 'Surat Jalan SAKR berhasil dibuat', 'data' => $delivery], 201);
     }
 }
