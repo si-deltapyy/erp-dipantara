@@ -3,6 +3,7 @@
 use App\Http\Controllers\Dashboard;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SpkController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 

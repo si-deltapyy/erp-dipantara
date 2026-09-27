@@ -1,7 +1,16 @@
 import { defineConfig } from '@playwright/test'
 import { randomBytes } from 'node:crypto'
+import { join } from 'node:path'
+import { tmpdir } from 'node:os'
 
 const production = process.env.E2E_PRODUCTION === 'true'
+if (production) {
+    process.env.E2E_AUTH_PASSWORD ??= randomBytes(24).toString('hex')
+    process.env.E2E_DATABASE ??= join(
+        tmpdir(),
+        'woodflow-e2e-' + randomBytes(8).toString('hex') + '.sqlite',
+    )
+}
 
 export default defineConfig({
     testDir: './tests/frontend/e2e',
@@ -13,7 +22,7 @@ export default defineConfig({
     reporter: [['list'], ['html', { open: 'never' }]],
     use: {
         baseURL: 'http://127.0.0.1:8011',
-        trace: 'retain-on-failure',
+        trace: production ? 'off' : 'retain-on-failure',
         screenshot: 'only-on-failure',
     },
     projects: [
@@ -25,7 +34,9 @@ export default defineConfig({
     ],
     webServer: [
         {
-            command: 'php artisan serve --host=127.0.0.1 --port=8011',
+            command: production
+                ? 'node tests/frontend/live-server.mjs'
+                : 'php artisan serve --host=127.0.0.1 --port=8011',
             url: 'http://127.0.0.1:8011/app',
             reuseExistingServer: false,
             env: {
@@ -33,10 +44,10 @@ export default defineConfig({
                 APP_DEBUG: 'false',
                 APP_URL: 'http://127.0.0.1:8011',
                 APP_KEY: 'base64:' + randomBytes(32).toString('base64'),
-                SESSION_DRIVER: 'array',
+                SESSION_DRIVER: production ? 'database' : 'array',
                 CACHE_STORE: 'array',
                 DB_CONNECTION: 'sqlite',
-                DB_DATABASE: ':memory:',
+                DB_DATABASE: production ? (process.env.E2E_DATABASE ?? ':memory:') : ':memory:',
                 DB_URL: '',
             },
         },

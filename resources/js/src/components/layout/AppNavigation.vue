@@ -1,14 +1,21 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useSessionStore } from '@/stores/session'
+import { canAccess } from '@/core/domain/access-policy'
+import { navigation } from '@/router/navigation'
 import { useI18n } from 'vue-i18n'
 import AppIcon from '@/components/ui/AppIcon.vue'
 import { mockEnabled } from '@/core/constants/environment'
 
 defineEmits<{ navigate: [] }>()
 const { t } = useI18n()
-const links = [
-    { name: 'home', label: 'navigation.home', icon: 'home' as const },
-    ...(mockEnabled ? [{ name: 'mock-lab', label: 'navigation.lab', icon: 'flask' as const }] : []),
-]
+const store = useSessionStore()
+const links = computed(() =>
+    navigation.filter((entry) => {
+        if (!mockEnabled && entry.developmentCapability) return false
+        return canAccess(store.user, entry.requiredPermissions, entry.developmentCapability)
+    }),
+)
 </script>
 
 <template>

@@ -33,6 +33,21 @@ class LoginRequest extends FormRequest
         ];
     }
 
+    public function messages(): array
+    {
+        if (! $this->expectsJson()) {
+            return [];
+        }
+
+        return [
+            'email.required' => trans('auth.email_required', [], 'id'),
+            'email.string' => trans('auth.email_invalid', [], 'id'),
+            'email.email' => trans('auth.email_invalid', [], 'id'),
+            'password.required' => trans('auth.password_required', [], 'id'),
+            'password.string' => trans('auth.password_required', [], 'id'),
+        ];
+    }
+
     /**
      * Attempt to authenticate the request's credentials.
      *
@@ -46,7 +61,7 @@ class LoginRequest extends FormRequest
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => trans('auth.failed', [], $this->expectsJson() ? 'id' : null),
             ]);
         }
 
@@ -72,7 +87,7 @@ class LoginRequest extends FormRequest
             'email' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
-            ]),
+            ], $this->expectsJson() ? 'id' : null),
         ]);
     }
 
