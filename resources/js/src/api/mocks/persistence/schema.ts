@@ -1,3 +1,4 @@
+import type { DocumentAudit, DocumentReceipt, StoredDocument } from './document-schema'
 import type { PurchaseOrder } from '@/core/types/purchase-order'
 import type { Grader } from '@/core/types/grader'
 import type { BankAccount } from '@/core/types/bank-account'
@@ -6,6 +7,8 @@ import type { Mitra } from '@/core/types/mitra'
 import type { Buyer } from '@/core/types/buyer'
 
 export const demoStores = [
+    'documents',
+    'documentMutations',
     'purchase-orders',
     'purchaseOrderMutations',
     'graders',
@@ -25,7 +28,7 @@ export const demoStores = [
     'timberProductMutations',
 ] as const
 export type DemoStore = (typeof demoStores)[number]
-export const demoSchemaVersion = 7
+export const demoSchemaVersion = 8
 export const demoDatasetVersion = 1
 export interface DatasetMetadata {
     readonly id: 'dataset'
@@ -61,6 +64,8 @@ export interface MutationReceipt {
     readonly result: DemoSample
 }
 export interface DemoTables {
+    readonly documents: StoredDocument
+    readonly documentMutations: DocumentReceipt
     readonly 'purchase-orders': PurchaseOrder
     readonly purchaseOrderMutations: PurchaseOrderMutationReceipt
     readonly graders: Grader
@@ -75,7 +80,7 @@ export interface DemoTables {
     readonly buyerMutations: BuyerMutationReceipt
     readonly metadata: DatasetMetadata
     readonly samples: DemoSample
-    readonly audit: DemoAudit | MasterDataAudit | PurchaseOrderAudit
+    readonly audit: DemoAudit | MasterDataAudit | PurchaseOrderAudit | DocumentAudit
     readonly blobs: DemoBlob
     readonly mutations: MutationReceipt
 }

@@ -174,7 +174,7 @@ test('preserves v6 data and rolls back create and submit including audit and rec
         revision: result.originalRevision,
         status: 'draft',
     })
-    expect(result.version).toBe(7)
+    expect(result.version).toBe(8)
     expect(result.preserved).toEqual([1, 1, 1, 1, 1, 1, 1])
     expect(result.generation).toBe(true)
     expect(result.seeds).toBe(26)

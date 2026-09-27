@@ -10,6 +10,7 @@ import { formatPurchaseOrderMoney } from './purchase-order-format'
 import { usePurchaseOrderReview } from './composables/usePurchaseOrderReview'
 import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
 import PurchaseOrderReviewDialog from './components/PurchaseOrderReviewDialog.vue'
+import PurchaseOrderDocuments from './components/PurchaseOrderDocuments.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppConfirmDialog from '@/components/ui/AppConfirmDialog.vue'
 const { t } = useI18n()
@@ -112,6 +113,7 @@ const canEdit = computed(
                     t('purchase-orders.refresh')
                 }}</AppButton>
             </div>
+            <PurchaseOrderDocuments :key="order.id" :order="order" />
             <div class="flex flex-wrap justify-end gap-3">
                 <AppButton
                     v-if="review.canApprove"

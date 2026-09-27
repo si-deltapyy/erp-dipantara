@@ -1,4 +1,5 @@
 import { configurePurchaseOrders } from '@/composables/configurePurchaseOrders'
+import { configureDocuments } from '@/composables/configureDocuments'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
@@ -28,6 +29,7 @@ async function start(): Promise<void> {
         configureDemo(app)
     }
     await configurePurchaseOrders(app, pinia)
+    await configureDocuments(app, pinia)
     await configureBuyers(app, pinia)
     await configureMitras(app, pinia)
     await configureGraders(app, pinia)
