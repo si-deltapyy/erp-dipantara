@@ -1,65 +1,42 @@
-<?php
-
+<?
 namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $products = Product::all();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $products
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request): JsonResponse
     {
-        //
-    }
+        $validated = $request->validate([
+            'name' => 'required|string',
+            'type' => 'required|string', // Jati, Sengon, Mahoni
+            'dimension_length' => 'required|numeric',
+            'dimension_width' => 'required|numeric',
+            'dimension_height' => 'required|numeric',
+            'dimension_diameter' => 'required|numeric',
+            'volume' => 'nullable|numeric',
+            'grade' => 'required|string',
+            'price' => 'required|integer'
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $product = Product::create($validated);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Product $product)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Product $product)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Product $product)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Product $product)
-    {
-        //
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Produk kayu berhasil ditambahkan',
+            'data' => $product
+        ], 201);
     }
 }

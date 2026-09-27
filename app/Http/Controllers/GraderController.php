@@ -1,65 +1,46 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Grader;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class GraderController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $graders = Grader::with('user')->get();
+        return response()->json(['status' => 'success', 'data' => $graders]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request): JsonResponse
     {
-        //
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'phone_number' => 'required|string',
+            'grader_group' => 'required|string'
+        ]);
+
+        $grader = Grader::create($validated);
+        return response()->json(['status' => 'success', 'message' => 'Grader berhasil dibuat', 'data' => $grader], 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function show($id): JsonResponse
     {
-        //
+        $grader = Grader::with('user')->findOrFail($id);
+        return response()->json(['status' => 'success', 'data' => $grader]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Grader $grader)
+    public function update(Request $request, $id): JsonResponse
     {
-        //
+        $grader = Grader::findOrFail($id);
+        $grader->update($request->only(['phone_number', 'grader_group']));
+        return response()->json(['status' => 'success', 'message' => 'Data Grader diperbarui', 'data' => $grader]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Grader $grader)
+    public function destroy($id): JsonResponse
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Grader $grader)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Grader $grader)
-    {
-        //
+        Grader::findOrFail($id)->delete();
+        return response()->json(['status' => 'success', 'message' => 'Grader dihapus']);
     }
 }
