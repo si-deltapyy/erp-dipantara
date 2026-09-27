@@ -1,5 +1,5 @@
 import type { Grading, GradingInput } from '@/core/types/grading'
-import type { WorkflowVersion } from '@/core/types/workflow'
+import type { WorkflowVersion, WorkflowRejection } from '@/core/types/workflow'
 import type { SessionUser } from '@/core/types/session'
 import type { DemoTransaction } from './transaction'
 import type { DatasetMetadata } from './schema'
@@ -14,9 +14,9 @@ import {
     labelGrading,
 } from './grading-context'
 export interface GradingMutation {
-    readonly action: 'create' | 'update' | 'submit'
+    readonly action: 'create' | 'update' | 'submit' | 'approve' | 'reject'
     readonly id?: string
-    readonly input: (GradingInput & { version?: number }) | WorkflowVersion
+    readonly input: (GradingInput & { version?: number }) | WorkflowVersion | WorkflowRejection
     readonly key: string
     readonly hash: string
 }
@@ -45,7 +45,14 @@ export async function writeGrading(
     }
     if (previous && (!('version' in mutation.input) || previous.version !== mutation.input.version))
         throw new ApiError('conflict')
-    if (previous && !['draft', 'rejected'].includes(previous.status)) throw new ApiError('conflict')
+    const reviewing = mutation.action === 'approve' || mutation.action === 'reject'
+    if (
+        previous &&
+        (reviewing
+            ? previous.status !== 'submitted'
+            : !['draft', 'rejected'].includes(previous.status))
+    )
+        throw new ApiError('conflict')
     const input = 'assignmentId' in mutation.input ? mutation.input : previous
     if (!input || input.assignmentId !== assignment.id)
         throw new ApiError('validation', { assignmentId: ['gradings.parentLocked'] })
@@ -53,7 +60,8 @@ export async function writeGrading(
     if (!grader || grader.provisioningStatus !== 'active') throw new ApiError('conflict')
     await assertGradingCapacity(transaction, input, assignment, previous ? [previous.id] : [])
     const submitting = mutation.action === 'submit'
-    if (submitting && assignment.orderStatus !== 'approved') throw new ApiError('conflict')
+    if ((submitting || reviewing) && assignment.orderStatus !== 'approved')
+        throw new ApiError('conflict')
     const now = new Date().toISOString()
     const grading: Grading = labelGrading(
         {
@@ -62,7 +70,13 @@ export async function writeGrading(
             rows: input.rows,
             id: previous?.id ?? crypto.randomUUID(),
             version: (previous?.version ?? 0) + 1,
-            status: submitting ? 'submitted' : (previous?.status ?? 'draft'),
+            status: reviewing
+                ? mutation.action === 'approve'
+                    ? 'approved'
+                    : 'rejected'
+                : submitting
+                  ? 'submitted'
+                  : (previous?.status ?? 'draft'),
             ...calculateGrading(input, assignment),
             createdByUserId: previous?.createdByUserId ?? parseId(actor.id),
             submittedByUserId: submitting
@@ -71,7 +85,12 @@ export async function writeGrading(
             createdAt: previous?.createdAt ?? now,
             updatedAt: now,
             allowedActions: [],
-            rejectionReason: submitting ? null : (previous?.rejectionReason ?? null),
+            rejectionReason:
+                'reason' in mutation.input
+                    ? mutation.input.reason
+                    : submitting || mutation.action === 'approve'
+                      ? null
+                      : (previous?.rejectionReason ?? null),
             revisionOfId: previous?.revisionOfId ?? null,
             revisionReason: previous?.revisionReason ?? null,
             invoiceRevisionRequired: previous?.invoiceRevisionRequired ?? false,
@@ -90,6 +109,7 @@ export async function writeGrading(
         actorId: actor.id,
         version: grading.version,
         action: mutation.action,
+        ...('reason' in mutation.input ? { reason: mutation.input.reason } : {}),
     })
     await transaction.put('gradingMutations', {
         id: receiptId,

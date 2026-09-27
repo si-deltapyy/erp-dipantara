@@ -7,7 +7,7 @@ import type { GradingMutation } from './grading-mutation'
 import { ApiError } from '@/core/types/api-error'
 import { assertRecordAccess, evaluateRecordAccess } from '@/core/domain/record-policy'
 import { parseGradingInput, parseGradingQuery } from '@/api/grading-mapper'
-import { parseWorkflowVersion } from '@/api/contracts/workflow-parsers'
+import { parseWorkflowVersion, parseWorkflowRejection } from '@/api/contracts/workflow-parsers'
 import { parseId } from '@/api/contracts/value-parsers'
 import { requireDataset } from './demo-repository'
 import { runDemoTransaction } from './transaction'
@@ -122,9 +122,11 @@ export class GradingRepository {
         if (mutation.action !== 'create') parseId(mutation.id)
         if (!mutation.key.trim() || mutation.key.length > 100) throw new ApiError('validation')
         const input =
-            mutation.action === 'submit'
-                ? parseWorkflowVersion(mutation.input)
-                : parseGradingInput(mutation.input, mutation.action === 'update')
+            mutation.action === 'reject'
+                ? parseWorkflowRejection(mutation.input)
+                : mutation.action === 'submit' || mutation.action === 'approve'
+                  ? parseWorkflowVersion(mutation.input)
+                  : parseGradingInput(mutation.input, mutation.action === 'update')
         const hash = await hashMutationPayload({ ...input, generation })
         return runDemoTransaction(
             this.options,

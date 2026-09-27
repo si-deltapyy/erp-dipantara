@@ -63,3 +63,23 @@ test('rejects mismatched row results and treats invalid successful writes as unc
         }),
     ).rejects.toMatchObject({ kind: 'unexpected' })
 })
+
+test('sends versioned grading review and preserves returned rejection reason', async () => {
+    const client = axios.create()
+    const post = vi.spyOn(client, 'post').mockResolvedValue({
+        data: {
+            data: { ...gradingFixture, status: 'rejected', rejectionReason: 'Measure again' },
+        },
+    })
+    const api = createHttpGradings(client)
+    const options = { signal: new AbortController().signal, idempotencyKey: 'review' }
+    await api.approve('grading-one', { version: 2 }, options)
+    expect(
+        (await api.reject('grading-one', { version: 2, reason: 'Measure again' }, options))
+            .rejectionReason,
+    ).toBe('Measure again')
+    expect(post.mock.calls.map((call) => [call[0], call[1]])).toEqual([
+        ['/api/v1/gradings/grading-one/approve', { version: 2 }],
+        ['/api/v1/gradings/grading-one/reject', { version: 2, reason: 'Measure again' }],
+    ])
+})

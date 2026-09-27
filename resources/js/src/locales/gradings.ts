@@ -2,6 +2,11 @@ import orders from './orders'
 export default {
     gradings: {
         ...orders.orders,
+        approve: 'Setujui grading',
+        reject: 'Tolak grading',
+        approveDescription: 'Pastikan ukuran dan volume benar sebelum menyetujui hasil grading.',
+        rejectDescription: 'Jelaskan pengukuran yang perlu diperbaiki.',
+        assignmentFilter: 'Filter ID penugasan',
         title: 'Grading',
         add: 'Tambah grading',
         edit: 'Edit grading',

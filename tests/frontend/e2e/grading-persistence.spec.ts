@@ -175,12 +175,102 @@ test('guards grading scope, order approval, capacity, stale versions and idempot
             signal,
         )
         const reloaded = await new GradingRepository(options).get(grader, grading.id, signal)
+        const reviewFailures: string[] = []
+        const rejectReview = async (run: () => Promise<unknown>) => {
+            try {
+                await run()
+                reviewFailures.push('unexpected-success')
+            } catch (cause) {
+                reviewFailures.push((cause as { kind: string }).kind)
+            }
+        }
+        await rejectReview(() =>
+            gradings.mutate(
+                { ...grader, permissions: actor('admin-demo').permissions },
+                {
+                    action: 'approve',
+                    id: grading.id,
+                    input: { version: grading.version },
+                    key: 'self-review',
+                },
+                generation,
+                signal,
+            ),
+        )
+        await rejectReview(() =>
+            gradings.mutate(
+                supervisor,
+                { action: 'approve', id: grading.id, input: { version: 99 }, key: 'stale-review' },
+                generation,
+                signal,
+            ),
+        )
+        const rejected = await gradings.mutate(
+            supervisor,
+            {
+                action: 'reject',
+                id: grading.id,
+                input: { version: grading.version, reason: 'Measure again' },
+                key: 'reject',
+            },
+            generation,
+            signal,
+        )
+        const edited = await gradings.mutate(
+            grader,
+            {
+                action: 'update',
+                id: grading.id,
+                input: { ...input, version: rejected.version },
+                key: 'edit',
+            },
+            generation,
+            signal,
+        )
+        const resubmitted = await gradings.mutate(
+            grader,
+            {
+                action: 'submit',
+                id: grading.id,
+                input: { version: edited.version },
+                key: 'resubmit',
+            },
+            generation,
+            signal,
+        )
+        const approved = await gradings.mutate(
+            supervisor,
+            {
+                action: 'approve',
+                id: grading.id,
+                input: { version: resubmitted.version },
+                key: 'approve',
+            },
+            generation,
+            signal,
+        )
+        const approvedRetry = await gradings.mutate(
+            supervisor,
+            {
+                action: 'approve',
+                id: grading.id,
+                input: { version: resubmitted.version },
+                key: 'approve',
+            },
+            generation,
+            signal,
+        )
         const empty = await gradings.list(
             other,
             { page: 1, perPage: 20, search: '', sort: '-createdAt' },
             signal,
         )
         return {
+            reviewFailures,
+            reason: edited.rejectionReason,
+            cleared: resubmitted.rejectionReason,
+            approvedStatus: approved.status,
+            sameVersion: approved.version === approvedRetry.version,
             failures,
             sameId: retry.id === draft.id,
             status: reloaded.status,
@@ -191,6 +281,11 @@ test('guards grading scope, order approval, capacity, stale versions and idempot
         }
     })
     expect(result.failures).toEqual(['not-found', 'conflict', 'validation', 'conflict', 'conflict'])
+    expect(result.reviewFailures).toEqual(['forbidden', 'conflict'])
+    expect(result.reason).toBe('Measure again')
+    expect(result.cleared).toBeNull()
+    expect(result.approvedStatus).toBe('approved')
+    expect(result.sameVersion).toBe(true)
     expect(result.sameId).toBe(true)
     expect(result.status).toBe('submitted')
     expect(result.rowId).toBe('stable-row')
