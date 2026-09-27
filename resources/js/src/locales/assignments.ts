@@ -1,6 +1,13 @@
 import orders from './orders'
 export default {
     assignments: {
+        assignedTitle: 'Penugasan Grader',
+        detailTitle: 'Detail penugasan',
+        assignedHint: 'Penugasan yang tersedia untuk akun Anda.',
+        open: 'Buka penugasan',
+        back: 'Kembali ke penugasan',
+        grades: 'Mutu yang tersedia',
+        orderStatus: 'Status order',
         terms: 'Termin Mitra',
         noTerms: 'Belum ada termin Mitra.',
         noDueDate: 'Tidak ditentukan',

@@ -1,4 +1,5 @@
 import { orderRoutes } from './orders'
+import { assignmentRoutes } from './assignments'
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import type { DevelopmentCapability } from '@/core/types/session'
@@ -21,7 +22,13 @@ const routes: RouteRecordRaw[] = [
     },
 ]
 
-routes.push(...orderRoutes, ...authRoutes, ...masterDataRoutes, ...purchaseOrderRoutes)
+routes.push(
+    ...assignmentRoutes,
+    ...orderRoutes,
+    ...authRoutes,
+    ...masterDataRoutes,
+    ...purchaseOrderRoutes,
+)
 
 routes.push({
     path: '/:pathMatch(.*)*',
