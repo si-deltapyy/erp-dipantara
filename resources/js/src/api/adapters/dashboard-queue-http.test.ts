@@ -66,3 +66,36 @@ it('requires queue counts and drilldown targets to match their typed kind', () =
     expect(() => parseQueueSummaries([summary, summary])).toThrow()
     expect(() => parseQueueSummaries([{ ...summary, count: -1 }])).toThrow()
 })
+
+it.each(['purchase-orders', 'orders', 'gradings', 'payments', 'closings'] as const)(
+    'reads the %s review queue and rejects another resource',
+    async (resource) => {
+        const client = axios.create()
+        const entry = {
+            ...record,
+            resource,
+            status: resource === 'closings' ? 'requested' : 'submitted',
+            targetPath: `/${resource}/${record.id}`,
+        }
+        const response = { data: [entry], meta: { page: 1, perPage: 20, total: 1 } }
+        const get = vi.spyOn(client, 'get').mockResolvedValue({ data: response })
+        const query = {
+            kind: `${resource}-review` as const,
+            page: 1,
+            perPage: 20,
+            search: '',
+            sort: '-createdAt' as const,
+        }
+        const api = createHttpDashboard(client)
+        expect(await api.queue(query, new AbortController().signal)).toEqual(response)
+        get.mockResolvedValue({
+            data: {
+                ...response,
+                data: [{ ...record, resource: 'invoices', targetPath: '/invoices/' + record.id }],
+            },
+        })
+        await expect(api.queue(query, new AbortController().signal)).rejects.toMatchObject({
+            kind: 'validation',
+        })
+    },
+)

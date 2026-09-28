@@ -11,6 +11,11 @@ export default {
         total: '{count} pekerjaan',
         back: 'Kembali ke dashboard',
         queues: {
+            'purchase-orders-review': 'PO menunggu review',
+            'orders-review': 'Order menunggu review',
+            'gradings-review': 'Grading menunggu review',
+            'payments-review': 'Pembayaran menunggu review',
+            'closings-review': 'Closing menunggu review',
             'purchase-orders-processing': 'PO belum memiliki order',
             'orders-processing': 'Order perlu diproses',
             'deliveries-processing': 'Pengiriman perlu diproses',
@@ -22,6 +27,8 @@ export default {
             'Sepuluh transaksi terbaru milik PO Anda. Buka detail untuk memeriksa status dan tindak lanjut.',
         activityEmpty: 'Belum ada transaksi yang dapat ditampilkan.',
         resources: {
+            gradings: 'Grading',
+            closings: 'Closing',
             orders: 'Order',
             deliveries: 'Pengiriman',
             'purchase-orders': 'Purchase Order',
@@ -29,6 +36,7 @@ export default {
             payments: 'Pembayaran',
         },
         statuses: {
+            requested: 'Menunggu review closing',
             dispatched: 'Dalam pengiriman',
             received: 'Diterima',
             draft: 'Draft',

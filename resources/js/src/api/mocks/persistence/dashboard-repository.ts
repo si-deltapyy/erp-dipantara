@@ -22,6 +22,7 @@ const stores: readonly DemoStore[] = [
     'payments',
     'assignments',
     'gradings',
+    'closings',
 ]
 export class DashboardRepository {
     constructor(private readonly options: DatabaseOptions = {}) {}

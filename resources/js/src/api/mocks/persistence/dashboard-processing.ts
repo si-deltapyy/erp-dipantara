@@ -1,10 +1,7 @@
+import { queueEntry } from './dashboard-queue-entry'
 import type { SessionUser } from '@/core/types/session'
 import type { RecordMetadata } from '@/core/types/contracts'
-import type {
-    DashboardQueueEntry,
-    DashboardQueueKind,
-    QueueResource,
-} from '@/core/types/dashboard-queue'
+import type { DashboardQueueEntry, ProcessingQueueKind } from '@/core/types/dashboard-queue'
 import type { DemoTransaction } from './transaction'
 import { evaluateRecordAccess } from '@/core/domain/record-policy'
 import { presentOrder } from '../order-policy'
@@ -23,30 +20,10 @@ type ProcessingRecord = RecordMetadata & {
     readonly invoiceNumber?: string
     readonly licensePlate?: string
 }
-function queueEntry(
-    resource: QueueResource,
-    record: Omit<ProcessingRecord, 'purchaseOrderId'>,
-): DashboardQueueEntry {
-    return {
-        resource,
-        id: record.id,
-        label:
-            record.number ??
-            record.invoiceNumber ??
-            record.licensePlate ??
-            record.purchaseOrderNumber,
-        purchaseOrderNumber: record.purchaseOrderNumber,
-        status: record.status,
-        version: record.version,
-        createdAt: record.createdAt,
-        updatedAt: record.updatedAt,
-        targetPath: `/${resource}/${encodeURIComponent(record.id)}`,
-    }
-}
 async function downstreamRecords(
     transaction: DemoTransaction,
     actor: SessionUser,
-    kind: DashboardQueueKind,
+    kind: ProcessingQueueKind,
 ): Promise<readonly ProcessingRecord[]> {
     if (kind === 'orders-processing')
         return (await transaction.list('orders')).map((record) => presentOrder(record, actor, ''))
@@ -67,7 +44,7 @@ async function downstreamRecords(
 export async function processingQueueEntries(
     transaction: DemoTransaction,
     actor: SessionUser,
-    kind: DashboardQueueKind,
+    kind: ProcessingQueueKind,
 ): Promise<readonly DashboardQueueEntry[]> {
     const parents = new Map(
         (await transaction.list('purchase-orders')).map((order) => [order.id, order]),

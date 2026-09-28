@@ -4,7 +4,7 @@ import type {
     DashboardQueueQuery,
     DashboardQueueSummary,
 } from '@/core/types/dashboard-queue'
-import { processingQueueKinds, queueStatuses } from '@/core/types/dashboard-queue'
+import { dashboardQueueKinds, queueStatuses, queueResources } from '@/core/types/dashboard-queue'
 import { parseBuyerQuery } from './buyer-mapper'
 import { parseTimestamp } from './contracts/timestamp-parser'
 import { parsePage } from './contracts/response-parsers'
@@ -19,7 +19,7 @@ import {
 } from './contracts/value-parsers'
 export function parseQueueKind(value: unknown): DashboardQueueKind {
     const kind = parseString(value, 'kind')
-    const matched = processingQueueKinds.find((candidate) => candidate === kind)
+    const matched = dashboardQueueKinds.find((candidate) => candidate === kind)
     if (!matched) return invalidContract('kind')
     return matched
 }
@@ -49,7 +49,9 @@ export function parseQueueEntry(value: unknown): DashboardQueueEntry {
         resource !== 'orders' &&
         resource !== 'deliveries' &&
         resource !== 'invoices' &&
-        resource !== 'payments'
+        resource !== 'payments' &&
+        resource !== 'gradings' &&
+        resource !== 'closings'
     )
         return invalidContract('resource')
     const id = parseId(record.id)
@@ -75,7 +77,7 @@ export function parseQueuePage(
     kind: DashboardQueueKind,
 ): PageResponse<DashboardQueueEntry> {
     const page = parsePage(value, parseQueueEntry)
-    if (page.data.some((record) => record.resource !== kind.replace('-processing', '')))
+    if (page.data.some((record) => record.resource !== queueResources[kind]))
         return invalidContract('resource')
     return page
 }
