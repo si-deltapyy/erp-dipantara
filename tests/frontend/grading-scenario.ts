@@ -9,13 +9,13 @@ function actor(id: string): SessionUser {
     if (!found) throw new Error(id)
     return found
 }
-export async function createApprovedGradingScenario(): Promise<
-    Awaited<ReturnType<typeof buildScenario>>
-> {
-    return buildScenario()
+export async function createApprovedGradingScenario(
+    databaseName?: string,
+): Promise<Awaited<ReturnType<typeof buildScenario>>> {
+    return buildScenario(databaseName)
 }
-async function buildScenario() {
-    const options = { name: 'grading-revision-test-' + crypto.randomUUID() }
+async function buildScenario(databaseName?: string) {
+    const options = { name: databaseName ?? 'grading-revision-test-' + crypto.randomUUID() }
     const metadata = await new DemoRepository(options).initialize()
     const signal = new AbortController().signal,
         generation = metadata.generation

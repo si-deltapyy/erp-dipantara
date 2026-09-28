@@ -1,6 +1,6 @@
+import { persistentGradingDownstream } from './grading-downstream-resolver'
 import { parseGradingRevision } from '@/api/contracts/grading-revision'
 import type { GradingDownstream } from '../grading-downstream'
-import { gradingDownstreamFixtures } from '../grading-downstream'
 import type { Grading, GradingQuery } from '@/core/types/grading'
 import type { PageResponse } from '@/core/types/contracts'
 import type { SessionUser } from '@/core/types/session'
@@ -20,6 +20,7 @@ import { gradingAssignment, labelGrading } from './grading-context'
 import { gradingAccess, presentGrading, requireGradingPermission } from '../grading-policy'
 const readStores: readonly DemoStore[] = [
     'metadata',
+    'deliveries',
     'gradings',
     'assignments',
     'orders',
@@ -31,7 +32,7 @@ const readStores: readonly DemoStore[] = [
 export class GradingRepository {
     constructor(
         private readonly options: DatabaseOptions = {},
-        private readonly downstream: GradingDownstream = gradingDownstreamFixtures,
+        private readonly downstream?: GradingDownstream,
     ) {}
     async list(
         user: SessionUser | null,
@@ -152,7 +153,7 @@ export class GradingRepository {
                         input,
                         hash,
                     },
-                    this.downstream,
+                    this.downstream ?? (await persistentGradingDownstream(transaction)),
                 )
                 return presentGrading(
                     grading,

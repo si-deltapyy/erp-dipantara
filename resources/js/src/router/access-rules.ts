@@ -5,6 +5,7 @@ export interface AccessRule {
     readonly developmentCapability?: DevelopmentCapability
 }
 export const accessRules = {
+    deliveries: { requiredPermissions: ['deliveries.read.all'] },
     gradings: {
         requiredPermissions: [],
         anyPermissions: ['gradings.read.all', 'gradings.read.assigned'],

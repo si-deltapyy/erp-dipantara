@@ -1,3 +1,4 @@
+import deliveries from './deliveries'
 import gradings from './gradings'
 import assignments from './assignments'
 import orders from './orders'
@@ -21,6 +22,7 @@ export const i18n = createI18n({
         id: {
             ...id,
             ...orders,
+            ...deliveries,
             ...gradings,
             ...assignments,
             ...documents,
