@@ -1,3 +1,4 @@
+import reports from './reports'
 import dashboard from './dashboard'
 import production from './production'
 import closings from './closings'
@@ -26,6 +27,7 @@ export const i18n = createI18n({
     messages: {
         id: {
             ...id,
+            ...reports,
             ...dashboard,
             ...production,
             ...orders,

@@ -1,3 +1,4 @@
+import { configureReports } from '@/composables/configureReports'
 import { configureDashboard } from '@/composables/configureDashboard'
 import { configureClosings } from '@/composables/configureClosings'
 import { configurePayments } from '@/composables/configurePayments'
@@ -43,6 +44,7 @@ async function start(): Promise<void> {
     await configureInvoices(app, pinia)
     await configureClosings(app, pinia)
     await configureDashboard(app, pinia)
+    await configureReports(app, pinia)
     await configurePayments(app, pinia)
     await configurePurchaseOrders(app, pinia)
     await configureDocuments(app, pinia)
