@@ -19,14 +19,14 @@ import { runDemoTransaction } from './transaction'
 import type { DatabaseOptions } from './database'
 import { hashMutationPayload } from './idempotency'
 import { writeBankAccount } from './bank-account-mutation'
-import { resolveBankAccountScope, bankAccountInvoiceFixtures } from '../bank-account-lookup-scope'
+import { invoiceAccountLinks } from './bank-account-invoices'
+import { resolveBankAccountScope } from '../bank-account-lookup-scope'
 import type { BankAccountInvoiceLink } from '../bank-account-lookup-scope'
 
 export class BankAccountRepository {
     constructor(
         private readonly options: DatabaseOptions = {},
-        private readonly transactionLinks: () => readonly BankAccountInvoiceLink[] = () =>
-            bankAccountInvoiceFixtures,
+        private readonly transactionLinks?: () => readonly BankAccountInvoiceLink[],
     ) {}
     async list(
         user: SessionUser | null,
@@ -36,15 +36,19 @@ export class BankAccountRepository {
     ): Promise<PageResponse<BankAccount>> {
         const actor = requireBankAccountPermission(user, lookup ? 'lookup' : 'read')
         const filter = lookup ? parseBankAccountQuery(query) : parseBankAccountListQuery(query)
-        const inScope = lookup
-            ? resolveBankAccountScope(actor, filter, this.transactionLinks())
-            : () => true
         return runDemoTransaction(
             this.options,
-            ['metadata', 'bank-accounts'],
+            ['metadata', 'bank-accounts', 'invoices', 'purchase-orders'],
             'readonly',
             async (transaction) => {
                 const metadata = await requireDataset(transaction)
+                const inScope = lookup
+                    ? resolveBankAccountScope(
+                          actor,
+                          filter,
+                          this.transactionLinks?.() ?? (await invoiceAccountLinks(transaction)),
+                      )
+                    : () => true
                 const search = filter.search.trim().toLocaleLowerCase('id')
                 const matches = (await transaction.list('bank-accounts'))
                     .filter((bankAccount) => inScope(bankAccount))

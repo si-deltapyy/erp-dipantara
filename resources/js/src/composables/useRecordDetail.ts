@@ -18,6 +18,7 @@ export function useRecordDetail<T>(
         subscribe(listener: () => void): () => void
     },
     resource: string,
+    observeChanges = true,
 ): RecordDetailState<T> {
     const route = useRoute()
     const session = useSession()
@@ -51,7 +52,7 @@ export function useRecordDetail<T>(
         () => void refresh(),
         { immediate: true },
     )
-    const unsubscribe = api.subscribe(() => void refresh())
+    const unsubscribe = observeChanges ? api.subscribe(() => void refresh()) : () => undefined
     onScopeDispose(() => {
         active?.abort()
         unsubscribe()

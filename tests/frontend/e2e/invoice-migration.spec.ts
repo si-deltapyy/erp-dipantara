@@ -2,8 +2,8 @@ import { expect, test } from '@playwright/test'
 import type * as DatabaseModule from '../../../resources/js/src/api/mocks/persistence/database'
 import type * as TransactionModule from '../../../resources/js/src/api/mocks/persistence/transaction'
 import type * as SchemaModule from '../../../resources/js/src/api/mocks/persistence/schema'
-test.skip(process.env.E2E_PRODUCTION === 'true', 'Delivery migration mock')
-test('upgrades schema 11 additively while preserving records, audit, receipts and binary documents', async ({
+test.skip(process.env.E2E_PRODUCTION === 'true', 'Invoice migration mock')
+test('upgrades schema 12 additively while preserving records, audit, receipts and binary documents', async ({
     page,
 }) => {
     await page.goto('/app')
@@ -21,15 +21,12 @@ test('upgrades schema 11 additively while preserving records, audit, receipts an
         const { demoStores } = (await import(
             origin + '/resources/js/src/api/mocks/persistence/schema.ts'
         )) as typeof SchemaModule
-        const name = 'delivery-upgrade-' + crypto.randomUUID()
+        const name = 'invoice-upgrade-' + crypto.randomUUID()
         const legacy = demoStores.filter(
-            (store) =>
-                !['deliveries', 'deliveryMutations', 'invoices', 'invoiceMutations'].includes(
-                    store,
-                ),
+            (store) => !['invoices', 'invoiceMutations'].includes(store),
         )
         await new Promise<void>((resolve, reject) => {
-            const request = indexedDB.open(name, 11)
+            const request = indexedDB.open(name, 12)
             request.onupgradeneeded = () => {
                 for (const store of legacy) {
                     const table = request.result.createObjectStore(store, { keyPath: 'id' })
@@ -64,19 +61,19 @@ test('upgrades schema 11 additively while preserving records, audit, receipts an
                 return {
                     counts,
                     blob: blob?.content,
-                    deliveries: await transaction.count('deliveries'),
+                    invoices: await transaction.count('invoices'),
                 }
             },
         )
         return {
             version,
             counts: preserved.counts,
-            deliveries: preserved.deliveries,
+            invoices: preserved.invoices,
             binary: await preserved.blob?.text(),
         }
     })
-    expect(result.version).toBeGreaterThanOrEqual(12)
+    expect(result.version).toBeGreaterThanOrEqual(13)
     expect(result.counts.every((count) => count === 1)).toBe(true)
-    expect(result.deliveries).toBe(0)
+    expect(result.invoices).toBe(4)
     expect(result.binary).toBe('preserved binary')
 })

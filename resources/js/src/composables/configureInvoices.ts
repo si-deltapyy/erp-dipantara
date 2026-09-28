@@ -1,6 +1,7 @@
-import { inject } from 'vue'
+import { inject, watch } from 'vue'
 import type { App } from 'vue'
 import type { DemoRuntime } from '@/api/mocks/demo-runtime'
+import { useInvoiceRecoveryStore } from '@/stores/invoice-recovery'
 import type { Pinia } from 'pinia'
 import { invoicesApiKey } from '@/api/invoices-api'
 import { createHttpInvoices } from '@/api/adapters/invoices-http'
@@ -22,8 +23,23 @@ export async function configureInvoices(app: App, pinia: Pinia): Promise<void> {
             : undefined,
     })
     app.provide(invoicesApiKey, api)
+    const recovery = useInvoiceRecoveryStore(pinia)
+    const stop = watch(
+        () => [session.status, session.user],
+        () => {
+            if (
+                session.status === 'guest' ||
+                (session.user &&
+                    [recovery.snapshot, recovery.issue].some(
+                        (snapshot) => snapshot && snapshot.actorId !== session.user?.id,
+                    ))
+            )
+                recovery.$reset()
+        },
+    )
+    app.onUnmount(stop)
+    if (import.meta.hot) import.meta.hot.dispose(stop)
 }
-
 function injectRuntime(): DemoRuntime {
     const runtime = inject(demoRuntimeKey)
     if (!runtime) throw new Error('Demo runtime is not configured')

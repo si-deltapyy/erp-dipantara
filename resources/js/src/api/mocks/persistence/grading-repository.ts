@@ -21,6 +21,7 @@ import { gradingAccess, presentGrading, requireGradingPermission } from '../grad
 const readStores: readonly DemoStore[] = [
     'metadata',
     'deliveries',
+    'invoices',
     'gradings',
     'assignments',
     'orders',

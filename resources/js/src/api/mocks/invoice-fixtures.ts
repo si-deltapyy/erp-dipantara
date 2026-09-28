@@ -1,7 +1,10 @@
 import { parseInvoice } from '@/api/invoice-mapper'
-export const invoiceFixtures = [
+const baseline = [
     parseInvoice({
         id: 'synthetic-payable-01',
+        ownerUserId: 'user-demo',
+        purchaseOrderNumber: 'DEMO-PO-03',
+        counterpartyName: 'Mitra Simulasi 01',
         purchaseOrderId: 'demo-po-03',
         mitraId: 'demo-mitra-01',
         direction: 'payable',
@@ -22,4 +25,31 @@ export const invoiceFixtures = [
         version: 1,
         allowedActions: [],
     }),
+]
+
+export const invoiceFixtures = [
+    ...baseline,
+    ...[
+        {
+            id: 'demo-invoice-buyer-one',
+            direction: 'receivable',
+            mitraId: null,
+            counterpartyName: 'Perusahaan Simulasi 01',
+        },
+        {
+            id: 'demo-invoice-mitra-one',
+            direction: 'payable',
+            mitraId: 'demo-mitra-01',
+            counterpartyName: 'Mitra Simulasi 01',
+        },
+        {
+            id: 'demo-invoice-buyer-two',
+            direction: 'receivable',
+            mitraId: null,
+            purchaseOrderId: 'demo-po-26',
+            ownerUserId: 'multiple-demo',
+            purchaseOrderNumber: 'DEMO-PO-26',
+            counterpartyName: 'Perusahaan Simulasi 01',
+        },
+    ].map((link) => parseInvoice({ ...baseline[0], ...link, status: 'draft', number: null })),
 ]

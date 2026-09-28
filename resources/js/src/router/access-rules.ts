@@ -5,6 +5,10 @@ export interface AccessRule {
     readonly developmentCapability?: DevelopmentCapability
 }
 export const accessRules = {
+    invoices: {
+        requiredPermissions: [],
+        anyPermissions: ['invoices.read.all', 'invoices.read.own'],
+    },
     deliveries: {
         requiredPermissions: [],
         anyPermissions: ['deliveries.read.all', 'deliveries.read.own', 'deliveries.read.assigned'],

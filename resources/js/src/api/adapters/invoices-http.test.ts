@@ -1,3 +1,5 @@
+import { invoiceDraft } from '@/core/domain/invoice-draft'
+import { parseInvoiceInput } from '@/api/contracts/invoice-input'
 import axios from 'axios'
 import { expect, it, vi } from 'vitest'
 import { createHttpInvoices } from './invoices-http'
@@ -5,7 +7,7 @@ import { invoiceFixtures } from '@/api/mocks/invoice-fixtures'
 it('reads payable terms with PO and Mitra filters and preserves server totals', async () => {
     const client = axios.create()
     const get = vi.spyOn(client, 'get').mockResolvedValue({
-        data: { data: invoiceFixtures, meta: { page: 1, perPage: 20, total: 1 } },
+        data: { data: invoiceFixtures.slice(0, 1), meta: { page: 1, perPage: 20, total: 1 } },
     })
     const signal = new AbortController().signal
     const query = {
@@ -21,4 +23,46 @@ it('reads payable terms with PO and Mitra filters and preserves server totals', 
     expect(get).toHaveBeenCalledWith('/api/v1/invoices', { params: query, signal })
     expect(response.data[0]?.terms[0]?.dueDate).toBeNull()
     expect(response.data[0]?.outstandingAmount).toBe('100000.00')
+})
+
+it('writes versioned invoice terms and issues without automatically retrying ambiguous outcomes', async () => {
+    const client = axios.create()
+    const invoice = invoiceFixtures[0]
+    if (!invoice) throw new Error('Missing fixture')
+    const post = vi.spyOn(client, 'post').mockResolvedValue({ data: { data: invoice } })
+    const put = vi.spyOn(client, 'put').mockResolvedValue({ data: { data: invoice } })
+    const get = vi.spyOn(client, 'get').mockResolvedValue({ data: { data: invoice } })
+    const api = createHttpInvoices(client)
+    const input = invoiceDraft(invoice)
+    const options = { signal: new AbortController().signal, idempotencyKey: 'terms-key' }
+    await api.get(invoice.id, options.signal)
+    expect(get).toHaveBeenCalledWith('/api/v1/invoices/' + invoice.id, { signal: options.signal })
+    await api.create(input, options)
+    await api.update(invoice.id, { ...input, version: 1, revisionNumber: 1 }, options)
+    expect(put).toHaveBeenCalledWith(
+        '/api/v1/invoices/' + invoice.id,
+        { ...input, version: 1, revisionNumber: 1 },
+        { signal: options.signal, headers: { 'Idempotency-Key': 'terms-key' } },
+    )
+    await api.issue(invoice.id, { version: 2, revisionNumber: 1 }, options)
+    expect(post).toHaveBeenLastCalledWith(
+        '/api/v1/invoices/' + invoice.id + '/issue',
+        { version: 2, revisionNumber: 1 },
+        { signal: options.signal, headers: { 'Idempotency-Key': 'terms-key' } },
+    )
+    post.mockRejectedValueOnce(new Error('ambiguous'))
+    await expect(api.issue(invoice.id, { version: 2, revisionNumber: 1 }, options)).rejects.toThrow(
+        'ambiguous',
+    )
+    expect(post).toHaveBeenCalledTimes(3)
+    post.mockResolvedValueOnce({ data: { data: {} } })
+    await expect(api.create(input, options)).rejects.toMatchObject({ kind: 'unexpected' })
+    expect(() =>
+        parseInvoiceInput({
+            ...input,
+            terms: [{ label: 'Invalid', amount: '-1.00', dueDate: null }],
+        }),
+    ).toThrow()
+    expect(() => parseInvoiceInput({ ...input, invoiceDate: '2026-02-30' })).toThrow()
+    expect(() => parseInvoiceInput({ ...input, totalAmount: '0.00' })).toThrow()
 })

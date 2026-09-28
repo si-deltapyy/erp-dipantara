@@ -1,11 +1,11 @@
 import type { GradingDownstream } from '../grading-downstream'
-import { gradingDownstreamFixtures } from '../grading-downstream'
 import type { DemoTransaction } from './transaction'
 
 export async function persistentGradingDownstream(
     transaction: DemoTransaction,
 ): Promise<GradingDownstream> {
     const deliveries = await transaction.list('deliveries')
+    const invoices = await transaction.list('invoices')
     return {
         allocations: () =>
             deliveries.flatMap((delivery) =>
@@ -15,6 +15,12 @@ export async function persistentGradingDownstream(
                     status: delivery.status === 'draft' ? ('reserved' as const) : delivery.status,
                 })),
             ),
-        hasIssuedInvoice: gradingDownstreamFixtures.hasIssuedInvoice,
+        hasIssuedInvoice: (purchaseOrderId, mitraId) =>
+            invoices.some(
+                (invoice) =>
+                    invoice.status === 'issued' &&
+                    invoice.purchaseOrderId === purchaseOrderId &&
+                    invoice.mitraId === mitraId,
+            ),
     }
 }

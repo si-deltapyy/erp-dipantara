@@ -1,9 +1,9 @@
-import type { DocumentReference, DocumentUpload } from '@/core/types/document'
+import type { DocumentReference, DocumentUpload, DocumentParentType } from '@/core/types/document'
 
 export interface StoredDocument extends DocumentReference {
-    readonly parentType: DocumentUpload['parentType']
+    readonly parentType: DocumentParentType
     readonly parentId: string | null
-    readonly purpose: DocumentUpload['purpose']
+    readonly purpose: DocumentUpload['purpose'] | 'invoice_pdf'
     readonly createdByUserId: string
     readonly expiresAt: number | null
     readonly content: Blob

@@ -1,3 +1,4 @@
+import { invoiceFixtures } from '../invoice-fixtures'
 import { purchaseOrderFixtures } from '../purchase-order-fixtures'
 import { graderFixtures } from '../grader-fixtures'
 import { bankAccountFixtures } from '../bank-account-fixtures'
@@ -40,6 +41,7 @@ export async function seedDataset(
         revision,
     }
     await transaction.put('metadata', metadata)
+    for (const invoice of invoiceFixtures) await transaction.put('invoices', invoice)
     for (const order of purchaseOrderFixtures) await transaction.put('purchase-orders', order)
     for (const grader of graderFixtures) await transaction.put('graders', grader)
     for (const account of bankAccountFixtures) await transaction.put('bank-accounts', account)

@@ -1,3 +1,5 @@
+import { parseInvoiceTerms } from './contracts/invoice-input'
+import { parseDeliveryDate } from './contracts/delivery-input'
 import type { Invoice, InvoiceQuery } from '@/core/types/invoice'
 import { parseMetadata } from './contracts/response-parsers'
 import { parseTimestamp } from './contracts/timestamp-parser'
@@ -20,6 +22,9 @@ export function parseInvoice(value: unknown): Invoice {
         record,
         [
             'id',
+            'ownerUserId',
+            'purchaseOrderNumber',
+            'counterpartyName',
             'purchaseOrderId',
             'mitraId',
             'direction',
@@ -49,26 +54,20 @@ export function parseInvoice(value: unknown): Invoice {
     if (kind !== 'down_payment' && kind !== 'settlement') return invalidContract('kind')
     if (status !== 'draft' && status !== 'issued' && status !== 'superseded')
         return invalidContract('status')
-    if (!Array.isArray(record.terms) || !record.terms.length) return invalidContract('terms')
-    const terms = record.terms.map((entry, index) => {
-        const term = parseObject(entry, `terms.${index}`)
-        requireKeys(term, ['label', 'amount', 'dueDate'], `terms.${index}`)
-        return {
-            label: parseString(term.label, 'label'),
-            amount: parseMoney(term.amount, 'amount'),
-            dueDate: nullable(term.dueDate, 'dueDate'),
-        }
-    })
+    const terms = parseInvoiceTerms(record.terms)
     return {
         ...parseMetadata(record),
         id: parseId(record.id),
+        ownerUserId: parseId(record.ownerUserId),
+        purchaseOrderNumber: parseString(record.purchaseOrderNumber, 'purchaseOrderNumber'),
+        counterpartyName: parseString(record.counterpartyName, 'counterpartyName'),
         purchaseOrderId: parseId(record.purchaseOrderId),
         mitraId: record.mitraId === null ? null : parseId(record.mitraId),
         direction,
         kind,
         status,
         terms,
-        invoiceDate: parseString(record.invoiceDate, 'invoiceDate'),
+        invoiceDate: parseDeliveryDate(record.invoiceDate, 'invoiceDate'),
         notes: nullable(record.notes, 'notes'),
         number: nullable(record.number, 'number'),
         totalAmount: parseMoney(record.totalAmount, 'totalAmount'),
