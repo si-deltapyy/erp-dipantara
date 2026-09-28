@@ -33,3 +33,34 @@ test('forwards report filters and rejects invalid periods or incompatible respon
     })
     await expect(api.production(query, signal)).rejects.toThrow()
 })
+
+test('exports the canonical filter with one idempotency key and no automatic retry', async () => {
+    const client = axios.create()
+    const document = {
+        id: 'export-1',
+        fileName: 'production-2026-09.csv',
+        mimeType: 'text/csv',
+        sizeBytes: 100,
+    }
+    const post = vi.spyOn(client, 'post').mockResolvedValue({ data: { data: document } })
+    const signal = new AbortController().signal
+    const input = {
+        kind: 'production' as const,
+        period: '2026-09',
+        format: 'csv' as const,
+        filters: { graderId: 'grader-1' },
+    }
+    expect(
+        await createHttpReports(client).export(input, { signal, idempotencyKey: 'one' }),
+    ).toEqual(document)
+    expect(post).toHaveBeenLastCalledWith(
+        '/api/v1/reports/exports',
+        { ...input, filters: { ...input.filters, search: '', sort: '-createdAt' } },
+        { signal, headers: { 'Idempotency-Key': 'one' } },
+    )
+    post.mockRejectedValue(new Error('network'))
+    await expect(
+        createHttpReports(client).export(input, { signal, idempotencyKey: 'one' }),
+    ).rejects.toThrow('network')
+    expect(post).toHaveBeenCalledTimes(2)
+})

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { useProductionReport } from './composables/useProductionReport'
+import ReportExport from './components/ReportExport.vue'
 import ReportFilters from './components/ReportFilters.vue'
 import ProductionTable from './components/ProductionTable.vue'
 import AppPagination from '@/components/ui/AppPagination.vue'
@@ -14,6 +15,7 @@ const { response, query, loading, error, refresh, changePage } = useProductionRe
         <p class="text-sm text-muted">{{ t('production.simulation') }}</p>
         <div class="panel space-y-5">
             <ReportFilters />
+            <ReportExport kind="production" />
             <AppButton variant="secondary" :pending="loading" @click="refresh">{{
                 t('purchase-orders.refresh')
             }}</AppButton>

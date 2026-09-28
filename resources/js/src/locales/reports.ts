@@ -1,6 +1,10 @@
 import purchaseOrders from './purchase-orders'
 export default {
     reports: {
+        export: 'Ekspor CSV',
+        download: 'Unduh ulang CSV',
+        exportNotice:
+            'CSV memuat seluruh hasil sesuai filter dan akses. Hasil kosong tetap memiliki header. Jika gagal, klik kembali untuk mengulang permintaan yang sama.',
         prices: 'Laporan harga beli',
         quantity: 'Batang',
         volume: 'Volume (m3)',

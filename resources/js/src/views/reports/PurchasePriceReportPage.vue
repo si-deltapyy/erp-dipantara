@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { usePurchasePriceReport } from './composables/usePurchasePriceReport'
+import ReportExport from './components/ReportExport.vue'
 import ReportFilters from './components/ReportFilters.vue'
 import PurchasePriceTable from './components/PurchasePriceTable.vue'
 import AppPagination from '@/components/ui/AppPagination.vue'
@@ -14,6 +15,7 @@ const { response, query, loading, error, refresh, changePage } = usePurchasePric
         <p class="text-sm text-muted">{{ t('reports.priceNotice') }}</p>
         <div class="panel space-y-5">
             <ReportFilters />
+            <ReportExport kind="purchase_prices" />
             <AppButton variant="secondary" :pending="loading" @click="refresh">{{
                 t('purchase-orders.refresh')
             }}</AppButton>

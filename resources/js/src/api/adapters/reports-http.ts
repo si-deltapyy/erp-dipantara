@@ -1,3 +1,6 @@
+import { parseReportExport } from '@/api/report-export-mapper'
+import { parseDocument } from '@/api/document-mapper'
+import { parseDetail } from '@/api/contracts/response-parsers'
 import { parsePurchasePriceRow } from '@/api/purchase-price-mapper'
 import type { AxiosInstance } from 'axios'
 import type { ReportsApi } from '@/core/types/report'
@@ -8,6 +11,14 @@ import { parseProductionRow } from '@/api/production-mapper'
 import { parseReportQuery } from '@/api/report-mapper'
 export function createHttpReports(client: AxiosInstance = createHttpClient()): ReportsApi {
     return {
+        async export(input, options) {
+            const response = await client.post<unknown>(
+                '/api/v1/reports/exports',
+                parseReportExport(input),
+                { signal: options.signal, headers: { 'Idempotency-Key': options.idempotencyKey } },
+            )
+            return parseDetail(response.data, parseDocument).data
+        },
         async purchasePrices(query, signal) {
             const response = await client.get<unknown>('/api/v1/reports/purchase-prices', {
                 params: parseReportQuery(query),

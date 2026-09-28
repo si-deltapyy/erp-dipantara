@@ -1,3 +1,4 @@
+import type { StoredReportExport } from './report-export-schema'
 import type { Closing } from '@/core/types/closing'
 import type { Payment } from '@/core/types/payment'
 import type { Invoice } from '@/core/types/invoice'
@@ -14,6 +15,7 @@ import type { Mitra } from '@/core/types/mitra'
 import type { Buyer } from '@/core/types/buyer'
 
 export const demoStores = [
+    'reportExports',
     'closings',
     'closingMutations',
     'payments',
@@ -50,7 +52,7 @@ export const demoStores = [
     'timberProductMutations',
 ] as const
 export type DemoStore = (typeof demoStores)[number]
-export const demoSchemaVersion = 16
+export const demoSchemaVersion = 17
 export const demoDatasetVersion = 1
 export interface DatasetMetadata {
     readonly id: 'dataset'
@@ -86,6 +88,7 @@ export interface MutationReceipt {
     readonly result: DemoSample
 }
 export interface DemoTables {
+    readonly reportExports: StoredReportExport
     readonly closings: Closing
     readonly closingMutations: {
         readonly id: string

@@ -3,7 +3,7 @@ import type { DocumentReference, DocumentUpload, DocumentParentType } from '@/co
 export interface StoredDocument extends DocumentReference {
     readonly parentType: DocumentParentType
     readonly parentId: string | null
-    readonly purpose: DocumentUpload['purpose'] | 'invoice_pdf'
+    readonly purpose: DocumentUpload['purpose'] | 'invoice_pdf' | 'report_csv'
     readonly createdByUserId: string
     readonly expiresAt: number | null
     readonly content: Blob

@@ -1,3 +1,4 @@
+import { assertExportAccess } from './report-export-policy'
 import { assertOpenPurchaseOrder } from './closed-order-guard'
 import type { SessionUser } from '@/core/types/session'
 import type { DocumentParent } from '@/core/types/document'
@@ -21,6 +22,13 @@ export async function assertDocumentParentAccess(
     parent: DocumentParent,
     action: DocumentAction,
 ): Promise<void> {
+    if (parent.parentType === 'report') {
+        if (action === 'upload') throw new ApiError('forbidden')
+        const report = await transaction.get('reportExports', parent.parentId)
+        if (!report) throw new ApiError('not-found')
+        await assertExportAccess(transaction, actor, report, action)
+        return
+    }
     if (parent.parentType === 'payment') {
         const payment = await transaction.get('payments', parent.parentId)
         if (!payment) throw new ApiError('not-found')
