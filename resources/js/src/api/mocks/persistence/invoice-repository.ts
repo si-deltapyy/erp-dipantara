@@ -1,3 +1,5 @@
+import type { InvoiceSettlement } from '@/core/types/invoice-settlement'
+import { invoiceSettlement } from './invoice-monitoring'
 import {
     invoiceCreditFixture,
     invoiceOutstanding,
@@ -61,6 +63,7 @@ export class InvoiceRepository {
                             (!filter.purchaseOrderId ||
                                 filter.purchaseOrderId === invoice.purchaseOrderId) &&
                             (!filter.direction || filter.direction === invoice.direction) &&
+                            (!filter.status || filter.status === invoice.status) &&
                             (!filter.mitraId || filter.mitraId === invoice.mitraId) &&
                             [
                                 invoice.number ?? '',
@@ -113,6 +116,31 @@ export class InvoiceRepository {
                     ),
                     actor,
                     metadata.generation,
+                )
+            },
+            signal,
+        )
+    }
+    async settlement(
+        user: SessionUser | null,
+        id: string,
+        signal: AbortSignal,
+    ): Promise<InvoiceSettlement> {
+        const actor = requireInvoicePermission(user, 'read')
+        parseId(id)
+        return runDemoTransaction(
+            this.options,
+            stores,
+            'readonly',
+            async (transaction) => {
+                await requireDataset(transaction)
+                const stored = await transaction.get('invoices', id)
+                if (!stored) throw new ApiError('not-found')
+                assertRecordAccess(actor, 'invoices.read', stored)
+                return invoiceSettlement(
+                    transaction,
+                    normalizeIssuedInvoice(stored),
+                    await this.credits(transaction, id),
                 )
             },
             signal,

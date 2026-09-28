@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import AppSelect from '@/components/ui/AppSelect.vue'
 import { useI18n } from 'vue-i18n'
 import { useMasterList } from '@/composables/useMasterList'
 import { useInvoiceApi } from './composables/useInvoiceApi'
@@ -7,8 +10,33 @@ import AppButton from '@/components/ui/AppButton.vue'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
 import AppPagination from '@/components/ui/AppPagination.vue'
 const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
+const direction = computed(() =>
+    typeof route.query.direction === 'string' ? route.query.direction : '',
+)
+const status = computed(() => (typeof route.query.status === 'string' ? route.query.status : ''))
+const directions = computed(() => [
+    { value: '', label: t('invoices.allDirections') },
+    ...['receivable', 'payable'].map((value) => ({ value, label: t('invoices.' + value) })),
+])
+const statuses = computed(() => [
+    { value: '', label: t('invoices.allStatuses') },
+    ...['draft', 'issued'].map((value) => ({ value, label: t('invoices.statuses.' + value) })),
+])
+function filters(): Record<string, string | undefined> {
+    return Object.fromEntries(
+        ['purchaseOrderId', 'mitraId', 'direction', 'status'].map((key) => [
+            key,
+            typeof route.query[key] === 'string' ? route.query[key] : undefined,
+        ]),
+    )
+}
+async function changeFilter(key: string, value: string): Promise<void> {
+    await router.replace({ query: { ...route.query, page: undefined, [key]: value || undefined } })
+}
 const { response, query, search, loading, error, canCreate, refresh, searchRecords, changePage } =
-    useMasterList(useInvoiceApi(), 'invoices')
+    useMasterList(useInvoiceApi(), 'invoices', filters)
 </script>
 <template>
     <section class="space-y-6">
@@ -32,6 +60,20 @@ const { response, query, search, loading, error, canCreate, refresh, searchRecor
                         :maxlength="200"
                     />
                 </div>
+                <AppSelect
+                    id="invoice-direction-filter"
+                    :model-value="direction"
+                    :options="directions"
+                    :label="t('invoices.direction')"
+                    @update:model-value="changeFilter('direction', $event)"
+                />
+                <AppSelect
+                    id="invoice-status-filter"
+                    :model-value="status"
+                    :options="statuses"
+                    :label="t('invoices.status')"
+                    @update:model-value="changeFilter('status', $event)"
+                />
                 <AppButton type="submit">{{ t('invoices.searchAction') }}</AppButton
                 ><AppButton variant="secondary" :pending="loading" @click="refresh">{{
                     t('invoices.refresh')

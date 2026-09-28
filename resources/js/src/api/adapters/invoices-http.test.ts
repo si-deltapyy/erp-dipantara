@@ -100,3 +100,36 @@ it('uses stable invoice IDs for revision and version history', async () => {
     })
     expect(post).not.toHaveBeenCalled()
 })
+
+it('reads settlement projections with server operational date and rejects inconsistent balances', async () => {
+    const client = axios.create()
+    const summary = {
+        invoiceId: 'invoice-one',
+        issuedRevisionNumber: 1,
+        operationalDate: '2026-09-28',
+        invoiceAmount: '100.00',
+        approvedCredit: '20.00',
+        outstandingAmount: '80.00',
+        overdueAmount: '80.00',
+        terms: [
+            {
+                index: 0,
+                label: 'Term',
+                amount: '100.00',
+                dueDate: '2026-09-27',
+                settledAmount: '20.00',
+                outstandingAmount: '80.00',
+                overdue: true,
+            },
+        ],
+    }
+    const get = vi.spyOn(client, 'get').mockResolvedValue({ data: { data: summary } })
+    const api = createHttpInvoices(client)
+    const signal = new AbortController().signal
+    expect(await api.settlement('invoice-one', signal)).toEqual(summary)
+    expect(get).toHaveBeenCalledWith('/api/v1/invoices/invoice-one/settlement', { signal })
+    get.mockResolvedValue({ data: { data: { ...summary, overdueAmount: '90.00' } } })
+    await expect(api.settlement('invoice-one', signal)).rejects.toMatchObject({
+        kind: 'validation',
+    })
+})

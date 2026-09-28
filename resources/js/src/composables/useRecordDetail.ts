@@ -19,6 +19,7 @@ export function useRecordDetail<T>(
     },
     resource: string,
     observeChanges = true,
+    identity?: () => string | undefined,
 ): RecordDetailState<T> {
     const route = useRoute()
     const session = useSession()
@@ -29,7 +30,7 @@ export function useRecordDetail<T>(
     let active: AbortController | undefined
     async function refresh(): Promise<void> {
         active?.abort()
-        const id = route.params.id
+        const id = identity ? identity() : route.params.id
         record.value = undefined
         if (typeof id !== 'string') return
         const request = new AbortController()
@@ -48,7 +49,7 @@ export function useRecordDetail<T>(
         }
     }
     watch(
-        () => [route.params.id, store.user],
+        () => [identity ? identity() : route.params.id, store.user],
         () => void refresh(),
         { immediate: true },
     )

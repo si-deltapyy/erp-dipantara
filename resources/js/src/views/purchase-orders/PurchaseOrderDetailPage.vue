@@ -120,6 +120,12 @@ const canEdit = computed(
                 class="secondary-button"
                 >{{ t('deliveries.monitor') }}</RouterLink
             >
+            <RouterLink
+                v-if="evaluateRecordAccess(session.user, 'invoices.read', order) === 'allowed'"
+                :to="{ name: 'invoices', query: { purchaseOrderId: order.id } }"
+                class="secondary-button"
+                >{{ t('invoices.monitor') }}</RouterLink
+            >
             <PurchaseOrderDocuments :key="order.id" :order="order" />
             <div class="flex flex-wrap justify-end gap-3">
                 <AppButton

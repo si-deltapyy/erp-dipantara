@@ -22,7 +22,11 @@ const { invoices, error, loading, hasMore, load } = useMitraTerms(
             {{ t('assignments.noTerms') }}
         </p>
         <div v-for="invoice in invoices" :key="invoice.id" class="space-y-1 text-sm">
-            <p>{{ invoice.number }}</p>
+            <RouterLink
+                :to="{ name: 'invoice-detail', params: { id: invoice.id } }"
+                class="font-semibold text-primary underline"
+                >{{ invoice.number ?? t('invoices.statuses.draft') }}</RouterLink
+            >
             <p v-for="term in invoice.terms" :key="term.label">
                 {{ term.label }}: {{ formatMoney(term.amount) }} /
                 {{ term.dueDate ?? t('assignments.noDueDate') }}

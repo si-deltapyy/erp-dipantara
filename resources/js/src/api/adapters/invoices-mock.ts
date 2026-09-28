@@ -43,6 +43,10 @@ export function createMockInvoices(
             runtime.executeBusiness('read', signal, (active) =>
                 repository.get(getUser(), id, active),
             ),
+        settlement: (id, signal) =>
+            runtime.executeBusiness('read', signal, (active) =>
+                repository.settlement(getUser(), id, active),
+            ),
         versions: (id, signal) =>
             runtime.executeBusiness('read', signal, (active) =>
                 repository.versions(getUser(), id, active),

@@ -7,6 +7,7 @@ import { useInvoiceIssue } from './composables/useInvoiceIssue'
 import { canActOnInvoice } from '@/core/domain/invoice-policy'
 import { formatMoney } from '@/core/formatting/money'
 import { useSessionStore } from '@/stores/session'
+import InvoiceSettlement from './components/InvoiceSettlement.vue'
 import InvoiceHistory from './components/InvoiceHistory.vue'
 import InvoiceDocument from './components/InvoiceDocument.vue'
 import AppButton from '@/components/ui/AppButton.vue'
@@ -121,6 +122,7 @@ const canEdit = computed(
                 class="secondary-button"
                 >{{ t('invoices.revise') }}</RouterLink
             >
+            <InvoiceSettlement :key="invoice.version" :invoice-id="invoice.id" />
             <InvoiceDocument :invoice="invoice" />
             <InvoiceHistory
                 v-if="invoice.revisionNumber > 1"

@@ -1,3 +1,4 @@
+import type { InvoiceSettlement } from './invoice-settlement'
 import type { PageResponse, RecordMetadata } from './contracts'
 import type { WorkflowVersion, WorkflowWriteOptions } from './workflow'
 import type { MasterListQuery } from './master-list'
@@ -34,6 +35,7 @@ export interface Invoice extends InvoiceInput, RecordMetadata {
     readonly updatedAt: string
 }
 export interface InvoiceQuery extends MasterListQuery {
+    readonly status?: 'draft' | 'issued' | 'superseded'
     readonly purchaseOrderId?: string
     readonly mitraId?: string
     readonly direction?: 'receivable' | 'payable'
@@ -46,6 +48,7 @@ export interface InvoiceVersion extends WorkflowVersion {
     readonly revisionNumber: number
 }
 export interface InvoicesApi {
+    settlement(id: string, signal: AbortSignal): Promise<InvoiceSettlement>
     revise(id: string, input: InvoiceRevision, options: WorkflowWriteOptions): Promise<Invoice>
     versions(id: string, signal: AbortSignal): Promise<readonly Invoice[]>
     get(id: string, signal: AbortSignal): Promise<Invoice>

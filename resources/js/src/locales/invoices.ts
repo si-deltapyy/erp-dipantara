@@ -1,5 +1,15 @@
 export default {
     invoices: {
+        monitor: 'Pantau invoice',
+        allDirections: 'Semua arah',
+        allStatuses: 'Semua status',
+        settlementSummary: 'Saldo termin issued aktif',
+        approvedCredit: 'Kredit pembayaran approved',
+        overdue: 'Lewat jatuh tempo',
+        termOutstanding: 'Sisa termin',
+        asOf: 'Per tanggal {date} (Asia/Jakarta)',
+        noIssued: 'Belum ada versi issued; draft tidak dihitung sebagai tagihan aktif.',
+
         revise: 'Revisi invoice',
         saveRevision: 'Simpan draft revisi',
         revisionReason: 'Alasan revisi',
