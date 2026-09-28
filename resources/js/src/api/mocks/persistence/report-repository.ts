@@ -1,3 +1,5 @@
+import type { PurchasePriceRow } from '@/core/types/purchase-price-report'
+import { purchasePriceRows, requirePurchasePriceActor } from './purchase-price-projection'
 import type { ReportQuery } from '@/core/types/report'
 import type { ProductionRow } from '@/core/types/production'
 import type { PageResponse } from '@/core/types/contracts'
@@ -9,6 +11,31 @@ import { requireDataset } from './demo-repository'
 import { runDemoTransaction } from './transaction'
 export class ReportRepository {
     constructor(private readonly options: DatabaseOptions = {}) {}
+    async purchasePrices(
+        user: SessionUser | null,
+        query: ReportQuery,
+        signal: AbortSignal,
+    ): Promise<PageResponse<PurchasePriceRow>> {
+        const actor = requirePurchasePriceActor(user)
+        const filter = parseReportQuery(query)
+        return runDemoTransaction(
+            this.options,
+            reportStores,
+            'readonly',
+            async (transaction) => {
+                await requireDataset(transaction)
+                const rows = await purchasePriceRows(transaction, actor, filter)
+                return {
+                    data: rows.slice(
+                        (filter.page - 1) * filter.perPage,
+                        filter.page * filter.perPage,
+                    ),
+                    meta: { page: filter.page, perPage: filter.perPage, total: rows.length },
+                }
+            },
+            signal,
+        )
+    }
     async production(
         user: SessionUser | null,
         query: ReportQuery,

@@ -8,6 +8,13 @@ export function createMockReports(
     repository = new ReportRepository(),
 ): ReportsApi {
     return {
+        purchasePrices: (query, signal) =>
+            runtime.executeBusiness('read', signal, async (active, _generation, scenario) => {
+                const response = await repository.purchasePrices(getUser(), query, active)
+                return scenario === 'empty'
+                    ? { data: [], meta: { ...response.meta, total: 0 } }
+                    : response
+            }),
         production: (query, signal) =>
             runtime.executeBusiness('read', signal, async (active, _generation, scenario) => {
                 const response = await repository.production(getUser(), query, active)

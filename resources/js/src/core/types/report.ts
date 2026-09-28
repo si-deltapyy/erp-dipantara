@@ -1,3 +1,4 @@
+import type { PurchasePriceRow } from './purchase-price-report'
 import type { MasterListQuery } from './master-list'
 import type { PageResponse } from './contracts'
 import type { ProductionRow, ProductionCategory } from './production'
@@ -12,6 +13,7 @@ export interface ReportQuery extends MasterListQuery, ReportFilters {
     readonly period: string
 }
 export interface ReportsApi {
+    purchasePrices(query: ReportQuery, signal: AbortSignal): Promise<PageResponse<PurchasePriceRow>>
     production(query: ReportQuery, signal: AbortSignal): Promise<PageResponse<ProductionRow>>
     subscribe(listener: () => void): () => void
 }
