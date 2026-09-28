@@ -1,16 +1,36 @@
 import invoices from './invoices'
 export default {
     dashboard: {
+        queueTitle: 'Antrean pekerjaan',
+        queueDescription:
+            'Pekerjaan yang dapat Anda proses. Buka detail untuk melanjutkan melalui modul terkait.',
+        queueCount: 'Pekerjaan dapat diproses',
+        queueEmpty: 'Tidak ada pekerjaan yang sesuai.',
+        search: 'Cari nomor PO atau transaksi',
+        searchAction: 'Cari',
+        total: '{count} pekerjaan',
+        back: 'Kembali ke dashboard',
+        queues: {
+            'purchase-orders-processing': 'PO belum memiliki order',
+            'orders-processing': 'Order perlu diproses',
+            'deliveries-processing': 'Pengiriman perlu diproses',
+            'invoices-processing': 'Invoice perlu diterbitkan',
+            'payments-processing': 'Pembayaran perlu diproses',
+        },
         activityTitle: 'Aktivitas transaksi saya',
         activityDescription:
             'Sepuluh transaksi terbaru milik PO Anda. Buka detail untuk memeriksa status dan tindak lanjut.',
         activityEmpty: 'Belum ada transaksi yang dapat ditampilkan.',
         resources: {
+            orders: 'Order',
+            deliveries: 'Pengiriman',
             'purchase-orders': 'Purchase Order',
             invoices: 'Invoice',
             payments: 'Pembayaran',
         },
         statuses: {
+            dispatched: 'Dalam pengiriman',
+            received: 'Diterima',
             draft: 'Draft',
             submitted: 'Menunggu persetujuan',
             approved: 'Disetujui',

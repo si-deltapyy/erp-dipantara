@@ -8,6 +8,10 @@ export function createMockDashboard(
     repository = new DashboardRepository(),
 ): DashboardApi {
     return {
+        queue: (query, signal) =>
+            runtime.executeBusiness('read', signal, (active) =>
+                repository.queue(getUser(), query, active),
+            ),
         get: (signal) =>
             runtime.executeBusiness('read', signal, (active) => repository.get(getUser(), active)),
         subscribe: (listener) => runtime.subscribe(listener),

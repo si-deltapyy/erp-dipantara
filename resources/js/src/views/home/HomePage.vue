@@ -3,6 +3,7 @@ import { useI18n } from 'vue-i18n'
 import { computed } from 'vue'
 import { useSessionStore } from '@/stores/session'
 import DashboardActivityList from './components/DashboardActivityList.vue'
+import DashboardQueueCards from './components/DashboardQueueCards.vue'
 import { useDashboard } from './composables/useDashboard'
 import DashboardMetricCard from './components/DashboardMetricCard.vue'
 import AppButton from '@/components/ui/AppButton.vue'
@@ -36,7 +37,11 @@ const { record: snapshot, loading, error, refresh } = useDashboard()
             <p class="text-sm text-muted">
                 {{ t('dashboard.asOf', { date: new Date(snapshot.asOf).toLocaleString('id-ID') }) }}
             </p>
-            <p v-if="!snapshot.metrics.length && !showActivity" role="status" class="panel">
+            <p
+                v-if="!snapshot.metrics.length && !snapshot.queues.length && !showActivity"
+                role="status"
+                class="panel"
+            >
                 {{ t('dashboard.empty') }}
             </p>
             <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -47,6 +52,7 @@ const { record: snapshot, loading, error, refresh } = useDashboard()
                 />
             </div>
             <DashboardActivityList v-if="showActivity" :activity="snapshot.activity" />
+            <DashboardQueueCards :queues="snapshot.queues" />
         </template>
         <p v-else class="panel text-muted">{{ t('dashboard.unavailable') }}</p>
     </section>

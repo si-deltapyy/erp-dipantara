@@ -1,4 +1,5 @@
 import { parseActivityList } from './dashboard-activity-mapper'
+import { parseQueueSummaries } from './dashboard-queue-mapper'
 import type { DashboardMetric, DashboardSnapshot } from '@/core/types/dashboard'
 import { dashboardTargets } from '@/core/types/dashboard'
 import { parseTimestamp } from './contracts/timestamp-parser'
@@ -37,7 +38,7 @@ export function parseDashboardMetric(value: unknown): DashboardMetric {
 }
 export function parseDashboardSnapshot(value: unknown): DashboardSnapshot {
     const snapshot = parseObject(value, 'dashboard')
-    requireKeys(snapshot, ['asOf', 'metrics', 'activity'], 'dashboard')
+    requireKeys(snapshot, ['asOf', 'metrics', 'activity', 'queues'], 'dashboard')
     if (!Array.isArray(snapshot.metrics)) return invalidContract('metrics')
     const metrics = snapshot.metrics.map(parseDashboardMetric)
     if (new Set(metrics.map((metric) => metric.key)).size !== metrics.length)
@@ -46,5 +47,6 @@ export function parseDashboardSnapshot(value: unknown): DashboardSnapshot {
         asOf: parseTimestamp(snapshot.asOf, 'asOf'),
         metrics,
         activity: parseActivityList(snapshot.activity),
+        queues: parseQueueSummaries(snapshot.queues),
     }
 }

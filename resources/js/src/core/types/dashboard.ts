@@ -1,4 +1,10 @@
 import type { DashboardActivity } from './dashboard-activity'
+import type {
+    DashboardQueueEntry,
+    DashboardQueueQuery,
+    DashboardQueueSummary,
+} from './dashboard-queue'
+import type { PageResponse } from './contracts'
 export const dashboardTargets = {
     'active-purchase-orders': '/purchase-orders?status=approved',
     'prepared-deliveries': '/deliveries?status=draft',
@@ -21,11 +27,16 @@ export type DashboardMetric =
           readonly targetPath: string
       }
 export interface DashboardSnapshot {
+    readonly queues: readonly DashboardQueueSummary[]
     readonly activity: readonly DashboardActivity[]
     readonly asOf: string
     readonly metrics: readonly DashboardMetric[]
 }
 export interface DashboardApi {
+    queue(
+        query: DashboardQueueQuery,
+        signal: AbortSignal,
+    ): Promise<PageResponse<DashboardQueueEntry>>
     get(signal: AbortSignal): Promise<DashboardSnapshot>
     subscribe(listener: () => void): () => void
 }

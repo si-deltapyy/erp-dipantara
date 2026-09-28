@@ -16,6 +16,16 @@ import { i18n } from '@/locales'
 
 const routes: RouteRecordRaw[] = [
     {
+        path: '/dashboard/queue',
+        name: 'dashboard-queue',
+        component: () => import('@/views/home/DashboardQueuePage.vue'),
+        meta: {
+            titleKey: 'dashboard.queueTitle',
+            requiresAuth: true,
+            requiredPermissions: ['dashboard.read.all'],
+        },
+    },
+    {
         path: '/',
         name: 'home',
         component: () => import('@/views/home/HomePage.vue'),
