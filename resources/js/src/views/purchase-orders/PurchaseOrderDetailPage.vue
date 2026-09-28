@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PurchaseOrderInvoiceSummary from '@/views/invoices/components/PurchaseOrderInvoiceSummary.vue'
 import { evaluateRecordAccess } from '@/core/domain/record-policy'
 import { computed, reactive } from 'vue'
 import { useRoute } from 'vue-router'
@@ -56,6 +57,10 @@ const canEdit = computed(
             <AppButton @click="refresh">{{ t('purchase-orders.refresh') }}</AppButton>
         </div>
         <template v-else-if="order">
+            <PurchaseOrderInvoiceSummary
+                v-if="evaluateRecordAccess(session.user, 'invoices.read', order) === 'allowed'"
+                :purchase-order-id="order.id"
+            />
             <RouterLink
                 v-if="evaluateRecordAccess(session.user, 'payments.read', order) === 'allowed'"
                 :to="{ name: 'payments', query: { purchaseOrderId: order.id } }"

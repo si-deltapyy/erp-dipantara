@@ -6,7 +6,6 @@ export type InvoiceCreditResolver = (
     transaction: DemoTransaction,
     invoiceId: string,
 ) => Promise<string>
-export const invoiceCreditFixture: InvoiceCreditResolver = async () => '0.00'
 export function normalizeIssuedInvoice(invoice: Invoice): Invoice {
     return {
         ...invoice,

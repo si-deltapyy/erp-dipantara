@@ -11,10 +11,16 @@ function actor(id: string): SessionUser {
 }
 export async function createApprovedGradingScenario(
     databaseName?: string,
+    purchaseOrderId = 'demo-po-03',
+    quantity = 2,
 ): Promise<Awaited<ReturnType<typeof buildScenario>>> {
-    return buildScenario(databaseName)
+    return buildScenario(databaseName, purchaseOrderId, quantity)
 }
-async function buildScenario(databaseName?: string) {
+async function buildScenario(
+    databaseName: string | undefined,
+    purchaseOrderId: string,
+    quantity: number,
+) {
     const options = { name: databaseName ?? 'grading-revision-test-' + crypto.randomUUID() }
     const metadata = await new DemoRepository(options).initialize()
     const signal = new AbortController().signal,
@@ -28,7 +34,7 @@ async function buildScenario(databaseName?: string) {
         gradings = new GradingRepository(options)
     const order = await orders.mutate(
         maker,
-        { action: 'create', input: { purchaseOrderId: 'demo-po-03', notes: null }, key: 'order' },
+        { action: 'create', input: { purchaseOrderId, notes: null }, key: 'order' },
         generation,
         signal,
     )
@@ -41,7 +47,7 @@ async function buildScenario(databaseName?: string) {
                 mitraId: 'demo-mitra-01',
                 graderId: 'demo-grader-01',
                 timberProductId: 'demo-timber-01',
-                quantity: 2,
+                quantity,
             },
             key: 'assignment',
         },
@@ -73,7 +79,7 @@ async function buildScenario(databaseName?: string) {
             {
                 rowId: 'stable-row',
                 timberProductId: 'demo-timber-01',
-                quantity: 2,
+                quantity,
                 diameterCm: '25',
                 lengthM: '2',
                 gradeCode: 'DEMO',
@@ -107,6 +113,7 @@ async function buildScenario(databaseName?: string) {
         supervisor,
         admin,
         orders,
+        order: submittedOrder,
         assignments,
         gradings,
         assignment,

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PurchaseOrderInvoiceSummary from '@/views/invoices/components/PurchaseOrderInvoiceSummary.vue'
 import OrderAssignments from './components/OrderAssignments.vue'
 import { hasBusinessPermission } from '@/core/domain/record-policy'
 import { computed, reactive } from 'vue'
@@ -49,7 +50,7 @@ const editable = computed(() => !!order.value && canActOnOrder(session.user, ord
                 <h2 class="text-xl font-semibold">{{ order.purchaseOrderNumber }}</h2>
                 <p>{{ order.buyerName }}</p>
                 <p>{{ t('orders.statuses.' + order.status) }}</p>
-                <p>{{ t('orders.dp') }}: {{ t('orders.dpUnavailable') }}</p>
+
                 <p class="whitespace-pre-wrap break-words">{{ order.notes }}</p>
                 <p v-if="order.rejectionReason">
                     {{ t('orders.rejectionReason') }}: {{ order.rejectionReason }}
@@ -105,6 +106,11 @@ const editable = computed(() => !!order.value && canActOnOrder(session.user, ord
                     >{{ t('orders.reject') }}</AppButton
                 >
             </div>
+            <PurchaseOrderInvoiceSummary
+                v-if="hasBusinessPermission(session.user, 'invoices.read')"
+                :purchase-order-id="order.purchaseOrderId"
+                down-payment-only
+            />
             <OrderAssignments
                 v-if="hasBusinessPermission(session.user, 'assignments.read')"
                 :key="order.id"

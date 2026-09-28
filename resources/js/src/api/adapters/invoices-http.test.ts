@@ -133,3 +133,40 @@ it('reads settlement projections with server operational date and rejects incons
         kind: 'validation',
     })
 })
+
+it('reads complete PO invoice summaries with separate DP totals and rejects inconsistent aggregates', async () => {
+    const client = axios.create()
+    const balances = {
+        issuedInvoiceCount: 1,
+        invoiceAmount: '100.00',
+        approvedCredit: '20.00',
+        outstandingAmount: '80.00',
+        overdueAmount: '80.00',
+    }
+    const zero = {
+        issuedInvoiceCount: 0,
+        invoiceAmount: '0.00',
+        approvedCredit: '0.00',
+        outstandingAmount: '0.00',
+        overdueAmount: '0.00',
+    }
+    const summary = {
+        purchaseOrderId: 'po-one',
+        operationalDate: '2026-09-28',
+        receivable: { ...balances, downPayment: balances },
+        payable: { ...zero, downPayment: zero },
+    }
+    const get = vi.spyOn(client, 'get').mockResolvedValue({ data: { data: summary } })
+    const api = createHttpInvoices(client)
+    const signal = new AbortController().signal
+    expect((await api.summary('po-one', signal)).receivable.downPayment.approvedCredit).toBe(
+        '20.00',
+    )
+    expect(get).toHaveBeenCalledWith('/api/v1/purchase-orders/po-one/invoice-summary', { signal })
+    get.mockResolvedValueOnce({
+        data: {
+            data: { ...summary, receivable: { ...summary.receivable, outstandingAmount: '90.00' } },
+        },
+    })
+    await expect(api.summary('po-one', signal)).rejects.toMatchObject({ kind: 'validation' })
+})

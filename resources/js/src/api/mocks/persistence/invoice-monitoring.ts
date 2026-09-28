@@ -8,9 +8,9 @@ export async function invoiceSettlement(
     transaction: DemoTransaction,
     invoice: Invoice,
     credit: string,
+    operationalDate = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }),
 ): Promise<InvoiceSettlement> {
     const issued = await activeInvoice(transaction, invoice)
-    const operationalDate = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' })
     const invoiceAmount = issued?.totalAmount ?? '0.00'
     assertInvoiceCredit(invoiceAmount, credit)
     const terms = allocateInvoiceCredit(issued?.terms ?? [], credit, operationalDate)

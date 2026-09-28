@@ -1,3 +1,4 @@
+import type { PurchaseOrderInvoiceSummary } from './invoice-summary'
 import type { InvoiceSettlement } from './invoice-settlement'
 import type { PageResponse, RecordMetadata } from './contracts'
 import type { WorkflowVersion, WorkflowWriteOptions } from './workflow'
@@ -48,6 +49,7 @@ export interface InvoiceVersion extends WorkflowVersion {
     readonly revisionNumber: number
 }
 export interface InvoicesApi {
+    summary(purchaseOrderId: string, signal: AbortSignal): Promise<PurchaseOrderInvoiceSummary>
     settlement(id: string, signal: AbortSignal): Promise<InvoiceSettlement>
     revise(id: string, input: InvoiceRevision, options: WorkflowWriteOptions): Promise<Invoice>
     versions(id: string, signal: AbortSignal): Promise<readonly Invoice[]>

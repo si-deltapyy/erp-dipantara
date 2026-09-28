@@ -1,3 +1,5 @@
+import type { PurchaseOrderInvoiceSummary } from '@/core/types/invoice-summary'
+import { purchaseOrderInvoiceSummary } from './invoice-summary'
 import { approvedPaymentCredit } from './payment-credit'
 import type { InvoiceSettlement } from '@/core/types/invoice-settlement'
 import { invoiceSettlement } from './invoice-monitoring'
@@ -114,6 +116,32 @@ export class InvoiceRepository {
                     ),
                     actor,
                     metadata.generation,
+                )
+            },
+            signal,
+        )
+    }
+    async summary(
+        user: SessionUser | null,
+        purchaseOrderId: string,
+        signal: AbortSignal,
+    ): Promise<PurchaseOrderInvoiceSummary> {
+        const actor = requireInvoicePermission(user, 'read')
+        parseId(purchaseOrderId)
+        return runDemoTransaction(
+            this.options,
+            stores,
+            'readonly',
+            async (transaction) => {
+                await requireDataset(transaction)
+                const parent = await transaction.get('purchase-orders', purchaseOrderId)
+                if (!parent) throw new ApiError('not-found')
+                assertRecordAccess(actor, 'invoices.read', parent)
+                return purchaseOrderInvoiceSummary(
+                    transaction,
+                    actor,
+                    purchaseOrderId,
+                    this.credits,
                 )
             },
             signal,

@@ -1,5 +1,13 @@
 export default {
     invoices: {
+        purchaseOrderSummary: 'Ringkasan settlement PO',
+        downPaymentSummary: 'Status DP Buyer dan Mitra',
+        invoiceAmount: 'Total issued aktif',
+        overdueAmount: 'Lewat jatuh tempo',
+        noDownPayment: 'Belum ada invoice DP issued.',
+        dpPaid: 'DP lunas',
+        dpUnpaid: 'DP belum dibayar',
+        dpPartial: 'DP dibayar sebagian',
         monitor: 'Pantau invoice',
         allDirections: 'Semua arah',
         allStatuses: 'Semua status',

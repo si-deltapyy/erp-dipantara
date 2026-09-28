@@ -11,6 +11,7 @@ import { usePaymentSubmit } from './composables/usePaymentSubmit'
 import { canActOnPayment } from '@/core/domain/payment-policy'
 import { formatMoney } from '@/core/formatting/money'
 import { useSessionStore } from '@/stores/session'
+import InvoiceSettlement from '@/views/invoices/components/InvoiceSettlement.vue'
 import PaymentDocument from './components/PaymentDocument.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppConfirmDialog from '@/components/ui/AppConfirmDialog.vue'
@@ -100,6 +101,7 @@ const canEdit = computed(
                     >{{ t('payments.edit') }}</RouterLink
                 >
             </div>
+            <InvoiceSettlement :key="payment.version" :invoice-id="payment.invoiceId" />
             <PaymentDocument :payment="payment" />
         </template>
         <p v-if="submission.error" role="alert">{{ t(submission.error) }}</p>

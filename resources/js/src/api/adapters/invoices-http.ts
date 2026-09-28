@@ -1,3 +1,4 @@
+import { parseInvoiceSummary } from '@/api/invoice-summary-mapper'
 import { parseInvoiceSettlement } from '@/api/invoice-settlement-mapper'
 import { parseObject, requireKeys, invalidContract } from '@/api/contracts/value-parsers'
 import {
@@ -31,6 +32,17 @@ export function createHttpInvoices(client: AxiosInstance = createHttpClient()): 
         async get(id, signal) {
             return parseDetail((await client.get<unknown>(path(id), { signal })).data, parseInvoice)
                 .data
+        },
+        async summary(purchaseOrderId, signal) {
+            return parseDetail(
+                (
+                    await client.get<unknown>(
+                        `/api/v1/purchase-orders/${encodeURIComponent(parseId(purchaseOrderId))}/invoice-summary`,
+                        { signal },
+                    )
+                ).data,
+                parseInvoiceSummary,
+            ).data
         },
         async settlement(id, signal) {
             return parseDetail(
