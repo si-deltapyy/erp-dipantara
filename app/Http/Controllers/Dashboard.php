@@ -37,9 +37,9 @@ class Dashboard extends Controller
         $poDalamProses = PreOrders::where('pre_order_status', 'on_process')->count();
         $poMenungguPelunasan = PreOrders::where('pre_order_status', 'delivered')->count();
 
-        $pemasukan = LogsPayment::where('type', 'masuk')->sum('amount');
-        $pengeluaran = LogsPayment::where('type', 'keluar')->sum('amount');
-        $netCashflow = $pemasukan - $pengeluaran;
+        // $pemasukan = LogsPayment::where('type', 'masuk')->sum('payment_amount');
+        // $pengeluaran = LogsPayment::where('type', 'keluar')->sum('payment_amount');
+        // $netCashflow = $pemasukan - $pengeluaran;
 
         return response()->json([
             'status' => 'success',
@@ -49,9 +49,9 @@ class Dashboard extends Controller
                     'po_menunggu_dp' => $poMenungguDp,
                     'po_dalam_proses' => $poDalamProses,
                     'po_menunggu_pelunasan' => $poMenungguPelunasan,
-                    'pemasukan' => $pemasukan,
-                    'pengeluaran' => $pengeluaran,
-                    'net_cashflow' => $netCashflow
+                    // 'pemasukan' => $pemasukan,
+                    // 'pengeluaran' => $pengeluaran,
+                    // 'net_cashflow' => $netCashflow
                 ]
             ]
         ]);
