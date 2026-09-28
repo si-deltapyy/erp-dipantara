@@ -193,6 +193,7 @@ export interface OrderMutationReceipt {
 }
 export interface OrderAudit {
     readonly id: string
+    readonly reason?: string
     readonly resource: 'orders' | 'assignments' | 'deliveries' | 'invoices' | 'payments'
     readonly recordId: string
     readonly actorId: string

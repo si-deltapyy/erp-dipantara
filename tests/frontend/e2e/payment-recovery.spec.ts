@@ -64,3 +64,47 @@ test('recovers payment fields and proof after upload 419 and replays committed p
     await page.getByRole('link', { name: 'Kembali ke daftar', exact: true }).click()
     await expect(page.getByText('1 pembayaran', { exact: true })).toBeVisible()
 })
+
+test('review recovers after 419 and retries committed approval without applying credit twice', async ({
+    page,
+}) => {
+    await page.goto('/app')
+    const id = await page.evaluate(async () => {
+        const origin = new URL(
+            document.querySelector<HTMLScriptElement>('script[src*="/@vite/client"]')?.src ??
+                location.origin,
+        ).origin
+        const { createPaymentScenario, createSubmittedPayment } = (await import(
+            origin + '/tests/frontend/payment-scenario.ts'
+        )) as typeof ScenarioModule
+        const context = await createPaymentScenario('woodflow-demo')
+        return (await createSubmittedPayment(context, context.owner, '1000000.00')).id
+    })
+    await login(page, 'admin@woodflow.test', '/app/payments/' + id)
+    await scenario(page, 'csrf')
+    await page.getByRole('button', { name: 'Setujui pembayaran', exact: true }).click()
+    await page.getByRole('dialog').getByRole('button', { name: 'Konfirmasi', exact: true }).click()
+    await expect(
+        page.getByText('Sesi telah diperbarui. Periksa keputusan lalu konfirmasi kembali.', {
+            exact: true,
+        }),
+    ).toBeVisible()
+    await page.getByRole('dialog').getByRole('button', { name: 'Batal', exact: true }).click()
+    await scenario(page, 'committed-timeout')
+    await page.getByRole('button', { name: 'Setujui pembayaran', exact: true }).click()
+    await page.getByRole('dialog').getByRole('button', { name: 'Konfirmasi', exact: true }).click()
+    await expect(
+        page.getByRole('dialog').getByRole('button', { name: 'Ulangi permintaan', exact: true }),
+    ).toBeVisible()
+    await page
+        .getByRole('dialog')
+        .getByRole('button', { name: 'Ulangi permintaan', exact: true })
+        .click()
+    await expect(
+        page.getByRole('dialog').getByText('Koneksi terputus. Silakan coba lagi.', { exact: true }),
+    ).toBeVisible()
+    await page.getByRole('dialog').getByRole('button', { name: 'Muat ulang', exact: true }).click()
+    await expect(page.getByText('Disetujui', { exact: true })).toBeVisible()
+    await page.getByRole('link', { name: /^DEMO-INV/ }).click()
+    await expect(page.getByText('Rp 700.000,00', { exact: true }).first()).toBeVisible()
+})

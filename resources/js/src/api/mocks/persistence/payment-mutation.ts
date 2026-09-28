@@ -1,6 +1,7 @@
+import { reviewPayment } from './payment-review'
 import { parseId } from '@/api/contracts/value-parsers'
 import type { Payment, PaymentInput } from '@/core/types/payment'
-import type { WorkflowVersion } from '@/core/types/workflow'
+import type { WorkflowVersion, WorkflowRejection } from '@/core/types/workflow'
 import type { SessionUser } from '@/core/types/session'
 import type { DatasetMetadata } from './schema'
 import type { DemoTransaction } from './transaction'
@@ -10,9 +11,10 @@ import { draftPayment } from './payment-draft'
 import { bindPaymentProof } from './payment-proof'
 import { paymentInvoice, paymentAccounts } from './payment-context'
 export interface PaymentMutation {
-    readonly action: 'create' | 'update' | 'submit'
+    readonly action: 'create' | 'update' | 'submit' | 'approve' | 'reject'
     readonly id?: string
-    readonly input: (PaymentInput & { readonly version?: number }) | WorkflowVersion
+    readonly input:
+        (PaymentInput & { readonly version?: number }) | WorkflowVersion | WorkflowRejection
     readonly key: string
     readonly hash: string
 }
@@ -35,7 +37,9 @@ export async function writePayment(
     if (
         previous &&
         (previous.version !== mutation.input.version ||
-            !['draft', 'rejected'].includes(previous.status))
+            !(mutation.action === 'approve' || mutation.action === 'reject'
+                ? previous.status === 'submitted'
+                : ['draft', 'rejected'].includes(previous.status)))
     )
         throw new ApiError('conflict')
     let payment =
@@ -45,6 +49,13 @@ export async function writePayment(
     if (!payment) throw new ApiError('validation')
     const invoice = await paymentInvoice(transaction, actor, payment.invoiceId)
     await paymentAccounts(transaction, payment, invoice)
+    if (mutation.action === 'approve' || mutation.action === 'reject')
+        payment = await reviewPayment(
+            transaction,
+            payment,
+            mutation.action,
+            'reason' in mutation.input ? mutation.input.reason : null,
+        )
     await transaction.put('payments', payment)
     await bindPaymentProof(transaction, actor, payment.id, payment.proofDocumentId)
     if (mutation.action === 'submit')
@@ -65,6 +76,7 @@ export async function writePayment(
         actorId: actor.id,
         version: payment.version,
         action: mutation.action,
+        ...('reason' in mutation.input ? { reason: mutation.input.reason } : {}),
     })
     await transaction.put('paymentMutations', {
         id: receiptId,

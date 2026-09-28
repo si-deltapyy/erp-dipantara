@@ -85,3 +85,34 @@ it('rejects unknown fields, impossible dates, negative cash and nonpositive comb
             .withholdingAmount,
     ).toBe('50000.00')
 })
+
+it('sends explicit versioned review decisions and rejects blank reasons before transport', async () => {
+    const client = axios.create()
+    const post = vi.spyOn(client, 'post').mockResolvedValue({
+        data: { data: { ...payment, status: 'approved', allowedActions: [] } },
+    })
+    const api = createHttpPayments(client)
+    const options = { signal: new AbortController().signal, idempotencyKey: 'review-key' }
+    await api.approve(payment.id, { version: 2 }, options)
+    expect(post).toHaveBeenLastCalledWith(
+        '/api/v1/payments/payment-one/approve',
+        { version: 2 },
+        { signal: options.signal, headers: { 'Idempotency-Key': 'review-key' } },
+    )
+    post.mockResolvedValueOnce({
+        data: { data: { ...payment, status: 'rejected', rejectionReason: 'Proof mismatch' } },
+    })
+    expect(
+        (await api.reject(payment.id, { version: 2, reason: 'Proof mismatch' }, options))
+            .rejectionReason,
+    ).toBe('Proof mismatch')
+    expect(post).toHaveBeenLastCalledWith(
+        '/api/v1/payments/payment-one/reject',
+        { version: 2, reason: 'Proof mismatch' },
+        { signal: options.signal, headers: { 'Idempotency-Key': 'review-key' } },
+    )
+    await expect(
+        api.reject(payment.id, { version: 2, reason: ' ' }, options),
+    ).rejects.toMatchObject({ kind: 'validation' })
+    expect(post).toHaveBeenCalledTimes(2)
+})

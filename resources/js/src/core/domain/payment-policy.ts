@@ -1,17 +1,23 @@
 import type { Payment } from '@/core/types/payment'
 import type { SessionUser } from '@/core/types/session'
-import { hasBusinessPermission, evaluateRecordAccess } from './record-policy'
-export function canCreatePayment(user: SessionUser | null): boolean {
-    return hasBusinessPermission(user, 'payments.create')
+import { evaluateRecordAccess, hasBusinessPermission } from './record-policy'
+
+export function canCreatePayment(actor: SessionUser | null): boolean {
+    return hasBusinessPermission(actor, 'payments.create')
+}
+export function isEditablePayment(payment: Payment): boolean {
+    return payment.status === 'draft' || payment.status === 'rejected'
 }
 export function canActOnPayment(
-    user: SessionUser | null,
+    actor: SessionUser | null,
     payment: Payment,
-    action: 'update' | 'submit',
+    action: 'update' | 'submit' | 'approve' | 'reject',
 ): boolean {
     return (
-        ['draft', 'rejected'].includes(payment.status) &&
+        (action === 'approve' || action === 'reject'
+            ? payment.status === 'submitted'
+            : isEditablePayment(payment)) &&
         payment.allowedActions.includes(action) &&
-        evaluateRecordAccess(user, `payments.${action}`, payment) === 'allowed'
+        evaluateRecordAccess(actor, `payments.${action}`, payment) === 'allowed'
     )
 }

@@ -8,7 +8,7 @@ import { ApiError } from '@/core/types/api-error'
 import { parseId } from '@/api/contracts/value-parsers'
 import { parsePaymentQuery } from '@/api/payment-mapper'
 import { parsePaymentInput } from '@/api/contracts/payment-input'
-import { parseWorkflowVersion } from '@/api/contracts/workflow-parsers'
+import { parseWorkflowVersion, parseWorkflowRejection } from '@/api/contracts/workflow-parsers'
 import { assertRecordAccess, evaluateRecordAccess } from '@/core/domain/record-policy'
 import { requirePaymentPermission, presentPayment } from './payment-policy'
 import { runDemoTransaction } from './transaction'
@@ -97,9 +97,11 @@ export class PaymentRepository {
         if (mutation.action !== 'create') parseId(mutation.id)
         if (!mutation.key.trim() || mutation.key.length > 100) throw new ApiError('validation')
         const input =
-            mutation.action === 'submit'
-                ? parseWorkflowVersion(mutation.input)
-                : parsePaymentInput(mutation.input, mutation.action === 'update')
+            mutation.action === 'reject'
+                ? parseWorkflowRejection(mutation.input)
+                : mutation.action === 'approve' || mutation.action === 'submit'
+                  ? parseWorkflowVersion(mutation.input)
+                  : parsePaymentInput(mutation.input, mutation.action === 'update')
         const hash = await hashMutationPayload({ ...input, generation })
         return runDemoTransaction(
             this.options,

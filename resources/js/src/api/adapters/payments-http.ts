@@ -1,5 +1,5 @@
 import { parsePaymentInput } from '@/api/contracts/payment-input'
-import { parseWorkflowVersion } from '@/api/contracts/workflow-parsers'
+import { parseWorkflowVersion, parseWorkflowRejection } from '@/api/contracts/workflow-parsers'
 import type { AxiosInstance } from 'axios'
 import type { PaymentsApi, Payment } from '@/core/types/payment'
 import type { WorkflowWriteOptions } from '@/core/types/workflow'
@@ -50,6 +50,28 @@ export function createHttpPayments(client: AxiosInstance = createHttpClient()): 
                     await client.post<unknown>(
                         `${path(id)}/submit`,
                         parseWorkflowVersion(input),
+                        config(options),
+                    )
+                ).data,
+            )
+        },
+        async approve(id, input, options) {
+            return mutationResponse(
+                (
+                    await client.post<unknown>(
+                        `${path(id)}/approve`,
+                        parseWorkflowVersion(input),
+                        config(options),
+                    )
+                ).data,
+            )
+        },
+        async reject(id, input, options) {
+            return mutationResponse(
+                (
+                    await client.post<unknown>(
+                        `${path(id)}/reject`,
+                        parseWorkflowRejection(input),
                         config(options),
                     )
                 ).data,

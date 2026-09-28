@@ -1,3 +1,5 @@
+import type { SessionUser } from '../../resources/js/src/core/types/session'
+import type { Payment } from '../../resources/js/src/core/types/payment'
 import { createApprovedGradingScenario } from './grading-scenario'
 import { InvoiceRepository } from '../../resources/js/src/api/mocks/persistence/invoice-repository'
 import { PaymentRepository } from '../../resources/js/src/api/mocks/persistence/payment-repository'
@@ -72,4 +74,45 @@ async function buildPaymentScenario(name?: string) {
         notes: null,
     }
     return { ...context, owner, other, invoices, payments, documents, invoice, proof, input }
+}
+
+export async function createSubmittedPayment(
+    context: Awaited<ReturnType<typeof createPaymentScenario>>,
+    actor: SessionUser,
+    amount: string,
+): Promise<Payment> {
+    const key = crypto.randomUUID()
+    const proof = await context.documents.upload(
+        actor,
+        {
+            parentType: 'payment',
+            parentId: null,
+            purpose: 'payment_proof',
+            file: new File(['%PDF-1.4\nReview\n%%EOF'], 'review.pdf', { type: 'application/pdf' }),
+        },
+        key,
+        context.generation,
+        context.signal,
+    )
+    const payment = await context.payments.mutate(
+        actor,
+        {
+            action: 'create',
+            input: {
+                ...context.input,
+                cashAmount: amount,
+                withholdingAmount: '0.00',
+                proofDocumentId: proof.id,
+            },
+            key,
+        },
+        context.generation,
+        context.signal,
+    )
+    return context.payments.mutate(
+        actor,
+        { action: 'submit', id: payment.id, input: { version: payment.version }, key },
+        context.generation,
+        context.signal,
+    )
 }

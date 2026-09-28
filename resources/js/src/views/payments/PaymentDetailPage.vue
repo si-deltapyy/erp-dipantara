@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { useRoute } from 'vue-router'
+import { usePaymentReview } from './composables/usePaymentReview'
+import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
+import AppReviewDialog from '@/components/ui/AppReviewDialog.vue'
 import { computed, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRecordDetail } from '@/composables/useRecordDetail'
@@ -18,6 +22,17 @@ const {
     error,
     refresh,
 } = useRecordDetail(usePaymentApi(), 'payments', false)
+const route = useRoute()
+const review = reactive(usePaymentReview(payment, refresh, () => route.params.id))
+const discard = reactive(
+    useUnsavedChanges(
+        () => session.status === 'authenticated' && !!review.reason.trim(),
+        () => session.status === 'authenticated' && review.pending,
+    ),
+)
+function closeReview(): void {
+    discard.requestDiscard(() => review.close())
+}
 const submission = reactive(usePaymentSubmit(payment))
 const canEdit = computed(
     () => payment.value && canActOnPayment(session.user, payment.value, 'update'),
@@ -95,6 +110,43 @@ const canEdit = computed(
             @click="submission.confirming = true"
             >{{ t(submission.uncertain ? 'payments.retryWrite' : 'payments.submit') }}</AppButton
         >
+        <div class="flex flex-wrap gap-3">
+            <AppButton
+                v-if="review.canApprove"
+                :disabled="review.pending"
+                @click="review.open('approve')"
+                >{{ t('payments.approve') }}</AppButton
+            >
+            <AppButton
+                v-if="review.canReject"
+                variant="secondary"
+                :disabled="review.pending"
+                @click="review.open('reject')"
+                >{{ t('payments.reject') }}</AppButton
+            >
+        </div>
+        <p v-if="review.error && !review.action" role="alert">{{ t(review.error) }}</p>
+        <AppReviewDialog
+            v-model:reason="review.reason"
+            resource="payments"
+            reason-id="payment-rejection-reason"
+            :action="review.action"
+            :reason-error="review.reasonError"
+            :error="review.error"
+            :pending="review.pending"
+            :uncertain="review.uncertain"
+            :blocked="review.blocked"
+            @close="closeReview"
+            @confirm="review.submit"
+            @reload="review.reload"
+        />
+        <AppConfirmDialog
+            :open="discard.confirming"
+            :title="t('payments.discardTitle')"
+            :description="t('payments.discardDescription')"
+            @confirm="discard.confirm"
+            @cancel="discard.cancel"
+        />
         <AppConfirmDialog
             :open="submission.confirming"
             :title="t('payments.submit')"

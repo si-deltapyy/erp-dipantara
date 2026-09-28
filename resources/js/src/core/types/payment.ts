@@ -1,6 +1,6 @@
 import type { PageResponse, RecordMetadata } from './contracts'
 import type { MasterListQuery } from './master-list'
-import type { WorkflowVersion, WorkflowWriteOptions } from './workflow'
+import type { WorkflowVersion, WorkflowWriteOptions, WorkflowRejection } from './workflow'
 export interface PaymentInput {
     readonly invoiceId: string
     readonly paymentDate: string
@@ -45,5 +45,7 @@ export interface PaymentsApi {
         options: WorkflowWriteOptions,
     ): Promise<Payment>
     submit(id: string, input: WorkflowVersion, options: WorkflowWriteOptions): Promise<Payment>
+    approve(id: string, input: WorkflowVersion, options: WorkflowWriteOptions): Promise<Payment>
+    reject(id: string, input: WorkflowRejection, options: WorkflowWriteOptions): Promise<Payment>
     subscribe(listener: () => void): () => void
 }

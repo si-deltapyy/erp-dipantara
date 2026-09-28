@@ -6,6 +6,18 @@ export default {
         destinationAccountLabel: 'Rekening tujuan',
         monitor: 'Pantau pembayaran',
         clearFilters: 'Hapus filter',
+        approve: 'Setujui pembayaran',
+        reject: 'Tolak pembayaran',
+        approveDescription:
+            'Pastikan rincian pembayaran sudah benar sebelum menyetujui pembayaran ini.',
+        rejectDescription:
+            'Jelaskan perbaikan yang diperlukan agar pengaju dapat merevisi pembayaran.',
+        rejectionReason: 'Alasan penolakan terakhir',
+        reason: 'Alasan penolakan',
+        reasonInvalid: 'Isi alasan penolakan dengan 1 sampai 2.000 karakter.',
+        reviewCsrf: 'Sesi telah diperbarui. Periksa keputusan lalu konfirmasi kembali.',
+        reviewConflict: 'Muat ulang detail dan periksa versi terbaru sebelum mengonfirmasi ulang.',
+        overpayment: 'Kredit pembayaran melebihi sisa tagihan issued aktif.',
         title: 'Pembayaran',
         section: 'Keuangan',
         subtitle: 'Pembayaran draft dan submitted belum mengurangi saldo invoice.',

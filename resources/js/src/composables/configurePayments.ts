@@ -30,7 +30,7 @@ export async function configurePayments(app: App, pinia: Pinia): Promise<void> {
             if (
                 session.status === 'guest' ||
                 (session.user &&
-                    [recovery.snapshot, recovery.submit].some(
+                    [recovery.snapshot, recovery.submit, recovery.review].some(
                         (snapshot) => snapshot && snapshot.actorId !== session.user?.id,
                     ))
             )
