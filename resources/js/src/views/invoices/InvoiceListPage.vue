@@ -16,6 +16,11 @@ const direction = computed(() =>
     typeof route.query.direction === 'string' ? route.query.direction : '',
 )
 const status = computed(() => (typeof route.query.status === 'string' ? route.query.status : ''))
+const balance = computed(() => (typeof route.query.balance === 'string' ? route.query.balance : ''))
+const balances = computed(() => [
+    { value: '', label: t('invoices.allBalances') },
+    { value: 'outstanding', label: t('invoices.outstandingOnly') },
+])
 const directions = computed(() => [
     { value: '', label: t('invoices.allDirections') },
     ...['receivable', 'payable'].map((value) => ({ value, label: t('invoices.' + value) })),
@@ -26,7 +31,7 @@ const statuses = computed(() => [
 ])
 function filters(): Record<string, string | undefined> {
     return Object.fromEntries(
-        ['purchaseOrderId', 'mitraId', 'direction', 'status'].map((key) => [
+        ['purchaseOrderId', 'mitraId', 'direction', 'status', 'balance'].map((key) => [
             key,
             typeof route.query[key] === 'string' ? route.query[key] : undefined,
         ]),
@@ -74,8 +79,15 @@ const { response, query, search, loading, error, canCreate, refresh, searchRecor
                     :label="t('invoices.status')"
                     @update:model-value="changeFilter('status', $event)"
                 />
-                <AppButton type="submit">{{ t('invoices.searchAction') }}</AppButton
-                ><AppButton variant="secondary" :pending="loading" @click="refresh">{{
+                <AppSelect
+                    id="invoice-balance-filter"
+                    :model-value="balance"
+                    :options="balances"
+                    :label="t('invoices.balanceFilter')"
+                    @update:model-value="changeFilter('balance', $event)"
+                />
+                <AppButton type="submit">{{ t('invoices.searchAction') }}</AppButton>
+                <AppButton variant="secondary" :pending="loading" @click="refresh">{{
                     t('invoices.refresh')
                 }}</AppButton>
             </form>
@@ -113,7 +125,16 @@ const { response, query, search, loading, error, canCreate, refresh, searchRecor
                             {{ t('invoices.' + invoice.direction) }} /
                             {{ t('invoices.statuses.' + invoice.status) }}
                         </p>
-                        <p>{{ formatMoney(invoice.totalAmount) }}</p>
+                        <div>
+                            <p>{{ formatMoney(invoice.totalAmount) }}</p>
+                            <p v-if="invoice.issuedRevisionNumber" class="text-sm text-muted">
+                                {{
+                                    t('invoices.remainingBalance', {
+                                        amount: formatMoney(invoice.outstandingAmount),
+                                    })
+                                }}
+                            </p>
+                        </div>
                     </li>
                 </ul>
                 <AppPagination

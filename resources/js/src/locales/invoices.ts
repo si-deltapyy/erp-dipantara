@@ -1,5 +1,9 @@
 export default {
     invoices: {
+        allBalances: 'Semua saldo',
+        outstandingOnly: 'Masih terutang',
+        balanceFilter: 'Saldo',
+        remainingBalance: 'Sisa: {amount}',
         purchaseOrderSummary: 'Ringkasan settlement PO',
         downPaymentSummary: 'Status DP Buyer dan Mitra',
         invoiceAmount: 'Total issued aktif',

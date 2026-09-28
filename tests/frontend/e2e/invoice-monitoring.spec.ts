@@ -53,7 +53,13 @@ test('scopes balances and filtered invoice links to the PO owner across reload',
         hiddenTotal: 0,
     })
     await login(page, 'user@woodflow.test', '/app/purchase-orders/demo-po-03')
-    await page.getByRole('link', { name: 'Pantau invoice', exact: true }).click()
+    await page
+        .locator('section.panel')
+        .filter({
+            has: page.getByRole('heading', { name: 'Ringkasan settlement PO', exact: true }),
+        })
+        .getByRole('link', { name: 'Pantau invoice', exact: true })
+        .click()
     await page.getByLabel('Arah tagihan', { exact: true }).selectOption('payable')
     await page.getByLabel('Status', { exact: true }).selectOption('issued')
     await page.getByRole('button', { name: 'Cari', exact: true }).click()

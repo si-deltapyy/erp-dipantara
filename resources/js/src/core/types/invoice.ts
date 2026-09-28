@@ -36,6 +36,7 @@ export interface Invoice extends InvoiceInput, RecordMetadata {
     readonly updatedAt: string
 }
 export interface InvoiceQuery extends MasterListQuery {
+    readonly balance?: 'outstanding'
     readonly status?: 'draft' | 'issued' | 'superseded'
     readonly purchaseOrderId?: string
     readonly mitraId?: string

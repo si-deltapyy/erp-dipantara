@@ -1,3 +1,4 @@
+import dashboard from './dashboard'
 import closings from './closings'
 import payments from './payments'
 import invoices from './invoices'
@@ -24,6 +25,7 @@ export const i18n = createI18n({
     messages: {
         id: {
             ...id,
+            ...dashboard,
             ...orders,
             ...invoices,
             ...payments,

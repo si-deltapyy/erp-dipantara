@@ -1,3 +1,4 @@
+import { outstandingInvoices } from './invoice-balance-filter'
 import { presentStoredInvoice } from './closed-record-presentation'
 import type { PurchaseOrderInvoiceSummary } from '@/core/types/invoice-summary'
 import { purchaseOrderInvoiceSummary } from './invoice-summary'
@@ -56,7 +57,7 @@ export class InvoiceRepository {
             async (transaction) => {
                 const metadata = await requireDataset(transaction)
                 const search = filter.search.trim().toLocaleLowerCase('id')
-                const matches = (await transaction.list('invoices'))
+                const candidates = (await transaction.list('invoices'))
                     .map(normalizeIssuedInvoice)
                     .filter(
                         (invoice) =>
@@ -77,6 +78,9 @@ export class InvoiceRepository {
                             (filter.sort === 'createdAt' ? 1 : -1) *
                             (a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id)),
                     )
+                const matches = filter.balance
+                    ? await outstandingInvoices(transaction, candidates, this.credits)
+                    : candidates
                 return {
                     data: await Promise.all(
                         matches

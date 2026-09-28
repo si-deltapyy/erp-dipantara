@@ -91,12 +91,14 @@ export function parseInvoice(value: unknown): Invoice {
     }
 }
 export function parseInvoiceQuery(query: InvoiceQuery): InvoiceQuery {
+    if (query.balance && query.balance !== 'outstanding') return invalidContract('balance')
     if (query.status && !['draft', 'issued', 'superseded'].includes(query.status))
         return invalidContract('status')
     if (query.direction && query.direction !== 'payable' && query.direction !== 'receivable')
         return invalidContract('direction')
     return {
         ...parseBuyerQuery(query),
+        ...(query.balance ? { balance: query.balance } : {}),
         ...(query.status ? { status: query.status } : {}),
         ...(query.purchaseOrderId ? { purchaseOrderId: parseId(query.purchaseOrderId) } : {}),
         ...(query.mitraId ? { mitraId: parseId(query.mitraId) } : {}),
