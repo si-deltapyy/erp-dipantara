@@ -7,7 +7,7 @@ const metric = {
     unit: 'count',
     targetPath: '/purchase-orders?status=approved',
 }
-const sample = { asOf: '2026-09-28T12:00:00Z', metrics: [metric] }
+const sample = { asOf: '2026-09-28T12:00:00Z', metrics: [metric], activity: [] }
 it('reads the current scoped dashboard snapshot with cancellation', async () => {
     const client = axios.create()
     const get = vi.spyOn(client, 'get').mockResolvedValue({ data: { data: sample } })

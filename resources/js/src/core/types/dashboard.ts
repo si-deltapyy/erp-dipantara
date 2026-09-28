@@ -1,3 +1,4 @@
+import type { DashboardActivity } from './dashboard-activity'
 export const dashboardTargets = {
     'active-purchase-orders': '/purchase-orders?status=approved',
     'prepared-deliveries': '/deliveries?status=draft',
@@ -20,6 +21,7 @@ export type DashboardMetric =
           readonly targetPath: string
       }
 export interface DashboardSnapshot {
+    readonly activity: readonly DashboardActivity[]
     readonly asOf: string
     readonly metrics: readonly DashboardMetric[]
 }

@@ -5,6 +5,7 @@ import { runDemoTransaction } from './transaction'
 import { requireDataset } from './demo-repository'
 import { requireDashboardActor } from './dashboard-policy'
 import { operationalMetrics, financialMetrics } from './dashboard-projector'
+import { ownerActivity } from './dashboard-activity'
 export class DashboardRepository {
     constructor(private readonly options: DatabaseOptions = {}) {}
     async get(user: SessionUser | null, signal: AbortSignal): Promise<DashboardSnapshot> {
@@ -17,6 +18,7 @@ export class DashboardRepository {
                 await requireDataset(transaction)
                 return {
                     asOf: new Date().toISOString(),
+                    activity: await ownerActivity(transaction, actor),
                     metrics: [
                         ...(await operationalMetrics(transaction, actor)),
                         ...(await financialMetrics(transaction, actor)),

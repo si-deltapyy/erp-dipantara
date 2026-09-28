@@ -1,6 +1,24 @@
 import invoices from './invoices'
 export default {
     dashboard: {
+        activityTitle: 'Aktivitas transaksi saya',
+        activityDescription:
+            'Sepuluh transaksi terbaru milik PO Anda. Buka detail untuk memeriksa status dan tindak lanjut.',
+        activityEmpty: 'Belum ada transaksi yang dapat ditampilkan.',
+        resources: {
+            'purchase-orders': 'Purchase Order',
+            invoices: 'Invoice',
+            payments: 'Pembayaran',
+        },
+        statuses: {
+            draft: 'Draft',
+            submitted: 'Menunggu persetujuan',
+            approved: 'Disetujui',
+            rejected: 'Perlu perbaikan',
+            closed: 'Ditutup',
+            issued: 'Diterbitkan',
+            superseded: 'Digantikan',
+        },
         title: 'Ringkasan operasional',
         description:
             'Pantau pekerjaan dan saldo sesuai akses Anda. Angka mengikuti kondisi transaksi saat dimuat.',
