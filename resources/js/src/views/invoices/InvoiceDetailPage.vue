@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { evaluateRecordAccess } from '@/core/domain/record-policy'
 import { computed, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRecordDetail } from '@/composables/useRecordDetail'
@@ -121,6 +122,15 @@ const canEdit = computed(
                 :to="{ name: 'invoice-revise', params: { id: invoice.id } }"
                 class="secondary-button"
                 >{{ t('invoices.revise') }}</RouterLink
+            >
+            <RouterLink
+                v-if="
+                    invoice.issuedRevisionNumber &&
+                    evaluateRecordAccess(session.user, 'payments.create', invoice) === 'allowed'
+                "
+                :to="{ name: 'payment-new', query: { invoiceId: invoice.id } }"
+                class="primary-button"
+                >{{ t('payments.start') }}</RouterLink
             >
             <InvoiceSettlement :key="invoice.version" :invoice-id="invoice.id" />
             <InvoiceDocument :invoice="invoice" />

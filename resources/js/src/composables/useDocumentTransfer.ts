@@ -24,6 +24,7 @@ export interface DocumentUploadState {
 export function useDocumentTransfer(
     target: () => DocumentUploadTarget,
     onUploaded: (document: DocumentReference) => Promise<void>,
+    onRecovery?: () => void,
 ): DocumentUploadState {
     const api = useDocumentsApi()
     const store = useSessionStore()
@@ -117,7 +118,8 @@ export function useDocumentTransfer(
             error.value = `documents.errors.${failure.kind}`
             if (failure.kind === 'validation') fileError.value = 'documents.uploadInvalid'
             if (failure.kind === 'conflict') fileError.value = 'documents.errors.conflict'
-            if (failure.kind === 'csrf')
+            if (failure.kind === 'csrf') {
+                onRecovery?.()
                 recovery.draft = {
                     actorId,
                     target: destination,
@@ -125,6 +127,7 @@ export function useDocumentTransfer(
                     idempotencyKey: key,
                     uncertain: uncertain.value,
                 }
+            }
             await session.handleRequestFailure(cause)
         } finally {
             if (active === request) pending.value = false

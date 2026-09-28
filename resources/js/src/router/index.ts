@@ -1,3 +1,4 @@
+import { paymentRoutes } from './payments'
 import { invoiceRoutes } from './invoices'
 import { deliveryRoutes } from './deliveries'
 import { gradingRoutes } from './gradings'
@@ -26,6 +27,7 @@ const routes: RouteRecordRaw[] = [
 ]
 
 routes.push(
+    ...paymentRoutes,
     ...invoiceRoutes,
     ...deliveryRoutes,
     ...gradingRoutes,

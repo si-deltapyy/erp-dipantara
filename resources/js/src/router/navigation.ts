@@ -13,6 +13,7 @@ export const navigation: readonly NavigationEntry[] = [
         icon: 'layers',
         ...accessRules['purchase-orders'],
     },
+    { name: 'payments', label: 'payments.title', icon: 'layers', ...accessRules.payments },
     { name: 'invoices', label: 'invoices.title', icon: 'layers', ...accessRules.invoices },
     { name: 'deliveries', label: 'deliveries.title', icon: 'layers', ...accessRules.deliveries },
     { name: 'gradings', label: 'gradings.title', icon: 'layers', ...accessRules.gradings },

@@ -1,3 +1,4 @@
+import type { Payment } from '@/core/types/payment'
 import type { Invoice } from '@/core/types/invoice'
 import type { Delivery } from '@/core/types/delivery'
 import type { Grading } from '@/core/types/grading'
@@ -12,6 +13,8 @@ import type { Mitra } from '@/core/types/mitra'
 import type { Buyer } from '@/core/types/buyer'
 
 export const demoStores = [
+    'payments',
+    'paymentMutations',
     'invoiceVersions',
     'invoices',
     'invoiceMutations',
@@ -44,7 +47,7 @@ export const demoStores = [
     'timberProductMutations',
 ] as const
 export type DemoStore = (typeof demoStores)[number]
-export const demoSchemaVersion = 14
+export const demoSchemaVersion = 15
 export const demoDatasetVersion = 1
 export interface DatasetMetadata {
     readonly id: 'dataset'
@@ -80,6 +83,13 @@ export interface MutationReceipt {
     readonly result: DemoSample
 }
 export interface DemoTables {
+    readonly payments: Payment
+    readonly paymentMutations: {
+        readonly id: string
+        readonly payloadHash: string
+        readonly expiresAt: number
+        readonly result: Payment
+    }
     readonly invoiceVersions: {
         readonly id: string
         readonly invoiceId: string
@@ -183,7 +193,7 @@ export interface OrderMutationReceipt {
 }
 export interface OrderAudit {
     readonly id: string
-    readonly resource: 'orders' | 'assignments' | 'deliveries' | 'invoices'
+    readonly resource: 'orders' | 'assignments' | 'deliveries' | 'invoices' | 'payments'
     readonly recordId: string
     readonly actorId: string
     readonly version: number

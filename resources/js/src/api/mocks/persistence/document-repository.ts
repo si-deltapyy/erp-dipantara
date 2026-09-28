@@ -24,6 +24,7 @@ import {
 const stores: readonly DemoStore[] = [
     'metadata',
     'invoices',
+    'payments',
     'deliveries',
     'documents',
     'purchase-orders',

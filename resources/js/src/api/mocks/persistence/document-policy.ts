@@ -20,6 +20,17 @@ export async function assertDocumentParentAccess(
     parent: DocumentParent,
     action: DocumentAction,
 ): Promise<void> {
+    if (parent.parentType === 'payment') {
+        const payment = await transaction.get('payments', parent.parentId)
+        if (!payment) throw new ApiError('not-found')
+        assertRecordAccess(actor, 'payments.read', payment)
+        assertRecordAccess(actor, `documents.${action}`, payment)
+        if (action === 'upload') {
+            if (!['draft', 'rejected'].includes(payment.status)) throw new ApiError('forbidden')
+            assertRecordAccess(actor, 'payments.update', payment)
+        }
+        return
+    }
     if (parent.parentType === 'invoice') {
         if (action === 'upload') throw new ApiError('forbidden')
         const invoice = await transaction.get('invoices', parent.parentId)

@@ -1,10 +1,7 @@
+import { approvedPaymentCredit } from './payment-credit'
 import type { InvoiceSettlement } from '@/core/types/invoice-settlement'
 import { invoiceSettlement } from './invoice-monitoring'
-import {
-    invoiceCreditFixture,
-    invoiceOutstanding,
-    normalizeIssuedInvoice,
-} from './invoice-settlement'
+import { invoiceOutstanding, normalizeIssuedInvoice } from './invoice-settlement'
 import type { InvoiceCreditResolver } from './invoice-settlement'
 import type { Invoice, InvoiceQuery } from '@/core/types/invoice'
 import type { PageResponse } from '@/core/types/contracts'
@@ -29,6 +26,7 @@ import { writeInvoice } from './invoice-mutation'
 const stores: readonly DemoStore[] = [
     'metadata',
     'invoices',
+    'payments',
     'invoiceVersions',
     'purchase-orders',
     'assignments',
@@ -39,7 +37,7 @@ const stores: readonly DemoStore[] = [
 export class InvoiceRepository {
     constructor(
         private readonly options: DatabaseOptions = {},
-        private readonly credits: InvoiceCreditResolver = invoiceCreditFixture,
+        private readonly credits: InvoiceCreditResolver = approvedPaymentCredit,
     ) {}
     async list(
         user: SessionUser | null,
