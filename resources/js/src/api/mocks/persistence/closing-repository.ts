@@ -1,3 +1,6 @@
+import type { ClosingReviewMutation } from './closing-review'
+import { reviewClosing } from './closing-review'
+import { parseWorkflowVersion, parseWorkflowRejection } from '@/api/contracts/workflow-parsers'
 import type { Closing, ClosingInput, ClosingQuery, ClosingEligibility } from '@/core/types/closing'
 import type { PageResponse } from '@/core/types/contracts'
 import type { SessionUser } from '@/core/types/session'
@@ -46,7 +49,7 @@ export class ClosingRepository {
         query: ClosingQuery,
         signal: AbortSignal,
     ): Promise<PageResponse<Closing>> {
-        requireClosingPermission(user, 'read')
+        const actor = requireClosingPermission(user, 'read')
         const filter = parseClosingQuery(query)
         return runDemoTransaction(
             this.options,
@@ -72,7 +75,7 @@ export class ClosingRepository {
                 return {
                     data: matches
                         .slice((filter.page - 1) * filter.perPage, filter.page * filter.perPage)
-                        .map((closing) => presentClosing(closing, metadata.generation)),
+                        .map((closing) => presentClosing(closing, actor, metadata.generation)),
                     meta: { page: filter.page, perPage: filter.perPage, total: matches.length },
                 }
             },
@@ -80,7 +83,7 @@ export class ClosingRepository {
         )
     }
     async get(user: SessionUser | null, id: string, signal: AbortSignal): Promise<Closing> {
-        requireClosingPermission(user, 'read')
+        const actor = requireClosingPermission(user, 'read')
         parseId(id)
         return runDemoTransaction(
             this.options,
@@ -90,7 +93,7 @@ export class ClosingRepository {
                 const metadata = await requireDataset(transaction)
                 const closing = await transaction.get('closings', id)
                 if (!closing) throw new ApiError('not-found')
-                return presentClosing(closing, metadata.generation)
+                return presentClosing(closing, actor, metadata.generation)
             },
             signal,
         )
@@ -115,6 +118,37 @@ export class ClosingRepository {
                 if (metadata.generation !== generation) throw new ApiError('conflict')
                 return presentClosing(
                     await requestClosing(transaction, metadata, actor, payload, key, hash),
+                    actor,
+                    generation,
+                )
+            },
+            signal,
+        )
+    }
+    async review(
+        user: SessionUser | null,
+        mutation: Omit<ClosingReviewMutation, 'hash'>,
+        generation: string,
+        signal: AbortSignal,
+    ): Promise<Closing> {
+        const actor = requireClosingPermission(user, mutation.action)
+        parseId(mutation.id)
+        if (!mutation.key.trim() || mutation.key.length > 100) throw new ApiError('validation')
+        const input =
+            mutation.action === 'reject'
+                ? parseWorkflowRejection(mutation.input)
+                : parseWorkflowVersion(mutation.input)
+        const hash = await hashMutationPayload({ ...input, generation })
+        return runDemoTransaction(
+            this.options,
+            [...closingStores, 'closingMutations', 'audit'],
+            'readwrite',
+            async (transaction) => {
+                const metadata = await requireDataset(transaction)
+                if (metadata.generation !== generation) throw new ApiError('conflict')
+                return presentClosing(
+                    await reviewClosing(transaction, metadata, actor, { ...mutation, input, hash }),
+                    actor,
                     generation,
                 )
             },

@@ -91,3 +91,22 @@ it('creates a versioned closing once and treats malformed success as uncertain',
     ).rejects.toMatchObject({ kind: 'unexpected' })
     expect(post).toHaveBeenCalledTimes(2)
 })
+
+it('validates review payloads before sending and preserves idempotency headers', async () => {
+    const client = axios.create()
+    const post = vi.spyOn(client, 'post').mockResolvedValue({ data: { data: {} } })
+    const api = createHttpClosings(client)
+    const options = { signal: new AbortController().signal, idempotencyKey: 'review-key' }
+    await expect(
+        api.reject('closing-one', { version: 1, reason: ' ' }, options),
+    ).rejects.toMatchObject({ kind: 'validation' })
+    expect(post).not.toHaveBeenCalled()
+    await expect(api.approve('closing-one', { version: 1 }, options)).rejects.toMatchObject({
+        kind: 'unexpected',
+    })
+    expect(post).toHaveBeenCalledWith(
+        '/api/v1/closings/closing-one/approve',
+        { version: 1 },
+        { signal: options.signal, headers: { 'Idempotency-Key': 'review-key' } },
+    )
+})

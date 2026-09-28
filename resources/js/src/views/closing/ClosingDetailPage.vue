@@ -1,4 +1,10 @@
 <script setup lang="ts">
+import { reactive } from 'vue'
+import { useRoute } from 'vue-router'
+import { useClosingReview } from './composables/useClosingReview'
+import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
+import AppReviewDialog from '@/components/ui/AppReviewDialog.vue'
+import AppConfirmDialog from '@/components/ui/AppConfirmDialog.vue'
 import { useI18n } from 'vue-i18n'
 import { useSessionStore } from '@/stores/session'
 import { evaluateRecordAccess } from '@/core/domain/record-policy'
@@ -14,6 +20,17 @@ const {
     error,
     refresh,
 } = useRecordDetail(useClosingApi(), 'closings', false)
+const route = useRoute()
+const review = reactive(useClosingReview(closing, refresh, () => route.params.id))
+const discard = reactive(
+    useUnsavedChanges(
+        () => session.status === 'authenticated' && !!review.reason.trim(),
+        () => session.status === 'authenticated' && review.pending,
+    ),
+)
+function closeReview(): void {
+    discard.requestDiscard(() => review.close())
+}
 </script>
 <template>
     <section class="space-y-6">
@@ -47,7 +64,47 @@ const {
                     >{{ t('closings.openPurchaseOrder') }}</RouterLink
                 >
             </div>
-            <ClosingEligibilityPanel :purchase-order-id="closing.purchaseOrderId" />
+            <div class="flex flex-wrap gap-3">
+                <AppButton
+                    v-if="review.canApprove"
+                    :disabled="review.pending"
+                    @click="review.open('approve')"
+                    >{{ t('closings.approve') }}</AppButton
+                >
+                <AppButton
+                    v-if="review.canReject"
+                    variant="secondary"
+                    :disabled="review.pending"
+                    @click="review.open('reject')"
+                    >{{ t('closings.reject') }}</AppButton
+                >
+            </div>
+            <ClosingEligibilityPanel
+                :key="closing.version"
+                :purchase-order-id="closing.purchaseOrderId"
+            />
         </template>
+        <AppReviewDialog
+            resource="closings"
+            reason-id="closing-review-reason"
+            :action="review.action"
+            :reason="review.reason"
+            :reason-error="review.reasonError"
+            :error="review.error"
+            :pending="review.pending"
+            :uncertain="review.uncertain"
+            :blocked="review.blocked"
+            @update:reason="review.reason = $event"
+            @close="closeReview"
+            @confirm="review.submit"
+            @reload="review.reload"
+        />
+        <AppConfirmDialog
+            :open="discard.confirming"
+            :title="t('closings.discardTitle')"
+            :description="t('closings.discardDescription')"
+            @confirm="discard.confirm"
+            @cancel="discard.cancel"
+        />
     </section>
 </template>

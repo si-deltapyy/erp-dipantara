@@ -1,6 +1,16 @@
 import invoices from './invoices'
 export default {
     closings: {
+        reviewCsrf: 'Sesi telah diperbarui. Periksa keputusan lalu konfirmasi kembali.',
+        approve: 'Setujui closing',
+        reject: 'Tolak closing',
+        reason: 'Alasan penolakan',
+        reasonInvalid: 'Isi alasan penolakan dengan 1 sampai 2.000 karakter.',
+        approveDescription:
+            'Kelayakan diperiksa ulang. Persetujuan menutup PO dan mengunci transaksi terkait.',
+        rejectDescription:
+            'Isi alasan penolakan. PO tetap disetujui dan dapat diajukan kembali setelah perbaikan.',
+        reviewConflict: 'Data atau akses berubah. Muat ulang untuk memeriksa kondisi terbaru.',
         title: 'Closing PO',
         detail: 'Detail closing',
         request: 'Ajukan closing',

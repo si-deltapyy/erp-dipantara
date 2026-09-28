@@ -33,7 +33,7 @@ export function useRecordReview<T extends WorkflowRecord>(
     recordId: () => unknown,
     options: {
         resource: string
-        api: WorkflowApi<T>
+        api: Pick<WorkflowApi<T>, 'approve' | 'reject'>
         recovery: { review: ReviewSnapshot<T> | null }
         canAct(actor: SessionUser | null, record: T, action: ReviewAction): boolean
     },
@@ -115,7 +115,7 @@ export function useRecordReview<T extends WorkflowRecord>(
         const id = recordId()
         await refresh()
         if (!record.value || actor !== store.user || id !== recordId()) return
-        if (record.value.status !== 'submitted') return reset()
+        if (!canApprove.value && !canReject.value) return reset()
         attempt = undefined
         uncertain.value = false
         blocked.value = false

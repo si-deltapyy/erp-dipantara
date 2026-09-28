@@ -29,7 +29,10 @@ export async function configureClosings(app: App, pinia: Pinia): Promise<void> {
         () => {
             if (
                 session.status === 'guest' ||
-                (session.user && recovery.snapshot && recovery.snapshot.actorId !== session.user.id)
+                (session.user &&
+                    [recovery.snapshot, recovery.review].some(
+                        (snapshot) => snapshot && snapshot.actorId !== session.user?.id,
+                    ))
             )
                 recovery.$reset()
         },

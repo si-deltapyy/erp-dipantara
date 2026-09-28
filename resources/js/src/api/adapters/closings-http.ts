@@ -1,3 +1,10 @@
+import type {
+    ReviewAction,
+    WorkflowVersion,
+    WorkflowRejection,
+    WorkflowWriteOptions,
+} from '@/core/types/workflow'
+import { parseWorkflowVersion, parseWorkflowRejection } from '@/api/contracts/workflow-parsers'
 import type { Closing } from '@/core/types/closing'
 import { ApiError } from '@/core/types/api-error'
 import { parseClosing } from '@/api/closing-record-mapper'
@@ -9,7 +16,24 @@ import { parseDetail, parsePage } from '@/api/contracts/response-parsers'
 import { parseId } from '@/api/contracts/value-parsers'
 import { parseClosingEligibility } from '@/api/closing-mapper'
 export function createHttpClosings(client: AxiosInstance = createHttpClient()): ClosingsApi {
+    async function review(
+        action: ReviewAction,
+        id: string,
+        input: WorkflowVersion | WorkflowRejection,
+        options: WorkflowWriteOptions,
+    ): Promise<Closing> {
+        const payload =
+            action === 'reject' ? parseWorkflowRejection(input) : parseWorkflowVersion(input)
+        const response = await client.post<unknown>(
+            `/api/v1/closings/${encodeURIComponent(parseId(id))}/${action}`,
+            payload,
+            { signal: options.signal, headers: { 'Idempotency-Key': options.idempotencyKey } },
+        )
+        return parseClosingMutation(response.data)
+    }
     return {
+        approve: (id, input, options) => review('approve', id, input, options),
+        reject: (id, input, options) => review('reject', id, input, options),
         async list(query, signal) {
             return parsePage(
                 (

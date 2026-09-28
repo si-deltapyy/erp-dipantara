@@ -1,6 +1,6 @@
 import type { RecordMetadata, PageResponse } from './contracts'
 import type { MasterListQuery } from './master-list'
-import type { WorkflowWriteOptions } from './workflow'
+import type { WorkflowWriteOptions, WorkflowVersion, WorkflowRejection } from './workflow'
 import type { PurchaseOrderInvoiceSummary } from './invoice-summary'
 export const closingReasonCodes = [
     'purchase_order_not_approved',
@@ -61,6 +61,8 @@ export interface ClosingQuery extends MasterListQuery {
     readonly status?: Closing['status']
 }
 export interface ClosingsApi {
+    approve(id: string, input: WorkflowVersion, options: WorkflowWriteOptions): Promise<Closing>
+    reject(id: string, input: WorkflowRejection, options: WorkflowWriteOptions): Promise<Closing>
     list(query: ClosingQuery, signal: AbortSignal): Promise<PageResponse<Closing>>
     get(id: string, signal: AbortSignal): Promise<Closing>
     create(input: ClosingInput, options: WorkflowWriteOptions): Promise<Closing>

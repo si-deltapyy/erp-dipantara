@@ -13,6 +13,7 @@ export async function closingEligibility(
     transaction: DemoTransaction,
     actor: SessionUser,
     purchaseOrderId: string,
+    excludeClosingId?: string,
 ): Promise<ClosingEligibility> {
     const metadata = await requireDataset(transaction)
     const purchaseOrder = await transaction.get('purchase-orders', purchaseOrderId)
@@ -30,7 +31,9 @@ export async function closingEligibility(
     if (
         (await transaction.list('closings')).some(
             (closing) =>
-                closing.purchaseOrderId === purchaseOrderId && closing.status === 'requested',
+                closing.purchaseOrderId === purchaseOrderId &&
+                closing.status === 'requested' &&
+                closing.id !== excludeClosingId,
         )
     )
         reasons.push('active_request')
