@@ -7,13 +7,50 @@ const metric = {
     unit: 'count',
     targetPath: '/purchase-orders?status=approved',
 }
-const sample = { asOf: '2026-09-28T12:00:00Z', metrics: [metric], activity: [], queues: [] }
+const sample = {
+    asOf: '2026-09-28T12:00:00Z',
+    metrics: [metric],
+    activity: [],
+    queues: [],
+    grader: null,
+}
 it('reads the current scoped dashboard snapshot with cancellation', async () => {
     const client = axios.create()
     const get = vi.spyOn(client, 'get').mockResolvedValue({ data: { data: sample } })
     const signal = new AbortController().signal
     expect(await createHttpDashboard(client).get(signal)).toEqual(sample)
     expect(get).toHaveBeenCalledWith('/api/v1/dashboard', { signal })
+})
+it('validates requested months before fetching and rejects a different response period', async () => {
+    const client = axios.create()
+    const get = vi.spyOn(client, 'get').mockResolvedValue({
+        data: {
+            data: {
+                ...sample,
+                grader: {
+                    period: '2026-08',
+                    assignments: {
+                        count: 0,
+                        assignedQuantity: 0,
+                        approvedQuantity: 0,
+                        remainingQuantity: 0,
+                        targetPath: '/assignments',
+                    },
+                    production: [],
+                },
+            },
+        },
+    })
+    const api = createHttpDashboard(client)
+    const signal = new AbortController().signal
+    await expect(api.get(signal, { period: '2026-13' })).rejects.toMatchObject({
+        kind: 'validation',
+    })
+    expect(get).not.toHaveBeenCalled()
+    await expect(api.get(signal, { period: '2026-09' })).rejects.toMatchObject({
+        kind: 'validation',
+    })
+    expect(get).toHaveBeenCalledWith('/api/v1/dashboard', { signal, params: { period: '2026-09' } })
 })
 it.each([
     { ...metric, value: '12.500000' },

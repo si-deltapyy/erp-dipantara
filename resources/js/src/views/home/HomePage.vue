@@ -4,11 +4,20 @@ import { computed } from 'vue'
 import { useSessionStore } from '@/stores/session'
 import DashboardActivityList from './components/DashboardActivityList.vue'
 import DashboardQueueCards from './components/DashboardQueueCards.vue'
+import DashboardGraderPanel from './components/DashboardGraderPanel.vue'
+import { useDashboardPeriod } from './composables/useDashboardPeriod'
+import AppTextInput from '@/components/ui/AppTextInput.vue'
 import { useDashboard } from './composables/useDashboard'
 import DashboardMetricCard from './components/DashboardMetricCard.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 const { t } = useI18n()
 const session = useSessionStore()
+const showGrader = computed(
+    () =>
+        session.user?.permissions.includes('dashboard.read.assigned') &&
+        !session.user.permissions.includes('dashboard.read.all'),
+)
+const { period, error: periodError, applyPeriod } = useDashboardPeriod()
 const showActivity = computed(
     () =>
         session.user?.permissions.includes('dashboard.read.own') &&
@@ -28,6 +37,20 @@ const { record: snapshot, loading, error, refresh } = useDashboard()
                 t('dashboard.refresh')
             }}</AppButton>
         </header>
+        <form
+            v-if="showGrader"
+            class="panel flex flex-wrap items-end gap-3"
+            @submit.prevent="applyPeriod"
+        >
+            <AppTextInput
+                id="dashboard-period"
+                v-model="period"
+                type="month"
+                :label="t('production.period')"
+                :error="periodError ? t(periodError) : undefined"
+            />
+            <AppButton type="submit">{{ t('production.apply') }}</AppButton>
+        </form>
         <p v-if="loading" role="status" class="panel">{{ t('dashboard.loading') }}</p>
         <div v-else-if="error" role="alert" class="panel space-y-3">
             <p>{{ t(error) }}</p>
@@ -38,7 +61,12 @@ const { record: snapshot, loading, error, refresh } = useDashboard()
                 {{ t('dashboard.asOf', { date: new Date(snapshot.asOf).toLocaleString('id-ID') }) }}
             </p>
             <p
-                v-if="!snapshot.metrics.length && !snapshot.queues.length && !showActivity"
+                v-if="
+                    !snapshot.metrics.length &&
+                    !snapshot.queues.length &&
+                    !showActivity &&
+                    !snapshot.grader
+                "
                 role="status"
                 class="panel"
             >
@@ -53,6 +81,7 @@ const { record: snapshot, loading, error, refresh } = useDashboard()
             </div>
             <DashboardActivityList v-if="showActivity" :activity="snapshot.activity" />
             <DashboardQueueCards :queues="snapshot.queues" />
+            <DashboardGraderPanel v-if="snapshot.grader" :snapshot="snapshot.grader" />
         </template>
         <p v-else class="panel text-muted">{{ t('dashboard.unavailable') }}</p>
     </section>

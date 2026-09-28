@@ -1,3 +1,4 @@
+import type { GraderDashboard } from './production'
 import type { DashboardActivity } from './dashboard-activity'
 import type {
     DashboardQueueEntry,
@@ -27,6 +28,7 @@ export type DashboardMetric =
           readonly targetPath: string
       }
 export interface DashboardSnapshot {
+    readonly grader: GraderDashboard | null
     readonly queues: readonly DashboardQueueSummary[]
     readonly activity: readonly DashboardActivity[]
     readonly asOf: string
@@ -37,6 +39,10 @@ export interface DashboardApi {
         query: DashboardQueueQuery,
         signal: AbortSignal,
     ): Promise<PageResponse<DashboardQueueEntry>>
-    get(signal: AbortSignal): Promise<DashboardSnapshot>
+    get(signal: AbortSignal, query?: DashboardQuery): Promise<DashboardSnapshot>
     subscribe(listener: () => void): () => void
+}
+
+export interface DashboardQuery {
+    readonly period?: string
 }

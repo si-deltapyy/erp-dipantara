@@ -1,5 +1,7 @@
 import type { SessionUser } from '@/core/types/session'
-import type { DashboardSnapshot } from '@/core/types/dashboard'
+import type { DashboardSnapshot, DashboardQuery } from '@/core/types/dashboard'
+import { parseDashboardQuery } from '@/api/dashboard-mapper'
+import { graderDashboard } from './dashboard-grader'
 import type { DatabaseOptions } from './database'
 import { runDemoTransaction } from './transaction'
 import { requireDataset } from './demo-repository'
@@ -18,11 +20,20 @@ const stores: readonly DemoStore[] = [
     'deliveries',
     'invoices',
     'payments',
+    'assignments',
+    'gradings',
 ]
 export class DashboardRepository {
     constructor(private readonly options: DatabaseOptions = {}) {}
-    async get(user: SessionUser | null, signal: AbortSignal): Promise<DashboardSnapshot> {
+    async get(
+        user: SessionUser | null,
+        signal: AbortSignal,
+        query: DashboardQuery = {},
+    ): Promise<DashboardSnapshot> {
         const actor = requireDashboardActor(user)
+        const period =
+            parseDashboardQuery(query).period ??
+            new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }).slice(0, 7)
         return runDemoTransaction(
             this.options,
             stores,
@@ -33,6 +44,7 @@ export class DashboardRepository {
                     asOf: new Date().toISOString(),
                     activity: await ownerActivity(transaction, actor),
                     queues: await dashboardQueueSummaries(transaction, actor),
+                    grader: await graderDashboard(transaction, actor, period),
                     metrics: [
                         ...(await operationalMetrics(transaction, actor)),
                         ...(await financialMetrics(transaction, actor)),

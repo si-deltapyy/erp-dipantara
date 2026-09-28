@@ -1,4 +1,6 @@
 import { parseActivityList } from './dashboard-activity-mapper'
+import { parseGraderDashboard, parseProductionPeriod } from './production-mapper'
+import type { DashboardQuery } from '@/core/types/dashboard'
 import { parseQueueSummaries } from './dashboard-queue-mapper'
 import type { DashboardMetric, DashboardSnapshot } from '@/core/types/dashboard'
 import { dashboardTargets } from '@/core/types/dashboard'
@@ -38,7 +40,7 @@ export function parseDashboardMetric(value: unknown): DashboardMetric {
 }
 export function parseDashboardSnapshot(value: unknown): DashboardSnapshot {
     const snapshot = parseObject(value, 'dashboard')
-    requireKeys(snapshot, ['asOf', 'metrics', 'activity', 'queues'], 'dashboard')
+    requireKeys(snapshot, ['asOf', 'metrics', 'activity', 'queues', 'grader'], 'dashboard')
     if (!Array.isArray(snapshot.metrics)) return invalidContract('metrics')
     const metrics = snapshot.metrics.map(parseDashboardMetric)
     if (new Set(metrics.map((metric) => metric.key)).size !== metrics.length)
@@ -48,5 +50,10 @@ export function parseDashboardSnapshot(value: unknown): DashboardSnapshot {
         metrics,
         activity: parseActivityList(snapshot.activity),
         queues: parseQueueSummaries(snapshot.queues),
+        grader: parseGraderDashboard(snapshot.grader),
     }
+}
+
+export function parseDashboardQuery(query: DashboardQuery): DashboardQuery {
+    return query.period === undefined ? {} : { period: parseProductionPeriod(query.period) }
 }

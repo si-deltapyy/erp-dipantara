@@ -25,13 +25,9 @@ test('distinguishes loading and errors from zero and removes finance when the ac
     await expect(page.getByTestId('metric-buyer-outstanding')).toBeVisible()
     await page.getByRole('button', { name: 'Keluar', exact: true }).click()
     await login(page, 'grader1@woodflow.test')
-    await expect(
-        page.getByText('Belum ada ringkasan yang tersedia untuk akses Anda.'),
-    ).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Penugasan saya', exact: true })).toBeVisible()
     await expect(page.getByTestId('metric-buyer-outstanding')).toHaveCount(0)
     await expect(page.getByTestId('metric-mitra-outstanding')).toHaveCount(0)
     await page.reload()
-    await expect(
-        page.getByText('Belum ada ringkasan yang tersedia untuk akses Anda.'),
-    ).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Penugasan saya', exact: true })).toBeVisible()
 })

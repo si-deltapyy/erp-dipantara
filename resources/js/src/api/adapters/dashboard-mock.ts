@@ -12,8 +12,10 @@ export function createMockDashboard(
             runtime.executeBusiness('read', signal, (active) =>
                 repository.queue(getUser(), query, active),
             ),
-        get: (signal) =>
-            runtime.executeBusiness('read', signal, (active) => repository.get(getUser(), active)),
+        get: (signal, query) =>
+            runtime.executeBusiness('read', signal, (active) =>
+                repository.get(getUser(), active, query),
+            ),
         subscribe: (listener) => runtime.subscribe(listener),
     }
 }

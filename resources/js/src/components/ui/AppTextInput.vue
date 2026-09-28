@@ -6,7 +6,7 @@ withDefaults(
         id: string
         label: string
         modelValue: string
-        type?: 'text' | 'email' | 'password' | 'date'
+        type?: 'text' | 'email' | 'password' | 'date' | 'month'
         hint?: string
         error?: string
         disabled?: boolean

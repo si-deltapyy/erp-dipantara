@@ -13,20 +13,22 @@ export async function createApprovedGradingScenario(
     databaseName?: string,
     purchaseOrderId = 'demo-po-03',
     quantity = 2,
+    graderNumber: 1 | 2 = 1,
 ): Promise<Awaited<ReturnType<typeof buildScenario>>> {
-    return buildScenario(databaseName, purchaseOrderId, quantity)
+    return buildScenario(databaseName, purchaseOrderId, quantity, graderNumber)
 }
 async function buildScenario(
     databaseName: string | undefined,
     purchaseOrderId: string,
     quantity: number,
+    graderNumber: 1 | 2,
 ) {
     const options = { name: databaseName ?? 'grading-revision-test-' + crypto.randomUUID() }
     const metadata = await new DemoRepository(options).initialize()
     const signal = new AbortController().signal,
         generation = metadata.generation
     const maker = actor('maker-demo'),
-        grader = actor('grader-one'),
+        grader = actor(graderNumber === 1 ? 'grader-one' : 'grader-two'),
         supervisor = actor('supervisor-demo'),
         admin = actor('admin-demo')
     const orders = new OrderRepository(options),
@@ -34,7 +36,11 @@ async function buildScenario(
         gradings = new GradingRepository(options)
     const order = await orders.mutate(
         maker,
-        { action: 'create', input: { purchaseOrderId, notes: null }, key: 'order' },
+        {
+            action: 'create',
+            input: { purchaseOrderId, notes: null },
+            key: 'order-' + purchaseOrderId,
+        },
         generation,
         signal,
     )
@@ -45,11 +51,11 @@ async function buildScenario(
             input: {
                 orderId: order.id,
                 mitraId: 'demo-mitra-01',
-                graderId: 'demo-grader-01',
+                graderId: graderNumber === 1 ? 'demo-grader-01' : 'demo-grader-02',
                 timberProductId: 'demo-timber-01',
                 quantity,
             },
-            key: 'assignment',
+            key: 'assignment-' + purchaseOrderId,
         },
         generation,
         signal,
@@ -88,7 +94,7 @@ async function buildScenario(
     }
     const draft = await gradings.mutate(
         grader,
-        { action: 'create', input, key: 'draft' },
+        { action: 'create', input, key: 'draft-' + purchaseOrderId },
         generation,
         signal,
     )
