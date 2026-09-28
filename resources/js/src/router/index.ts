@@ -1,3 +1,4 @@
+import { closingRoutes } from './closing'
 import { paymentRoutes } from './payments'
 import { invoiceRoutes } from './invoices'
 import { deliveryRoutes } from './deliveries'
@@ -27,6 +28,7 @@ const routes: RouteRecordRaw[] = [
 ]
 
 routes.push(
+    ...closingRoutes,
     ...paymentRoutes,
     ...invoiceRoutes,
     ...deliveryRoutes,

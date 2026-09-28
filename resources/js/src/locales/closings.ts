@@ -1,6 +1,32 @@
 import invoices from './invoices'
 export default {
     closings: {
+        title: 'Closing PO',
+        detail: 'Detail closing',
+        request: 'Ajukan closing',
+        history: 'Riwayat closing',
+        requestDescription:
+            'Pengajuan menunggu persetujuan reviewer berbeda. PO tetap disetujui sampai closing disetujui.',
+        notes: 'Catatan pengajuan',
+        noNotes: 'Tanpa catatan',
+        confirmTitle: 'Ajukan closing PO?',
+        refreshEligibility: 'Periksa ulang kelayakan',
+        choosePurchaseOrder: 'Pilih PO melalui detail untuk mengajukan closing.',
+        purchaseOrders: 'Daftar PO',
+        openPurchaseOrder: 'Buka PO',
+        back: 'Kembali ke daftar',
+        total: '{count} pengajuan closing',
+        empty: 'Belum ada pengajuan closing yang sesuai.',
+        search: 'Cari nomor PO',
+        searchAction: 'Cari',
+        statuses: { requested: 'Menunggu persetujuan', approved: 'Disetujui', rejected: 'Ditolak' },
+        invalid: 'Periksa nilai field ini.',
+        uncertain:
+            'Hasil belum diketahui. Ulangi permintaan yang sama atau periksa riwayat sebelum membuat pengajuan baru.',
+        retryWrite: 'Ulangi permintaan',
+        discardTitle: 'Buang perubahan?',
+        discardDescription: 'Catatan yang belum disimpan akan hilang.',
+
         eligibility: 'Kelayakan closing',
         loading: 'Memeriksa kelayakan closing...',
         refresh: 'Muat ulang',
@@ -20,6 +46,7 @@ export default {
             received: 'Diterima',
         },
         reasons: {
+            active_request: 'PO sudah memiliki pengajuan closing yang menunggu persetujuan.',
             purchase_order_not_approved: 'PO harus berstatus disetujui.',
             orders_incomplete: 'Order belum tersedia atau belum seluruhnya disetujui.',
             assignments_incomplete:

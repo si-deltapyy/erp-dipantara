@@ -63,6 +63,17 @@ const {
                 />
             </div>
             <div class="flex flex-wrap gap-3">
+                <RouterLink
+                    v-if="eligibility.allowedActions.includes('request')"
+                    :to="{ name: 'closing-new', query: { purchaseOrderId } }"
+                    class="primary-button"
+                    >{{ t('closings.request') }}</RouterLink
+                >
+                <RouterLink
+                    :to="{ name: 'closings', query: { purchaseOrderId } }"
+                    class="secondary-button"
+                    >{{ t('closings.history') }}</RouterLink
+                >
                 <AppButton @click="refresh">{{ t('closings.refresh') }}</AppButton>
                 <RouterLink
                     v-if="hasBusinessPermission(session.user, 'deliveries.read')"

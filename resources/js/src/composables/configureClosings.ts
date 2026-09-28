@@ -1,4 +1,5 @@
-import { inject } from 'vue'
+import { useClosingRecoveryStore } from '@/stores/closing-recovery'
+import { inject, watch } from 'vue'
 import type { App } from 'vue'
 import type { DemoRuntime } from '@/api/mocks/demo-runtime'
 import type { Pinia } from 'pinia'
@@ -22,6 +23,19 @@ export async function configureClosings(app: App, pinia: Pinia): Promise<void> {
             : undefined,
     })
     app.provide(closingsApiKey, api)
+    const recovery = useClosingRecoveryStore(pinia)
+    const stop = watch(
+        () => [session.status, session.user],
+        () => {
+            if (
+                session.status === 'guest' ||
+                (session.user && recovery.snapshot && recovery.snapshot.actorId !== session.user.id)
+            )
+                recovery.$reset()
+        },
+    )
+    app.onUnmount(stop)
+    if (import.meta.hot) import.meta.hot.dispose(stop)
 }
 function injectRuntime(): DemoRuntime {
     const runtime = inject(demoRuntimeKey)

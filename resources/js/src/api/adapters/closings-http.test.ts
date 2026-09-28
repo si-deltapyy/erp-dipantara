@@ -51,3 +51,43 @@ it.each([
         createHttpClosings(client).eligibility('po-one', new AbortController().signal),
     ).rejects.toMatchObject({ kind: 'validation' })
 })
+
+it('creates a versioned closing once and treats malformed success as uncertain', async () => {
+    const client = axios.create()
+    const input = {
+        purchaseOrderId: 'po-one',
+        version: 3,
+        snapshotToken: 'generation:12',
+        notes: 'Ready',
+    }
+    const closing = {
+        id: 'closing-one',
+        purchaseOrderId: 'po-one',
+        purchaseOrderNumber: 'PO-ONE',
+        ownerUserId: 'owner',
+        purchaseOrderVersion: 3,
+        eligibilityToken: 'generation:12',
+        notes: 'Ready',
+        status: 'requested',
+        rejectionReason: null,
+        version: 1,
+        createdByUserId: 'admin',
+        submittedByUserId: 'admin',
+        allowedActions: [],
+        createdAt: '2026-09-28T12:00:00Z',
+        updatedAt: '2026-09-28T12:00:00Z',
+    }
+    const post = vi.spyOn(client, 'post').mockResolvedValue({ data: { data: closing } })
+    const signal = new AbortController().signal
+    const api = createHttpClosings(client)
+    expect(await api.create(input, { signal, idempotencyKey: 'closing-key' })).toEqual(closing)
+    expect(post).toHaveBeenCalledWith('/api/v1/closings', input, {
+        signal,
+        headers: { 'Idempotency-Key': 'closing-key' },
+    })
+    post.mockResolvedValueOnce({ data: { data: { ...closing, status: 'draft' } } })
+    await expect(
+        api.create(input, { signal, idempotencyKey: 'closing-key' }),
+    ).rejects.toMatchObject({ kind: 'unexpected' })
+    expect(post).toHaveBeenCalledTimes(2)
+})
