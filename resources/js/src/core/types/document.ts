@@ -31,3 +31,16 @@ export interface DocumentsApi {
     download(id: string, signal: AbortSignal): Promise<DocumentContent>
     subscribe(listener: () => void): () => void
 }
+
+export interface DocumentUploadTarget {
+    readonly identity: string
+    readonly parentType: DocumentUpload['parentType']
+    readonly parentId: string | null
+    readonly purpose: DocumentPurpose
+    readonly scope: {
+        readonly createdByUserId: string
+        readonly ownerUserId?: string
+        readonly graderUserId?: string | null
+    }
+    readonly permitted: boolean
+}

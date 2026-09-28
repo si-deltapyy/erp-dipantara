@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
-import type { PurchaseOrder } from '@/core/types/purchase-order'
+import type { DocumentUploadTarget } from '@/core/types/document'
 
 export interface DocumentDraft {
     readonly actorId: string
-    readonly order: PurchaseOrder
+    readonly target: DocumentUploadTarget
     readonly file: File
     readonly idempotencyKey: string
     readonly uncertain: boolean

@@ -1,3 +1,5 @@
+import type { WorkflowVersion } from '@/core/types/workflow'
+import { assertDeliveryDocuments, transitionDelivery } from './delivery-readiness'
 import type { Delivery, DeliveryInput } from '@/core/types/delivery'
 import type { SessionUser } from '@/core/types/session'
 import type { DemoTransaction } from './transaction'
@@ -8,9 +10,9 @@ import { assertRecordAccess } from '@/core/domain/record-policy'
 import { deliveryAvailability } from './delivery-availability'
 
 export interface DeliveryMutation {
-    readonly action: 'create' | 'update'
+    readonly action: 'create' | 'update' | 'dispatch' | 'receive'
     readonly id?: string
-    readonly input: DeliveryInput & { readonly version?: number }
+    readonly input: (DeliveryInput & { readonly version?: number }) | WorkflowVersion
     readonly key: string
     readonly hash: string
 }
@@ -28,11 +30,16 @@ export async function writeDelivery(
         if (receipt.payloadHash !== mutation.hash) throw new ApiError('conflict')
         return receipt.result
     }
-    if (previous && (previous.status !== 'draft' || previous.version !== mutation.input.version))
-        throw new ApiError('conflict')
-    if (mutation.input.availabilityToken !== `${metadata.generation}:${metadata.revision}`)
+    if (previous && previous.version !== mutation.input.version) throw new ApiError('conflict')
+    if (
+        'availabilityToken' in mutation.input &&
+        mutation.input.availabilityToken !== `${metadata.generation}:${metadata.revision}`
+    )
         throw new ApiError('conflict', { allocations: ['deliveries.staleStock'] })
-    const delivery = await draftDelivery(transaction, actor, mutation.input, previous)
+    const delivery =
+        'allocations' in mutation.input
+            ? await draftDelivery(transaction, actor, mutation.input, previous)
+            : await transitionDelivery(transaction, previous, mutation.action)
     await transaction.put('deliveries', delivery)
     await transaction.put('metadata', { ...metadata, revision: metadata.revision + 1 })
     await transaction.put('audit', {
@@ -62,8 +69,8 @@ async function draftDelivery(
         throw new ApiError('validation', { purchaseOrderId: ['deliveries.invalidParent'] })
     assertRecordAccess(actor, 'purchase-orders.read', po)
     if (previous && previous.purchaseOrderId !== po.id) throw new ApiError('conflict')
-    if (input.documents.length)
-        throw new ApiError('validation', { documents: ['deliveries.documentsUnavailable'] })
+    if (previous && previous.status !== 'draft') throw new ApiError('conflict')
+    await assertDeliveryDocuments(transaction, previous?.id, input.documents)
     const available = await deliveryAvailability(transaction, po.id, previous?.id)
     const allocationContext = input.allocations.map((allocation, index) => {
         const row = available.find(
@@ -90,7 +97,7 @@ async function draftDelivery(
         licensePlate: input.licensePlate,
         allocations: input.allocations.map((row) => ({ ...row })),
         allocationContext,
-        documents: [],
+        documents: input.documents.map((document) => ({ ...document })),
         version: (previous?.version ?? 0) + 1,
         status: 'draft',
         createdByUserId: previous?.createdByUserId ?? parseId(actor.id),

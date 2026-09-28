@@ -95,3 +95,26 @@ test('rejects duplicate rows and impossible dates before writes and preserves un
         }),
     ).rejects.toMatchObject({ kind: 'unexpected' })
 })
+
+test('dispatches and receives using version and idempotency without retrying writes', async () => {
+    const client = axios.create()
+    const post = vi
+        .spyOn(client, 'post')
+        .mockResolvedValue({ data: { data: { ...deliveryFixture, status: 'dispatched' } } })
+    const api = createHttpDeliveries(client)
+    const options = { signal: new AbortController().signal, idempotencyKey: 'transition' }
+    expect((await api.dispatch('delivery-one', { version: 2 }, options)).status).toBe('dispatched')
+    post.mockResolvedValue({ data: { data: { ...deliveryFixture, status: 'received' } } })
+    expect((await api.receive('delivery-one', { version: 3 }, options)).status).toBe('received')
+    expect(post.mock.calls.map((call) => [call[0], call[1]])).toEqual([
+        ['/api/v1/deliveries/delivery-one/dispatch', { version: 2 }],
+        ['/api/v1/deliveries/delivery-one/receive', { version: 3 }],
+    ])
+    expect(post).toHaveBeenLastCalledWith(expect.anything(), expect.anything(), {
+        signal: options.signal,
+        headers: { 'Idempotency-Key': 'transition' },
+    })
+    post.mockRejectedValueOnce(new Error('ambiguous network result'))
+    await expect(api.receive('delivery-one', { version: 3 }, options)).rejects.toThrow('ambiguous')
+    expect(post).toHaveBeenCalledTimes(3)
+})

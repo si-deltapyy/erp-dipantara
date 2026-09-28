@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSessionStore } from '@/stores/session'
 import { canActOnDelivery } from '@/core/domain/delivery-policy'
 import { useDeliveryDetail } from './composables/useDeliveryDetail'
+import DeliveryDocuments from './components/DeliveryDocuments.vue'
+import DeliveryTransitions from './components/DeliveryTransitions.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 const { t } = useI18n()
+const locked = ref(false)
 const session = useSessionStore()
 const { delivery, loading, error, refresh } = useDeliveryDetail()
 const canEdit = computed(
@@ -50,7 +53,7 @@ const canEdit = computed(
                     </div>
                 </dl>
                 <RouterLink
-                    v-if="canEdit"
+                    v-if="canEdit && !locked"
                     :to="{ name: 'delivery-edit', params: { id: delivery.id } }"
                     class="primary-button"
                     >{{ t('deliveries.edit') }}</RouterLink
@@ -83,6 +86,12 @@ const canEdit = computed(
                     </tbody>
                 </table>
             </div>
+            <DeliveryDocuments :delivery="delivery" :locked="locked" />
+            <DeliveryTransitions
+                :delivery="delivery"
+                @changed="delivery = $event"
+                @locked="locked = $event"
+            />
         </template>
     </section>
 </template>

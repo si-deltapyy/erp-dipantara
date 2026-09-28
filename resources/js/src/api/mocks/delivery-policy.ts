@@ -3,7 +3,7 @@ import type { SessionUser } from '@/core/types/session'
 import { ApiError } from '@/core/types/api-error'
 export function requireDeliveryPermission(
     user: SessionUser | null,
-    action: 'read' | 'create' | 'update',
+    action: 'read' | 'create' | 'update' | 'dispatch' | 'receive',
 ): SessionUser {
     if (!user) throw new ApiError('unauthenticated')
     if (!user.permissions.includes(`deliveries.${action}.all`)) throw new ApiError('forbidden')
@@ -17,9 +17,13 @@ export function presentDelivery(
     return {
         ...delivery,
         snapshotGeneration: generation,
-        allowedActions:
-            delivery.status === 'draft' && actor.permissions.includes('deliveries.update.all')
-                ? ['update']
-                : [],
+        allowedActions: ['update', 'dispatch', 'receive'].filter((action) => {
+            if (!actor.permissions.includes(`deliveries.${action}.all`)) return false
+            if (action === 'receive') return delivery.status === 'dispatched'
+            return (
+                delivery.status === 'draft' &&
+                (action === 'update' || delivery.documents.length === 2)
+            )
+        }),
     }
 }

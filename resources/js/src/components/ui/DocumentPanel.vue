@@ -4,6 +4,8 @@ import { useI18n } from 'vue-i18n'
 import type { DocumentReference } from '@/core/types/document'
 import AppButton from './AppButton.vue'
 const props = defineProps<{
+    accept?: string
+    copy?: { title: string; description: string; file: string; empty: string; hint: string }
     documents: readonly DocumentReference[]
     loading: boolean
     listError: string
@@ -37,22 +39,26 @@ function select(event: Event): void {
 }
 </script>
 <template>
-    <section class="panel space-y-4" :aria-label="t('documents.title')">
-        <h2 class="text-lg font-semibold">{{ t('documents.title') }}</h2>
-        <p class="text-sm text-muted">{{ t('documents.description') }}</p>
+    <section class="panel space-y-4" :aria-label="t(copy?.title ?? 'documents.title')">
+        <h2 class="text-lg font-semibold">{{ t(copy?.title ?? 'documents.title') }}</h2>
+        <p class="text-sm text-muted">{{ t(copy?.description ?? 'documents.description') }}</p>
         <div v-if="canUpload" class="space-y-3">
-            <label :for="fileId" class="block font-semibold">{{ t('documents.file') }}</label>
+            <label :for="fileId" class="block font-semibold">{{
+                t(copy?.file ?? 'documents.file')
+            }}</label>
             <input
                 :id="fileId"
                 type="file"
-                accept="application/pdf,image/jpeg,image/png"
+                :accept="accept ?? 'application/pdf,image/jpeg,image/png'"
                 class="block w-full min-w-0 rounded border border-line p-2"
                 :disabled="pending || uncertain"
                 :aria-describedby="fileId + '-hint' + (fileError ? ' ' + fileId + '-error' : '')"
                 :aria-invalid="!!fileError"
                 @change="select"
             />
-            <p :id="fileId + '-hint'" class="text-sm text-muted">{{ t('documents.hint') }}</p>
+            <p :id="fileId + '-hint'" class="text-sm text-muted">
+                {{ t(copy?.hint ?? 'documents.hint') }}
+            </p>
             <p v-if="selectedName" class="break-all">{{ selectedName }}</p>
             <p v-if="fileError" :id="fileId + '-error'" role="alert" class="text-red-700">
                 {{ t(fileError) }}
@@ -97,7 +103,7 @@ function select(event: Event): void {
                 }}</AppButton>
             </div>
             <template v-else>
-                <p v-if="!documents.length">{{ t('documents.empty') }}</p>
+                <p v-if="!documents.length">{{ t(copy?.empty ?? 'documents.empty') }}</p>
                 <ul v-else class="space-y-4">
                     <li
                         v-for="document in props.documents"

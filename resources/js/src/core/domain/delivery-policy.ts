@@ -6,10 +6,10 @@ export function canCreateDelivery(user: SessionUser | null): boolean {
 export function canActOnDelivery(
     user: SessionUser | null,
     delivery: Delivery,
-    action: 'update',
+    action: 'update' | 'dispatch' | 'receive',
 ): boolean {
     return (
-        delivery.status === 'draft' &&
+        (action === 'receive' ? delivery.status === 'dispatched' : delivery.status === 'draft') &&
         delivery.allowedActions.includes(action) &&
         !!user?.permissions.includes(`deliveries.${action}.all`)
     )

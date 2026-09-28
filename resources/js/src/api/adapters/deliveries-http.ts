@@ -1,3 +1,4 @@
+import { parseWorkflowVersion } from '@/api/contracts/workflow-parsers'
 import type { AxiosInstance } from 'axios'
 import type { DeliveriesApi, Delivery } from '@/core/types/delivery'
 import type { WorkflowWriteOptions } from '@/core/types/workflow'
@@ -56,6 +57,28 @@ export function createHttpDeliveries(client: AxiosInstance = createHttpClient())
                     await client.put<unknown>(
                         path(id),
                         parseDeliveryInput(input, true),
+                        config(options),
+                    )
+                ).data,
+            )
+        },
+        async dispatch(id, input, options) {
+            return mutationResponse(
+                (
+                    await client.post<unknown>(
+                        `${path(id)}/dispatch`,
+                        parseWorkflowVersion(input),
+                        config(options),
+                    )
+                ).data,
+            )
+        },
+        async receive(id, input, options) {
+            return mutationResponse(
+                (
+                    await client.post<unknown>(
+                        `${path(id)}/receive`,
+                        parseWorkflowVersion(input),
                         config(options),
                     )
                 ).data,

@@ -8,6 +8,7 @@ import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
 import { useDeliveryForm } from '../composables/useDeliveryForm'
 import { useDeliveryAvailability } from '../composables/useDeliveryAvailability'
 import ApprovedPurchaseOrderLookup from '@/views/orders/components/ApprovedPurchaseOrderLookup.vue'
+import DeliverySakrSelection from './DeliverySakrSelection.vue'
 import DeliveryAllocationFields from './DeliveryAllocationFields.vue'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
 import AppButton from '@/components/ui/AppButton.vue'
@@ -143,6 +144,14 @@ async function submit(): Promise<void> {
                 {{ t(errors.allocations || errors.availabilityToken || '') }}
             </p>
         </section>
+        <DeliverySakrSelection
+            v-if="delivery"
+            :delivery-id="delivery.id"
+            :documents="draft.documents"
+            :disabled="disabled"
+            :errors="errors"
+            @change="update('documents', $event)"
+        />
         <div
             v-if="error"
             role="alert"

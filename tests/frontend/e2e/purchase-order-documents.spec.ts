@@ -107,7 +107,7 @@ test('retains failed upload drafts for access errors and clears the session on 4
     await login(page, 'admin@woodflow.test', path)
     for (const [scenario, message] of [
         ['forbidden', 'Anda tidak memiliki izin untuk dokumen ini.'],
-        ['not-found', 'Dokumen atau PO tidak ditemukan dalam akses Anda.'],
+        ['not-found', 'Dokumen atau transaksi tidak ditemukan dalam akses Anda.'],
         ['conflict', 'Upload mengalami konflik. Muat ulang dokumen dan pilih kembali file.'],
     ]) {
         await simulation(page, scenario)

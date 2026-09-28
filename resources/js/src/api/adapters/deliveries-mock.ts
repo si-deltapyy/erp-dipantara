@@ -49,6 +49,8 @@ export function createMockDeliveries(
             ),
         create: (input, options) => mutate({ action: 'create', input }, options),
         update: (id, input, options) => mutate({ action: 'update', id, input }, options),
+        dispatch: (id, input, options) => mutate({ action: 'dispatch', id, input }, options),
+        receive: (id, input, options) => mutate({ action: 'receive', id, input }, options),
         subscribe: (listener) => runtime.subscribe(listener),
     }
 }

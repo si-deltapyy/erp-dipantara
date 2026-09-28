@@ -1,6 +1,6 @@
 import type { PageResponse, RecordMetadata } from './contracts'
 import type { MasterListQuery } from './master-list'
-import type { WorkflowWriteOptions } from './workflow'
+import type { WorkflowVersion, WorkflowWriteOptions } from './workflow'
 
 export const deliveryStatuses = ['draft', 'dispatched', 'received'] as const
 export type DeliveryStatus = (typeof deliveryStatuses)[number]
@@ -62,6 +62,8 @@ export interface AvailableTimber {
     readonly snapshotToken: string
 }
 export interface DeliveriesApi {
+    dispatch(id: string, input: WorkflowVersion, options: WorkflowWriteOptions): Promise<Delivery>
+    receive(id: string, input: WorkflowVersion, options: WorkflowWriteOptions): Promise<Delivery>
     list(query: DeliveryQuery, signal: AbortSignal): Promise<PageResponse<Delivery>>
     get(id: string, signal: AbortSignal): Promise<Delivery>
     availability(

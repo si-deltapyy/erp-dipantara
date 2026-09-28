@@ -50,20 +50,24 @@ export function useRecordSubmit<T extends WorkflowRecord>(
         error.value = ''
         uncertain.value = false
     })
-    watch(record, (current) => {
-        const snapshot = options.snapshot()
-        if (
-            current &&
-            snapshot &&
-            snapshot.actorId === store.user?.id &&
-            snapshot.record?.id === current.id
-        ) {
-            key = snapshot.idempotencyKey
-            identity = `${store.user?.id}:${current.id}:${snapshot.record.version}`
-            error.value = `${options.resource}.errors.csrf`
-            options.clear()
-        }
-    })
+    watch(
+        record,
+        (current) => {
+            const snapshot = options.snapshot()
+            if (
+                current &&
+                snapshot &&
+                snapshot.actorId === store.user?.id &&
+                snapshot.record?.id === current.id
+            ) {
+                key = snapshot.idempotencyKey
+                identity = `${store.user?.id}:${current.id}:${snapshot.record.version}`
+                error.value = `${options.resource}.errors.csrf`
+                options.clear()
+            }
+        },
+        { immediate: true },
+    )
     async function submit(): Promise<void> {
         const current = record.value
         if (!current || pending.value || !canSubmit.value) return

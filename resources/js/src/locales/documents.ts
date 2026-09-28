@@ -1,5 +1,6 @@
 export default {
     documents: {
+        print: 'Cetak PDF',
         title: 'Dokumen PO',
         description: 'Unggah bukti PO. Penyimpanan dokumen tidak mengubah status persetujuan PO.',
         file: 'Pilih dokumen PO',
@@ -29,7 +30,7 @@ export default {
             csrf: 'Sesi keamanan diperbarui. Silakan ulangi upload.',
             unauthenticated: 'Sesi berakhir. Silakan masuk kembali.',
             forbidden: 'Anda tidak memiliki izin untuk dokumen ini.',
-            'not-found': 'Dokumen atau PO tidak ditemukan dalam akses Anda.',
+            'not-found': 'Dokumen atau transaksi tidak ditemukan dalam akses Anda.',
             conflict: 'Upload mengalami konflik. Muat ulang dokumen dan pilih kembali file.',
             network: 'Koneksi terputus. Silakan coba lagi.',
             unexpected: 'Dokumen belum dapat diproses. Silakan coba lagi.',

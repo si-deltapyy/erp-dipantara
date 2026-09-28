@@ -1,5 +1,30 @@
 export default {
     deliveries: {
+        sakrReadHint:
+            'Berkas perjalanan tersimpan. Pilih pratinjau untuk membaca atau mencetak PDF.',
+        sakrFiles: 'Berkas SAKR',
+        choosePdf: 'Pilih PDF SAKR',
+        noFiles: 'Belum ada berkas SAKR.',
+        sakr: 'Dokumen SAKR',
+        sakrHint:
+            'Unggah dua PDF dari halaman detail, lalu pilih arah dan isi nomor serta tanggal melalui Edit pengiriman.',
+        pdfOnly: 'PDF maksimal 5 MiB. Dokumen resmi berasal dari berkas yang Anda unggah.',
+        sakrFile: 'Berkas SAKR',
+        chooseFile: 'Pilih berkas',
+        sakrNumber: 'Nomor SAKR',
+        sakrDate: 'Tanggal SAKR',
+        directions: {
+            farmer_to_company: 'Petani → Dipantara',
+            company_to_buyer: 'Dipantara → Buyer',
+        },
+        invalidDocument: 'Pilih dua PDF berbeda milik pengiriman ini dan lengkapi metadata.',
+        incompleteDocuments: 'Lengkapi kedua arah SAKR sebelum mengirim.',
+        dispatch: 'Kirim pengiriman',
+        receive: 'Tandai diterima',
+        dispatchDescription:
+            'Pastikan alokasi, kendaraan dan kedua SAKR benar. Alokasi terkunci setelah pengiriman dikirim.',
+        receiveDescription: 'Konfirmasi bahwa pengiriman telah diterima.',
+
         title: 'Pengiriman',
         section: 'Operasional',
         subtitle: 'Alokasikan kayu yang telah disetujui ke pengiriman bertahap.',

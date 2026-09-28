@@ -30,7 +30,7 @@ export async function configureDeliveries(app: App, pinia: Pinia): Promise<void>
             if (
                 session.status === 'guest' ||
                 (session.user &&
-                    [recovery.snapshot].some(
+                    [recovery.snapshot, recovery.dispatch, recovery.receive].some(
                         (snapshot) => snapshot && snapshot.actorId !== session.user?.id,
                     ))
             )

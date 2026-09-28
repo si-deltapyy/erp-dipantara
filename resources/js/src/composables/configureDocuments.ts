@@ -34,10 +34,17 @@ export async function configureDocuments(app: App, pinia: Pinia): Promise<void> 
                 (session.user &&
                     draft &&
                     (draft.actorId !== session.user.id ||
-                        evaluateRecordAccess(session.user, 'documents.upload', draft.order) !==
-                            'allowed' ||
-                        evaluateRecordAccess(session.user, 'purchase-orders.read', draft.order) !==
-                            'allowed'))
+                        evaluateRecordAccess(
+                            session.user,
+                            'documents.upload',
+                            draft.target.scope,
+                        ) !== 'allowed' ||
+                        (draft.target.parentType === 'purchase-order' &&
+                            evaluateRecordAccess(
+                                session.user,
+                                'purchase-orders.read',
+                                draft.target.scope,
+                            ) !== 'allowed')))
             )
                 recovery.$reset()
         },

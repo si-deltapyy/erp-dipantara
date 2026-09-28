@@ -1,3 +1,4 @@
+import { parseWorkflowVersion } from '@/api/contracts/workflow-parsers'
 import type {
     AvailabilityQuery,
     AvailableTimber,
@@ -25,6 +26,7 @@ import { writeDelivery } from './delivery-mutation'
 import { hashMutationPayload } from './idempotency'
 const stores: readonly DemoStore[] = [
     'metadata',
+    'documents',
     'deliveries',
     'gradings',
     'assignments',
@@ -161,7 +163,10 @@ export class DeliveryRepository {
         const actor = requireDeliveryPermission(user, mutation.action)
         if (mutation.action !== 'create') parseId(mutation.id)
         if (!mutation.key.trim() || mutation.key.length > 100) throw new ApiError('validation')
-        const input = parseDeliveryInput(mutation.input, mutation.action === 'update')
+        const input =
+            mutation.action === 'dispatch' || mutation.action === 'receive'
+                ? parseWorkflowVersion(mutation.input)
+                : parseDeliveryInput(mutation.input, mutation.action === 'update')
         const hash = await hashMutationPayload({ ...input, generation })
         return runDemoTransaction(
             this.options,
