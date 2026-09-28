@@ -12,6 +12,7 @@ import type { Mitra } from '@/core/types/mitra'
 import type { Buyer } from '@/core/types/buyer'
 
 export const demoStores = [
+    'invoiceVersions',
     'invoices',
     'invoiceMutations',
     'deliveries',
@@ -43,7 +44,7 @@ export const demoStores = [
     'timberProductMutations',
 ] as const
 export type DemoStore = (typeof demoStores)[number]
-export const demoSchemaVersion = 13
+export const demoSchemaVersion = 14
 export const demoDatasetVersion = 1
 export interface DatasetMetadata {
     readonly id: 'dataset'
@@ -79,6 +80,11 @@ export interface MutationReceipt {
     readonly result: DemoSample
 }
 export interface DemoTables {
+    readonly invoiceVersions: {
+        readonly id: string
+        readonly invoiceId: string
+        readonly invoice: Invoice
+    }
     readonly invoices: Invoice
     readonly invoiceMutations: InvoiceMutationReceipt
     readonly deliveries: Delivery

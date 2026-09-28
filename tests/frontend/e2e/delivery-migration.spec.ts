@@ -24,9 +24,13 @@ test('upgrades schema 11 additively while preserving records, audit, receipts an
         const name = 'delivery-upgrade-' + crypto.randomUUID()
         const legacy = demoStores.filter(
             (store) =>
-                !['deliveries', 'deliveryMutations', 'invoices', 'invoiceMutations'].includes(
-                    store,
-                ),
+                ![
+                    'deliveries',
+                    'deliveryMutations',
+                    'invoices',
+                    'invoiceMutations',
+                    'invoiceVersions',
+                ].includes(store),
         )
         await new Promise<void>((resolve, reject) => {
             const request = indexedDB.open(name, 11)

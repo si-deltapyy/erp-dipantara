@@ -7,6 +7,12 @@ const meta = {
 }
 export const invoiceRoutes: RouteRecordRaw[] = [
     {
+        path: '/invoices/:id/revise',
+        name: 'invoice-revise',
+        component: () => import('@/views/invoices/InvoiceFormPage.vue'),
+        meta: { ...meta, anyPermissions: ['invoices.revise.all'] },
+    },
+    {
         path: '/invoices',
         name: 'invoices',
         component: () => import('@/views/invoices/InvoiceListPage.vue'),

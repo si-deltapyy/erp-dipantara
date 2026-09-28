@@ -17,6 +17,9 @@ export interface InvoiceInput {
 }
 export interface Invoice extends InvoiceInput, RecordMetadata {
     readonly id: string
+    readonly issuedRevisionNumber: number | null
+    readonly issuedTotalAmount: string | null
+    readonly revisionReason: string | null
     readonly ownerUserId: string
     readonly purchaseOrderNumber: string
     readonly counterpartyName: string
@@ -35,10 +38,16 @@ export interface InvoiceQuery extends MasterListQuery {
     readonly mitraId?: string
     readonly direction?: 'receivable' | 'payable'
 }
+export interface InvoiceRevision extends WorkflowVersion {
+    readonly reason: string
+    readonly terms: readonly InvoiceTerm[]
+}
 export interface InvoiceVersion extends WorkflowVersion {
     readonly revisionNumber: number
 }
 export interface InvoicesApi {
+    revise(id: string, input: InvoiceRevision, options: WorkflowWriteOptions): Promise<Invoice>
+    versions(id: string, signal: AbortSignal): Promise<readonly Invoice[]>
     get(id: string, signal: AbortSignal): Promise<Invoice>
     create(input: InvoiceInput, options: WorkflowWriteOptions): Promise<Invoice>
     update(

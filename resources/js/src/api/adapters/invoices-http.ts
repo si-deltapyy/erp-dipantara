@@ -1,4 +1,9 @@
-import { parseInvoiceInput, parseInvoiceVersion } from '@/api/contracts/invoice-input'
+import { parseObject, requireKeys, invalidContract } from '@/api/contracts/value-parsers'
+import {
+    parseInvoiceInput,
+    parseInvoiceVersion,
+    parseInvoiceRevision,
+} from '@/api/contracts/invoice-input'
 import type { AxiosInstance } from 'axios'
 import type { InvoicesApi, Invoice } from '@/core/types/invoice'
 import type { WorkflowWriteOptions } from '@/core/types/workflow'
@@ -25,6 +30,26 @@ export function createHttpInvoices(client: AxiosInstance = createHttpClient()): 
         async get(id, signal) {
             return parseDetail((await client.get<unknown>(path(id), { signal })).data, parseInvoice)
                 .data
+        },
+        async versions(id, signal) {
+            const response = parseObject(
+                (await client.get<unknown>(`${path(id)}/versions`, { signal })).data,
+                'versions',
+            )
+            requireKeys(response, ['data'], 'versions')
+            if (!Array.isArray(response.data)) return invalidContract('data')
+            return response.data.map(parseInvoice)
+        },
+        async revise(id, input, options) {
+            return mutationResponse(
+                (
+                    await client.post<unknown>(
+                        `${path(id)}/revisions`,
+                        parseInvoiceRevision(input),
+                        config(options),
+                    )
+                ).data,
+            )
         },
         async create(input, options) {
             return mutationResponse(

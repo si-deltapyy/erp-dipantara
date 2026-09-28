@@ -4,7 +4,7 @@ import { ApiError } from '@/core/types/api-error'
 import { hasBusinessPermission } from '@/core/domain/record-policy'
 export function requireInvoicePermission(
     user: SessionUser | null,
-    action: 'read' | 'create' | 'update' | 'issue',
+    action: 'read' | 'create' | 'update' | 'issue' | 'revise',
 ): SessionUser {
     if (!user) throw new ApiError('unauthenticated')
     if (!hasBusinessPermission(user, `invoices.${action}`)) throw new ApiError('forbidden')
@@ -14,9 +14,10 @@ export function presentInvoice(invoice: Invoice, actor: SessionUser, generation:
     return {
         ...invoice,
         snapshotGeneration: generation,
-        allowedActions: ['update', 'issue'].filter(
+        allowedActions: ['update', 'issue', 'revise'].filter(
             (action) =>
-                invoice.status === 'draft' && actor.permissions.includes(`invoices.${action}.all`),
+                invoice.status === (action === 'revise' ? 'issued' : 'draft') &&
+                actor.permissions.includes(`invoices.${action}.all`),
         ),
     }
 }

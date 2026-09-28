@@ -18,7 +18,7 @@ export async function persistentGradingDownstream(
         hasIssuedInvoice: (purchaseOrderId, mitraId) =>
             invoices.some(
                 (invoice) =>
-                    invoice.status === 'issued' &&
+                    (invoice.status === 'issued' || !!invoice.issuedRevisionNumber) &&
                     invoice.purchaseOrderId === purchaseOrderId &&
                     invoice.mitraId === mitraId,
             ),

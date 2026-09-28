@@ -66,3 +66,37 @@ it('writes versioned invoice terms and issues without automatically retrying amb
     expect(() => parseInvoiceInput({ ...input, invoiceDate: '2026-02-30' })).toThrow()
     expect(() => parseInvoiceInput({ ...input, totalAmount: '0.00' })).toThrow()
 })
+
+it('uses stable invoice IDs for revision and version history', async () => {
+    const invoice = invoiceFixtures[0]
+    if (!invoice) throw new Error('Missing fixture')
+    const client = axios.create()
+    const post = vi.spyOn(client, 'post').mockResolvedValue({
+        data: {
+            data: {
+                ...invoice,
+                status: 'draft',
+                revisionNumber: 2,
+                revisionReason: 'Correction',
+            },
+        },
+    })
+    const get = vi.spyOn(client, 'get').mockResolvedValue({ data: { data: [invoice] } })
+    const api = createHttpInvoices(client)
+    const options = { signal: new AbortController().signal, idempotencyKey: 'revision-key' }
+    const input = { version: invoice.version, reason: 'Correction', terms: invoice.terms }
+    expect((await api.revise(invoice.id, input, options)).id).toBe(invoice.id)
+    expect(post).toHaveBeenCalledWith(`/api/v1/invoices/${invoice.id}/revisions`, input, {
+        signal: options.signal,
+        headers: { 'Idempotency-Key': 'revision-key' },
+    })
+    expect((await api.versions(invoice.id, options.signal))[0]?.revisionNumber).toBe(1)
+    expect(get).toHaveBeenCalledWith(`/api/v1/invoices/${invoice.id}/versions`, {
+        signal: options.signal,
+    })
+    post.mockClear()
+    await expect(api.revise(invoice.id, { ...input, reason: '' }, options)).rejects.toMatchObject({
+        kind: 'validation',
+    })
+    expect(post).not.toHaveBeenCalled()
+})

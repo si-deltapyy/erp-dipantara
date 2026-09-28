@@ -48,3 +48,27 @@ test('preserves dirty terms after 419 and retries committed timeout without dupl
     await page.getByRole('link', { name: 'Kembali ke daftar', exact: true }).click()
     await expect(page.getByText('5 invoice', { exact: true })).toBeVisible()
 })
+
+test('preserves revision reason after session recovery and replays one revision after timeout', async ({
+    page,
+}) => {
+    await login(page, 'admin@woodflow.test', '/app/invoices/synthetic-payable-01/revise')
+    await page.getByLabel('Nominal termin', { exact: true }).fill('120000.00')
+    await page.getByLabel('Alasan revisi', { exact: true }).fill('Koreksi termin setelah review')
+    await scenario(page, 'csrf')
+    await page.getByRole('button', { name: 'Simpan draft revisi', exact: true }).click()
+    await expect(
+        page.getByText('Sesi diperbarui. Periksa draft sebelum mencoba kembali.', { exact: true }),
+    ).toBeVisible()
+    await expect(page.getByLabel('Alasan revisi', { exact: true })).toHaveValue(
+        'Koreksi termin setelah review',
+    )
+    await scenario(page, 'committed-timeout')
+    await page.getByRole('button', { name: 'Simpan draft revisi', exact: true }).click()
+    await expect(page.getByRole('button', { name: 'Ulangi permintaan', exact: true })).toBeVisible()
+    await scenario(page, 'success')
+    await page.getByRole('button', { name: 'Ulangi permintaan', exact: true }).click()
+    await expect(page.getByRole('heading', { name: 'Detail invoice', exact: true })).toBeVisible()
+    await expect(page.getByLabel('Versi invoice', { exact: true })).toHaveValue('2')
+    await expect(page.getByLabel('Versi invoice', { exact: true }).locator('option')).toHaveCount(2)
+})

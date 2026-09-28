@@ -27,6 +27,12 @@ const { draft, errors, error, pending, uncertain, dirty, permitted, save } = use
     },
 )
 const disabled = computed(() => pending.value || uncertain.value || !permitted.value)
+const kinds = computed(() =>
+    ['down_payment', 'settlement'].map((value) => ({ value, label: t('invoices.' + value) })),
+)
+function changeKind(value: string): void {
+    if (value === 'down_payment' || value === 'settlement') update('kind', value)
+}
 const directions = computed(() =>
     ['receivable', 'payable'].map((value) => ({ value, label: t('invoices.' + value) })),
 )
@@ -94,6 +100,14 @@ async function submit(): Promise<void> {
                 @update:model-value="update('invoiceDate', $event)"
             />
         </div>
+        <AppSelect
+            id="invoice-kind"
+            :model-value="draft.kind"
+            :options="kinds"
+            :label="t('invoices.kind')"
+            :disabled="disabled || !!invoice"
+            @update:model-value="changeKind"
+        />
         <InvoiceTerms
             :terms="draft.terms"
             :errors="errors"

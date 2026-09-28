@@ -43,6 +43,11 @@ export function createMockInvoices(
             runtime.executeBusiness('read', signal, (active) =>
                 repository.get(getUser(), id, active),
             ),
+        versions: (id, signal) =>
+            runtime.executeBusiness('read', signal, (active) =>
+                repository.versions(getUser(), id, active),
+            ),
+        revise: (id, input, options) => mutate({ action: 'revise', id, input }, options),
         create: (input, options) => mutate({ action: 'create', input }, options),
         update: (id, input, options) => mutate({ action: 'update', id, input }, options),
         issue: (id, input, options) => mutate({ action: 'issue', id, input }, options),

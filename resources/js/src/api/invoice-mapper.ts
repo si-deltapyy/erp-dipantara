@@ -22,6 +22,9 @@ export function parseInvoice(value: unknown): Invoice {
         record,
         [
             'id',
+            'issuedRevisionNumber',
+            'issuedTotalAmount',
+            'revisionReason',
             'ownerUserId',
             'purchaseOrderNumber',
             'counterpartyName',
@@ -58,6 +61,15 @@ export function parseInvoice(value: unknown): Invoice {
     return {
         ...parseMetadata(record),
         id: parseId(record.id),
+        issuedRevisionNumber:
+            record.issuedRevisionNumber === null
+                ? null
+                : parseInteger(record.issuedRevisionNumber, 'issuedRevisionNumber'),
+        issuedTotalAmount:
+            record.issuedTotalAmount === null
+                ? null
+                : parseMoney(record.issuedTotalAmount, 'issuedTotalAmount'),
+        revisionReason: nullable(record.revisionReason, 'revisionReason'),
         ownerUserId: parseId(record.ownerUserId),
         purchaseOrderNumber: parseString(record.purchaseOrderNumber, 'purchaseOrderNumber'),
         counterpartyName: parseString(record.counterpartyName, 'counterpartyName'),

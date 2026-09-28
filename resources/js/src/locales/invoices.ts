@@ -1,5 +1,16 @@
 export default {
     invoices: {
+        revise: 'Revisi invoice',
+        saveRevision: 'Simpan draft revisi',
+        revisionReason: 'Alasan revisi',
+        revisionHint: 'Versi issued sebelumnya tetap aktif sampai draft revisi diterbitkan.',
+        previousTotal: 'Total versi sebelumnya',
+        proposedTotal: 'Total usulan revisi',
+        issuedActive: 'Versi issued aktif: {revision}, total {amount}',
+        history: 'Riwayat versi invoice',
+        version: 'Versi invoice',
+        belowCredit: 'Total revisi tidak boleh lebih rendah dari pembayaran approved.',
+
         title: 'Invoice',
         section: 'Keuangan',
         subtitle: 'Termin tagihan Buyer dan Mitra terpisah dari realisasi pembayaran.',

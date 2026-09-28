@@ -1,4 +1,9 @@
-import type { InvoiceInput, InvoiceTerm, InvoiceVersion } from '@/core/types/invoice'
+import type {
+    InvoiceInput,
+    InvoiceTerm,
+    InvoiceVersion,
+    InvoiceRevision,
+} from '@/core/types/invoice'
 import { parseDeliveryDate } from './delivery-input'
 import {
     invalidContract,
@@ -81,5 +86,17 @@ export function parseInvoiceVersion(value: unknown): InvoiceVersion {
     return {
         version: parseInteger(record.version, 'version'),
         revisionNumber: parseInteger(record.revisionNumber, 'revisionNumber'),
+    }
+}
+
+export function parseInvoiceRevision(value: unknown): InvoiceRevision {
+    const record = parseObject(value, 'invoiceRevision')
+    requireKeys(record, ['version', 'reason', 'terms'], 'invoiceRevision')
+    const reason = parseString(record.reason, 'reason').trim()
+    if (!reason || reason.length > 255) return invalidContract('reason')
+    return {
+        version: parseInteger(record.version, 'version'),
+        reason,
+        terms: parseInvoiceTerms(record.terms),
     }
 }

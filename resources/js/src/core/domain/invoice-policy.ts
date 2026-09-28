@@ -6,10 +6,10 @@ export function canCreateInvoice(user: SessionUser | null): boolean {
 export function canActOnInvoice(
     user: SessionUser | null,
     invoice: Invoice,
-    action: 'update' | 'issue',
+    action: 'update' | 'issue' | 'revise',
 ): boolean {
     return (
-        invoice.status === 'draft' &&
+        invoice.status === (action === 'revise' ? 'issued' : 'draft') &&
         invoice.allowedActions.includes(action) &&
         !!user?.permissions.includes(`invoices.${action}.all`)
     )

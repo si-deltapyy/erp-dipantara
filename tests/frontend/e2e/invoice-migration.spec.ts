@@ -23,7 +23,7 @@ test('upgrades schema 12 additively while preserving records, audit, receipts an
         )) as typeof SchemaModule
         const name = 'invoice-upgrade-' + crypto.randomUUID()
         const legacy = demoStores.filter(
-            (store) => !['invoices', 'invoiceMutations'].includes(store),
+            (store) => !['invoices', 'invoiceMutations', 'invoiceVersions'].includes(store),
         )
         await new Promise<void>((resolve, reject) => {
             const request = indexedDB.open(name, 12)

@@ -1,3 +1,9 @@
+import {
+    invoiceCreditFixture,
+    invoiceOutstanding,
+    normalizeIssuedInvoice,
+} from './invoice-settlement'
+import type { InvoiceCreditResolver } from './invoice-settlement'
 import type { Invoice, InvoiceQuery } from '@/core/types/invoice'
 import type { PageResponse } from '@/core/types/contracts'
 import type { SessionUser } from '@/core/types/session'
@@ -7,7 +13,11 @@ import type { InvoiceMutation } from './invoice-mutation'
 import { ApiError } from '@/core/types/api-error'
 import { parseId } from '@/api/contracts/value-parsers'
 import { parseInvoiceQuery } from '@/api/invoice-mapper'
-import { parseInvoiceInput, parseInvoiceVersion } from '@/api/contracts/invoice-input'
+import {
+    parseInvoiceInput,
+    parseInvoiceVersion,
+    parseInvoiceRevision,
+} from '@/api/contracts/invoice-input'
 import { evaluateRecordAccess, assertRecordAccess } from '@/core/domain/record-policy'
 import { requireInvoicePermission, presentInvoice } from './invoice-policy'
 import { runDemoTransaction } from './transaction'
@@ -17,6 +27,7 @@ import { writeInvoice } from './invoice-mutation'
 const stores: readonly DemoStore[] = [
     'metadata',
     'invoices',
+    'invoiceVersions',
     'purchase-orders',
     'assignments',
     'orders',
@@ -24,7 +35,10 @@ const stores: readonly DemoStore[] = [
     'documents',
 ]
 export class InvoiceRepository {
-    constructor(private readonly options: DatabaseOptions = {}) {}
+    constructor(
+        private readonly options: DatabaseOptions = {},
+        private readonly credits: InvoiceCreditResolver = invoiceCreditFixture,
+    ) {}
     async list(
         user: SessionUser | null,
         query: InvoiceQuery,
@@ -40,6 +54,7 @@ export class InvoiceRepository {
                 const metadata = await requireDataset(transaction)
                 const search = filter.search.trim().toLocaleLowerCase('id')
                 const matches = (await transaction.list('invoices'))
+                    .map(normalizeIssuedInvoice)
                     .filter(
                         (invoice) =>
                             evaluateRecordAccess(actor, 'invoices.read', invoice) === 'allowed' &&
@@ -59,9 +74,20 @@ export class InvoiceRepository {
                             (a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id)),
                     )
                 return {
-                    data: matches
-                        .slice((filter.page - 1) * filter.perPage, filter.page * filter.perPage)
-                        .map((invoice) => presentInvoice(invoice, actor, metadata.generation)),
+                    data: await Promise.all(
+                        matches
+                            .slice((filter.page - 1) * filter.perPage, filter.page * filter.perPage)
+                            .map(async (invoice) =>
+                                presentInvoice(
+                                    invoiceOutstanding(
+                                        invoice,
+                                        await this.credits(transaction, invoice.id),
+                                    ),
+                                    actor,
+                                    metadata.generation,
+                                ),
+                            ),
+                    ),
                     meta: { page: filter.page, perPage: filter.perPage, total: matches.length },
                 }
             },
@@ -80,7 +106,48 @@ export class InvoiceRepository {
                 const invoice = await transaction.get('invoices', id)
                 if (!invoice) throw new ApiError('not-found')
                 assertRecordAccess(actor, 'invoices.read', invoice)
-                return presentInvoice(invoice, actor, metadata.generation)
+                return presentInvoice(
+                    invoiceOutstanding(
+                        normalizeIssuedInvoice(invoice),
+                        await this.credits(transaction, invoice.id),
+                    ),
+                    actor,
+                    metadata.generation,
+                )
+            },
+            signal,
+        )
+    }
+    async versions(
+        user: SessionUser | null,
+        id: string,
+        signal: AbortSignal,
+    ): Promise<readonly Invoice[]> {
+        const actor = requireInvoicePermission(user, 'read')
+        parseId(id)
+        return runDemoTransaction(
+            this.options,
+            stores,
+            'readonly',
+            async (transaction) => {
+                const metadata = await requireDataset(transaction)
+                const current = await transaction.get('invoices', id)
+                if (!current) throw new ApiError('not-found')
+                assertRecordAccess(actor, 'invoices.read', current)
+                const versions = (await transaction.list('invoiceVersions'))
+                    .filter(
+                        (version) =>
+                            version.invoiceId === id &&
+                            version.invoice.revisionNumber !== current.revisionNumber,
+                    )
+                    .map((version) => ({
+                        ...normalizeIssuedInvoice(version.invoice),
+                        allowedActions: [],
+                    }))
+                return [
+                    ...versions,
+                    presentInvoice(normalizeIssuedInvoice(current), actor, metadata.generation),
+                ].sort((a, b) => b.revisionNumber - a.revisionNumber)
             },
             signal,
         )
@@ -95,9 +162,11 @@ export class InvoiceRepository {
         if (mutation.action !== 'create') parseId(mutation.id)
         if (!mutation.key.trim() || mutation.key.length > 100) throw new ApiError('validation')
         const input =
-            mutation.action === 'issue'
-                ? parseInvoiceVersion(mutation.input)
-                : parseInvoiceInput(mutation.input, mutation.action === 'update')
+            mutation.action === 'revise'
+                ? parseInvoiceRevision(mutation.input)
+                : mutation.action === 'issue'
+                  ? parseInvoiceVersion(mutation.input)
+                  : parseInvoiceInput(mutation.input, mutation.action === 'update')
         const hash = await hashMutationPayload({ ...input, generation })
         return runDemoTransaction(
             this.options,
@@ -107,7 +176,13 @@ export class InvoiceRepository {
                 const metadata = await requireDataset(transaction)
                 if (metadata.generation !== generation) throw new ApiError('conflict')
                 return presentInvoice(
-                    await writeInvoice(transaction, metadata, actor, { ...mutation, input, hash }),
+                    await writeInvoice(
+                        transaction,
+                        metadata,
+                        actor,
+                        { ...mutation, input, hash },
+                        await this.credits(transaction, mutation.id ?? ''),
+                    ),
                     actor,
                     generation,
                 )

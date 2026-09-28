@@ -7,6 +7,7 @@ import { useInvoiceIssue } from './composables/useInvoiceIssue'
 import { canActOnInvoice } from '@/core/domain/invoice-policy'
 import { formatMoney } from '@/core/formatting/money'
 import { useSessionStore } from '@/stores/session'
+import InvoiceHistory from './components/InvoiceHistory.vue'
 import InvoiceDocument from './components/InvoiceDocument.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppConfirmDialog from '@/components/ui/AppConfirmDialog.vue'
@@ -97,7 +98,36 @@ const canEdit = computed(
                     <dd>{{ term.dueDate ?? t('invoices.noDueDate') }}</dd>
                 </dl>
             </section>
+            <p
+                v-if="
+                    invoice.status === 'draft' &&
+                    invoice.issuedRevisionNumber &&
+                    invoice.issuedTotalAmount
+                "
+                class="panel"
+                role="status"
+            >
+                {{
+                    t('invoices.issuedActive', {
+                        revision: invoice.issuedRevisionNumber,
+                        amount: formatMoney(invoice.issuedTotalAmount),
+                    })
+                }}
+                {{ t('invoices.revisionHint') }}
+            </p>
+            <RouterLink
+                v-if="canActOnInvoice(session.user, invoice, 'revise')"
+                :to="{ name: 'invoice-revise', params: { id: invoice.id } }"
+                class="secondary-button"
+                >{{ t('invoices.revise') }}</RouterLink
+            >
             <InvoiceDocument :invoice="invoice" />
+            <InvoiceHistory
+                v-if="invoice.revisionNumber > 1"
+                :key="invoice.version"
+                :invoice-id="invoice.id"
+                :revision-number="invoice.revisionNumber"
+            />
         </template>
         <p v-if="issue.error" role="alert">{{ t(issue.error) }}</p>
         <p v-if="issue.uncertain" role="status">{{ t('invoices.uncertain') }}</p>
