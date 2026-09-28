@@ -14,7 +14,6 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import { router } from '@/router'
 import { i18n } from '@/locales'
-import { mockEnabled, businessMockEnabled } from '@/core/constants/environment'
 import '@/assets/css/app.css'
 import { configureSession } from '@/composables/configureSession'
 import { createHttpSession } from '@/api/adapters/session-http'
@@ -27,24 +26,15 @@ import { configureBuyers } from '@/composables/configureBuyers'
 async function start(): Promise<void> {
     const pinia = createPinia()
     const app = createApp(App).use(pinia).use(i18n)
-    if (mockEnabled) {
-        const { configureMockSession } = await import('@/composables/configureMockSession')
-        configureMockSession(app, pinia, router)
-    } else {
-        configureSession(app, pinia, router, createHttpSession())
-    }
-    if (import.meta.env.DEV && businessMockEnabled) {
-        const { configureDemo } = await import('@/composables/configureDemo')
-        configureDemo(app)
-    }
+    configureSession(app, pinia, router, createHttpSession())
     await configureDeliveries(app, pinia)
     await configureGradings(app, pinia)
     await configureOrders(app, pinia)
     await configureAssignments(app, pinia)
     await configureInvoices(app, pinia)
     await configureClosings(app, pinia)
-    await configureDashboard(app, pinia)
-    await configureReports(app, pinia)
+    await configureDashboard(app)
+    await configureReports(app)
     await configurePayments(app, pinia)
     await configurePurchaseOrders(app, pinia)
     await configureDocuments(app, pinia)

@@ -1,65 +1,41 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Mitra;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class MitraController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $mitras = Mitra::all();
+        return response()->json(['status' => 'success', 'data' => $mitras]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request): JsonResponse
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string',
+            'phone_number' => 'required|string',
+            'address' => 'required|string',
+            'grader_group' => 'required|string'
+        ]);
+
+        $mitra = Mitra::create($validated);
+        return response()->json(['status' => 'success', 'message' => 'Mitra berhasil dibuat', 'data' => $mitra], 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function update(Request $request, $id): JsonResponse
     {
-        //
+        $mitra = Mitra::findOrFail($id);
+        $mitra->update($request->only(['name', 'phone_number', 'address', 'grader_group']));
+        return response()->json(['status' => 'success', 'message' => 'Data Mitra diperbarui', 'data' => $mitra]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Mitra $mitra)
+    public function destroy($id): JsonResponse
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Mitra $mitra)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Mitra $mitra)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Mitra $mitra)
-    {
-        //
+        Mitra::findOrFail($id)->delete();
+        return response()->json(['status' => 'success', 'message' => 'Mitra dihapus']);
     }
 }

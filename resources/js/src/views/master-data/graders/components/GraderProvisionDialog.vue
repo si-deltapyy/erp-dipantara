@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import type { Grader } from '@/core/types/grader'
-import { adapterModes } from '@/core/constants/environment'
 import { useSessionStore } from '@/stores/session'
 import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
 import { useGraderProvision } from '../composables/useGraderProvision'
@@ -13,7 +12,6 @@ const props = defineProps<{ grader: Grader }>()
 const emit = defineEmits<{ saved: []; close: [] }>()
 const { t } = useI18n()
 const session = useSessionStore()
-const simulated = adapterModes.domains['master-data'] === 'mock'
 const { error, pending, uncertain, save } = useGraderProvision(props.grader, () => emit('saved'))
 const { confirming, requestDiscard, confirm, cancel } = useUnsavedChanges(
     () => uncertain.value && session.status === 'authenticated',
@@ -34,9 +32,6 @@ function close(): void {
         <form class="space-y-5" @submit.prevent="save">
             <p>{{ t('graders.provisionDescription', { name: grader.name }) }}</p>
             <p class="break-words font-semibold">{{ grader.email }}</p>
-            <p v-if="simulated" class="text-sm text-muted">
-                {{ t('graders.provisionSimulation') }}
-            </p>
             <div
                 v-if="error"
                 role="alert"

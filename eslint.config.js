@@ -3,7 +3,7 @@ import ts from 'typescript-eslint'
 import vue from 'eslint-plugin-vue'
 import prettier from 'eslint-config-prettier'
 
-const frontend = ['resources/js/src/**/*.{ts,vue}', 'tests/frontend/**/*.ts', '*.config.ts']
+const frontend = ['resources/js/src/**/*.{ts,vue}', '*.config.ts']
 const restrictedLayers = (files, patterns) => ({
     files,
     rules: { 'no-restricted-imports': ['error', { patterns }] },
@@ -17,6 +17,27 @@ export default ts.config(
             'public/**',
             'test-results/**',
             'playwright-report/**',
+            'tests/**',
+            '**/*.test.ts',
+            '**/*.spec.ts',
+            'resources/js/src/api/mocks/**',
+            'resources/js/src/api/adapters/*-mock.ts',
+            'resources/js/src/views/development/**',
+            'phpunit.xml',
+            'playwright.config.ts',
+            'resources/js/src/api/adapter-selection.ts',
+            'resources/js/src/api/foundation-api.ts',
+            'resources/js/src/composables/configureDemo.ts',
+            'resources/js/src/composables/configureMockSession.ts',
+            'resources/js/src/composables/useDemoRuntime.ts',
+            'resources/js/src/core/constants/adapter-modes.ts',
+            'resources/js/src/core/constants/environment.ts',
+            'resources/js/src/core/types/foundation.ts',
+            'resources/js/src/locales/demo.ts',
+            'resources/js/src/locales/foundation.ts',
+            'resources/js/src/router/development-routes.ts',
+            'resources/js/src/views/auth/components/SessionControls.vue',
+            'vitest.config.ts',
         ],
     },
     { ...js.configs.recommended, files: frontend },

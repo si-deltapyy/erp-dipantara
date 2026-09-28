@@ -60,7 +60,7 @@ routes.push({
 })
 
 export const router = createRouter({
-    history: createWebHistory('/app/'),
+    history: createWebHistory('/dipantara/'),
     routes,
     scrollBehavior: () => ({ top: 0 }),
 })

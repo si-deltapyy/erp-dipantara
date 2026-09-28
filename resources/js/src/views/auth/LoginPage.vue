@@ -4,11 +4,6 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
-import { defineAsyncComponent } from 'vue'
-import { mockEnabled } from '@/core/constants/environment'
-const SessionControls = mockEnabled
-    ? defineAsyncComponent(() => import('./components/SessionControls.vue'))
-    : undefined
 import { useLoginForm } from './composables/useLoginForm'
 const { t, te } = useI18n()
 const route = useRoute()
@@ -26,14 +21,9 @@ async function submitForm(): Promise<void> {
 <template>
     <div class="space-y-6">
         <div>
-            <span
-                v-if="mockEnabled"
-                class="rounded-full bg-primary-light px-3 py-1 text-xs font-semibold text-primary-strong"
-                >{{ t('shell.mock') }}</span
-            >
             <h1 class="mt-4 text-2xl font-bold">{{ t('auth.title') }}</h1>
             <p class="mt-2 text-sm leading-6 text-muted">
-                {{ t(mockEnabled ? 'auth.introduction' : 'auth.liveIntroduction') }}
+                {{ t('auth.liveIntroduction') }}
             </p>
         </div>
         <p v-if="route.query.expired" role="status" class="text-sm text-muted">
@@ -67,10 +57,9 @@ async function submitForm(): Promise<void> {
             <AppTextInput
                 id="login-password"
                 v-model="password"
-                :label="t(mockEnabled ? 'auth.password' : 'auth.livePassword')"
+                :label="t('auth.livePassword')"
                 type="password"
-                :autocomplete="mockEnabled ? 'off' : 'current-password'"
-                :hint="mockEnabled ? t('auth.passwordHint') : undefined"
+                autocomplete="current-password"
                 :disabled="pending"
                 :error="passwordError ? errorText(passwordError) : undefined"
             />
@@ -78,12 +67,5 @@ async function submitForm(): Promise<void> {
                 t('auth.submit')
             }}</AppButton>
         </form>
-        <p v-if="mockEnabled" class="text-xs leading-5 text-muted">{{ t('auth.mockNotice') }}</p>
-        <component
-            :is="SessionControls"
-            v-if="SessionControls"
-            accounts
-            @account="email = $event"
-        />
     </div>
 </template>

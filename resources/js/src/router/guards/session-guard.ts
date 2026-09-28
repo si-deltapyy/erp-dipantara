@@ -12,13 +12,13 @@ export function registerSessionGuard(
         if (!to.meta.requiresAuth && to.name !== 'login') return true
         await controller.ensure()
         if (store.status === 'error')
-            return { name: 'session-error', query: { returnTo: '/app' + to.fullPath } }
+            return { name: 'session-error', query: { returnTo: '/dipantara' + to.fullPath } }
         if (to.name === 'login') {
             if (store.status !== 'authenticated') return true
             return { name: canAccess(store.user, []) ? 'home' : 'forbidden' }
         }
         if (store.status !== 'authenticated')
-            return { name: 'login', query: { returnTo: '/app' + to.fullPath } }
+            return { name: 'login', query: { returnTo: '/dipantara' + to.fullPath } }
         if (
             !canAccess(
                 store.user,

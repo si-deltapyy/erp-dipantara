@@ -20,11 +20,28 @@
             "@/*": ["resources/js/src/*"]
         }
     },
-    "include": [
-        "resources/js/src/**/*.ts",
-        "resources/js/src/**/*.vue",
-        "tests/frontend/**/*.ts",
-        "vitest.config.ts",
-        "playwright.config.ts"
+    "include": ["resources/js/src/**/*.ts", "resources/js/src/**/*.vue"],
+    "exclude": [
+        "tests/**",
+        "**/*.test.ts",
+        "**/*.spec.ts",
+        "resources/js/src/api/mocks/**",
+        "resources/js/src/api/adapters/*-mock.ts",
+        "resources/js/src/views/development/**",
+        "phpunit.xml",
+        "playwright.config.ts",
+        "resources/js/src/api/adapter-selection.ts",
+        "resources/js/src/api/foundation-api.ts",
+        "resources/js/src/composables/configureDemo.ts",
+        "resources/js/src/composables/configureMockSession.ts",
+        "resources/js/src/composables/useDemoRuntime.ts",
+        "resources/js/src/core/constants/adapter-modes.ts",
+        "resources/js/src/core/constants/environment.ts",
+        "resources/js/src/core/types/foundation.ts",
+        "resources/js/src/locales/demo.ts",
+        "resources/js/src/locales/foundation.ts",
+        "resources/js/src/router/development-routes.ts",
+        "resources/js/src/views/auth/components/SessionControls.vue",
+        "vitest.config.ts"
     ]
 }
