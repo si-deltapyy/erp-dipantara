@@ -28,7 +28,7 @@ export async function writeDelivery(
     const receipt = await transaction.get('deliveryMutations', receiptId)
     if (receipt && receipt.expiresAt > Date.now()) {
         if (receipt.payloadHash !== mutation.hash) throw new ApiError('conflict')
-        return receipt.result
+        return withDeliveryOwner(transaction, receipt.result)
     }
     if (previous && previous.version !== mutation.input.version) throw new ApiError('conflict')
     if (
@@ -36,10 +36,11 @@ export async function writeDelivery(
         mutation.input.availabilityToken !== `${metadata.generation}:${metadata.revision}`
     )
         throw new ApiError('conflict', { allocations: ['deliveries.staleStock'] })
-    const delivery =
+    const candidate =
         'allocations' in mutation.input
             ? await draftDelivery(transaction, actor, mutation.input, previous)
             : await transitionDelivery(transaction, previous, mutation.action)
+    const delivery = await withDeliveryOwner(transaction, candidate)
     await transaction.put('deliveries', delivery)
     await transaction.put('metadata', { ...metadata, revision: metadata.revision + 1 })
     await transaction.put('audit', {
@@ -91,6 +92,7 @@ async function draftDelivery(
     return {
         id: previous?.id ?? crypto.randomUUID(),
         purchaseOrderId: po.id,
+        ownerUserId: po.createdByUserId,
         purchaseOrderNumber: po.number,
         buyerName: po.buyerName,
         deliveryDate: input.deliveryDate,
@@ -106,4 +108,13 @@ async function draftDelivery(
         createdAt: previous?.createdAt ?? now,
         updatedAt: now,
     }
+}
+
+async function withDeliveryOwner(
+    transaction: DemoTransaction,
+    delivery: Delivery,
+): Promise<Delivery> {
+    const purchaseOrder = await transaction.get('purchase-orders', delivery.purchaseOrderId)
+    if (!purchaseOrder) throw new ApiError('not-found')
+    return { ...delivery, ownerUserId: purchaseOrder.createdByUserId }
 }

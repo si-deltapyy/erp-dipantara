@@ -30,6 +30,7 @@ export interface DeliveryContext extends DeliveryAllocation {
 }
 export interface Delivery extends Omit<DeliveryInput, 'availabilityToken'>, RecordMetadata {
     readonly id: string
+    readonly ownerUserId: string
     readonly status: DeliveryStatus
     readonly purchaseOrderNumber: string
     readonly buyerName: string

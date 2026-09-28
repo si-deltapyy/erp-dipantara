@@ -53,7 +53,7 @@ const discard = reactive(
 )
 </script>
 <template>
-    <section class="space-y-4">
+    <section v-if="canRead || upload.canUpload" class="space-y-4">
         <h2 class="text-lg font-semibold">{{ t('deliveries.sakr') }}</h2>
 
         <dl v-if="delivery.documents.length" class="panel grid gap-4 sm:grid-cols-2">

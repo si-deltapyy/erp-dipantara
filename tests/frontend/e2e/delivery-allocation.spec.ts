@@ -105,7 +105,7 @@ test('splits 500 units atomically, rejects stale stock and protects reserved gra
             generation,
             signal,
         )
-        await fail(() => repository.list(grader, query, signal))
+        await fail(() => repository.list({ ...grader, permissions: [] }, query, signal))
         await fail(() =>
             gradings.mutate(
                 grader,

@@ -2,6 +2,7 @@ import type { Delivery } from '../../resources/js/src/core/types/delivery'
 import { parseId } from '../../resources/js/src/api/contracts/value-parsers'
 export const deliveryFixture: Delivery = {
     id: 'delivery-one',
+    ownerUserId: 'user-demo',
     purchaseOrderId: 'po-one',
     purchaseOrderNumber: 'DEMO-PO-001',
     buyerName: 'Buyer Simulasi',

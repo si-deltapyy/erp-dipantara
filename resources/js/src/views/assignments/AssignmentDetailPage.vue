@@ -57,6 +57,14 @@ const {
             </dl>
             <RouterLink
                 v-if="
+                    evaluateRecordAccess(session.user, 'deliveries.read', assignment) === 'allowed'
+                "
+                :to="{ name: 'deliveries', query: { assignmentId: assignment.id } }"
+                class="secondary-button"
+                >{{ t('deliveries.monitor') }}</RouterLink
+            >
+            <RouterLink
+                v-if="
                     evaluateRecordAccess(session.user, 'gradings.create', assignment) === 'allowed'
                 "
                 :to="{ name: 'grading-new', query: { assignmentId: assignment.id } }"

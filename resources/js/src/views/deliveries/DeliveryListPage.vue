@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { deliveryStatuses } from '@/core/types/delivery'
+import AppSelect from '@/components/ui/AppSelect.vue'
 import { useI18n } from 'vue-i18n'
 import { useMasterList } from '@/composables/useMasterList'
 import { useDeliveryApi } from './composables/useDeliveryApi'
@@ -7,8 +11,26 @@ import AppButton from '@/components/ui/AppButton.vue'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
 import AppPagination from '@/components/ui/AppPagination.vue'
 const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
+const status = computed(() => (typeof route.query.status === 'string' ? route.query.status : ''))
+const statusOptions = computed(() => [
+    { value: '', label: t('deliveries.allStatuses') },
+    ...deliveryStatuses.map((value) => ({ value, label: t('deliveries.statuses.' + value) })),
+])
+function queryFilters(): Record<string, string | undefined> {
+    return Object.fromEntries(
+        ['status', 'purchaseOrderId', 'assignmentId'].map((key) => [
+            key,
+            typeof route.query[key] === 'string' ? route.query[key] : undefined,
+        ]),
+    )
+}
+async function changeStatus(value: string): Promise<void> {
+    await router.replace({ query: { ...route.query, page: undefined, status: value || undefined } })
+}
 const { response, query, search, loading, error, canCreate, refresh, searchRecords, changePage } =
-    useMasterList(useDeliveryApi(), 'deliveries')
+    useMasterList(useDeliveryApi(), 'deliveries', queryFilters)
 </script>
 <template>
     <section class="space-y-6">
@@ -32,6 +54,13 @@ const { response, query, search, loading, error, canCreate, refresh, searchRecor
                         :maxlength="200"
                     />
                 </div>
+                <AppSelect
+                    id="delivery-status"
+                    :model-value="status"
+                    :options="statusOptions"
+                    :label="t('deliveries.status')"
+                    @update:model-value="changeStatus"
+                />
                 <AppButton type="submit">{{ t('deliveries.searchAction') }}</AppButton
                 ><AppButton variant="secondary" :pending="loading" @click="refresh">{{
                     t('deliveries.refresh')

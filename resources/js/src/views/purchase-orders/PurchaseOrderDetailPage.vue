@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { evaluateRecordAccess } from '@/core/domain/record-policy'
 import { computed, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -113,6 +114,12 @@ const canEdit = computed(
                     t('purchase-orders.refresh')
                 }}</AppButton>
             </div>
+            <RouterLink
+                v-if="evaluateRecordAccess(session.user, 'deliveries.read', order) === 'allowed'"
+                :to="{ name: 'deliveries', query: { purchaseOrderId: order.id } }"
+                class="secondary-button"
+                >{{ t('deliveries.monitor') }}</RouterLink
+            >
             <PurchaseOrderDocuments :key="order.id" :order="order" />
             <div class="flex flex-wrap justify-end gap-3">
                 <AppButton

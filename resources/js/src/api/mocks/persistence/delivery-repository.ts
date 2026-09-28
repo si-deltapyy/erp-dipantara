@@ -1,3 +1,4 @@
+import { scopedDelivery } from './delivery-access'
 import { parseWorkflowVersion } from '@/api/contracts/workflow-parsers'
 import type {
     AvailabilityQuery,
@@ -49,7 +50,13 @@ export class DeliveryRepository {
             async (transaction) => {
                 const metadata = await requireDataset(transaction)
                 const search = filter.search.trim().toLocaleLowerCase('id')
-                const matches = (await transaction.list('deliveries'))
+                const scoped = await Promise.all(
+                    (await transaction.list('deliveries')).map((delivery) =>
+                        scopedDelivery(transaction, actor, delivery),
+                    ),
+                )
+                const matches = scoped
+                    .filter((delivery): delivery is Delivery => !!delivery)
                     .filter(
                         (delivery) =>
                             (!filter.purchaseOrderId ||
@@ -91,7 +98,9 @@ export class DeliveryRepository {
                 const metadata = await requireDataset(transaction)
                 const delivery = await transaction.get('deliveries', id)
                 if (!delivery) throw new ApiError('not-found')
-                return presentDelivery(delivery, actor, metadata.generation)
+                const scoped = await scopedDelivery(transaction, actor, delivery)
+                if (!scoped) throw new ApiError('not-found')
+                return presentDelivery(scoped, actor, metadata.generation)
             },
             signal,
         )
@@ -102,6 +111,7 @@ export class DeliveryRepository {
         signal: AbortSignal,
     ): Promise<PageResponse<AvailableTimber>> {
         const actor = requireDeliveryPermission(user, 'read')
+        if (!actor.permissions.includes('deliveries.read.all')) throw new ApiError('forbidden')
         if (
             !actor.permissions.includes('deliveries.create.all') &&
             !actor.permissions.includes('deliveries.update.all')

@@ -1,3 +1,4 @@
+import { hasBusinessPermission } from '@/core/domain/record-policy'
 import type { Delivery } from '@/core/types/delivery'
 import type { SessionUser } from '@/core/types/session'
 import { ApiError } from '@/core/types/api-error'
@@ -6,7 +7,12 @@ export function requireDeliveryPermission(
     action: 'read' | 'create' | 'update' | 'dispatch' | 'receive',
 ): SessionUser {
     if (!user) throw new ApiError('unauthenticated')
-    if (!user.permissions.includes(`deliveries.${action}.all`)) throw new ApiError('forbidden')
+    if (
+        action === 'read'
+            ? !hasBusinessPermission(user, 'deliveries.read')
+            : !user.permissions.includes(`deliveries.${action}.all`)
+    )
+        throw new ApiError('forbidden')
     return user
 }
 export function presentDelivery(

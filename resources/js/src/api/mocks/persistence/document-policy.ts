@@ -23,8 +23,11 @@ export async function assertDocumentParentAccess(
     if (parent.parentType === 'delivery') {
         const delivery = await transaction.get('deliveries', parent.parentId)
         if (!delivery) throw new ApiError('not-found')
-        assertRecordAccess(actor, 'deliveries.read', delivery)
-        assertRecordAccess(actor, `documents.${action}`, delivery)
+        const po = await transaction.get('purchase-orders', delivery.purchaseOrderId)
+        if (!po) throw new ApiError('not-found')
+        const scope = { ...delivery, ownerUserId: po.createdByUserId }
+        assertRecordAccess(actor, 'deliveries.read', scope)
+        assertRecordAccess(actor, `documents.${action}`, scope)
         if (
             action === 'upload' &&
             (delivery.status !== 'draft' || !actor.permissions.includes('deliveries.update.all'))

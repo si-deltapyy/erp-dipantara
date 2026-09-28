@@ -1,5 +1,7 @@
 export default {
     deliveries: {
+        allStatuses: 'Semua status',
+        monitor: 'Pantau pengiriman',
         sakrReadHint:
             'Berkas perjalanan tersimpan. Pilih pratinjau untuk membaca atau mencetak PDF.',
         sakrFiles: 'Berkas SAKR',
