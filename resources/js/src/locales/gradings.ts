@@ -2,6 +2,20 @@ import orders from './orders'
 export default {
     gradings: {
         ...orders.orders,
+        revise: 'Revisi grading',
+        saveRevision: 'Simpan draft revisi',
+        revisionReason: 'Alasan revisi',
+        revisionReasonInvalid: 'Isi alasan revisi dengan 1 sampai 255 karakter.',
+        revisionHint: 'Hasil sebelumnya tetap berlaku sampai revisi ini disetujui.',
+        allocatedRow: 'Baris telah dialokasikan atau dikirim dan tidak dapat diubah.',
+        pendingRevision: 'Masih ada draft revisi yang harus diselesaikan.',
+        previousResult: 'Hasil sebelumnya',
+        revisedResult: 'Hasil revisi',
+        openPrevious: 'Buka hasil sebelumnya',
+        invoiceRevisionRequired:
+            'Hasil berubah. Invoice yang sudah diterbitkan perlu ditinjau untuk revisi.',
+        assignmentHistory: 'Grading pada penugasan ini',
+
         approve: 'Setujui grading',
         reject: 'Tolak grading',
         approveDescription: 'Pastikan ukuran dan volume benar sebelum menyetujui hasil grading.',

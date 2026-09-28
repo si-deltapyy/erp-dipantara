@@ -36,7 +36,14 @@ export interface GradingQuery extends MasterListQuery {
     readonly assignmentId?: string
     readonly status?: GradingStatus
 }
+export interface GradingRevisionInput {
+    readonly version: number
+    readonly reason: string
+    readonly gradingDate: string
+    readonly rows: readonly GradingRow[]
+}
 export interface GradingsApi extends WorkflowApi<Grading> {
+    revise(id: string, input: GradingRevisionInput, options: WorkflowWriteOptions): Promise<Grading>
     list(query: GradingQuery, signal: AbortSignal): Promise<PageResponse<Grading>>
     get(id: string, signal: AbortSignal): Promise<Grading>
     create(input: GradingInput, options: WorkflowWriteOptions): Promise<Grading>

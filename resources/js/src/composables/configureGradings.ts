@@ -30,9 +30,12 @@ export async function configureGradings(app: App, pinia: Pinia): Promise<void> {
             if (
                 session.status === 'guest' ||
                 (session.user &&
-                    [recovery.snapshot, recovery.review, recovery.submission].some(
-                        (snapshot) => snapshot && snapshot.actorId !== session.user?.id,
-                    ))
+                    [
+                        recovery.snapshot,
+                        recovery.review,
+                        recovery.submission,
+                        recovery.revision,
+                    ].some((snapshot) => snapshot && snapshot.actorId !== session.user?.id))
             )
                 recovery.$reset()
         },

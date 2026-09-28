@@ -23,11 +23,12 @@ export function presentGrading(
     actor: SessionUser,
     generation: string,
 ): Grading {
-    const actions: ('update' | 'submit' | 'approve' | 'reject')[] = []
+    const actions: ('update' | 'submit' | 'approve' | 'reject' | 'revise')[] = []
     if (['draft', 'rejected'].includes(record.status)) {
         actions.push('update')
         if (assignment.orderStatus === 'approved') actions.push('submit')
     }
+    if (record.status === 'approved') actions.push('revise')
     if (record.status === 'submitted') actions.push('approve', 'reject')
     return {
         ...record,

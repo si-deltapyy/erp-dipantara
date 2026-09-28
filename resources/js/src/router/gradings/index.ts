@@ -7,6 +7,12 @@ const meta = {
 }
 export const gradingRoutes: RouteRecordRaw[] = [
     {
+        path: '/gradings/:id/revise',
+        name: 'grading-revise',
+        component: () => import('@/views/gradings/GradingFormPage.vue'),
+        meta: { ...meta, anyPermissions: ['gradings.revise.all', 'gradings.revise.assigned'] },
+    },
+    {
         path: '/gradings',
         name: 'gradings',
         component: () => import('@/views/gradings/GradingListPage.vue'),

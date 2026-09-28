@@ -1,4 +1,11 @@
-import type { Grading, GradingInput } from '@/core/types/grading'
+import type { Assignment } from '@/core/types/assignment'
+import type { GradingDownstream } from '../grading-downstream'
+import {
+    createGradingRevision,
+    assertRevisionParent,
+    activateGradingRevision,
+} from './grading-revisions'
+import type { Grading, GradingInput, GradingRevisionInput } from '@/core/types/grading'
 import type { WorkflowVersion, WorkflowRejection } from '@/core/types/workflow'
 import type { SessionUser } from '@/core/types/session'
 import type { DemoTransaction } from './transaction'
@@ -14,9 +21,13 @@ import {
     labelGrading,
 } from './grading-context'
 export interface GradingMutation {
-    readonly action: 'create' | 'update' | 'submit' | 'approve' | 'reject'
+    readonly action: 'create' | 'update' | 'submit' | 'approve' | 'reject' | 'revise'
     readonly id?: string
-    readonly input: (GradingInput & { version?: number }) | WorkflowVersion | WorkflowRejection
+    readonly input:
+        | (GradingInput & { version?: number })
+        | WorkflowVersion
+        | WorkflowRejection
+        | GradingRevisionInput
     readonly key: string
     readonly hash: string
 }
@@ -25,6 +36,7 @@ export async function writeGrading(
     metadata: DatasetMetadata,
     actor: SessionUser,
     mutation: GradingMutation,
+    downstream: GradingDownstream,
 ): Promise<Grading> {
     const previous = mutation.id ? await transaction.get('gradings', mutation.id) : undefined
     if (mutation.id && !previous) throw new ApiError('not-found')
@@ -45,6 +57,65 @@ export async function writeGrading(
     }
     if (previous && (!('version' in mutation.input) || previous.version !== mutation.input.version))
         throw new ApiError('conflict')
+    let changed: Grading
+    if (mutation.action === 'revise') {
+        if (
+            !previous ||
+            !('rows' in mutation.input) ||
+            !('reason' in mutation.input) ||
+            !('version' in mutation.input)
+        )
+            throw new ApiError('validation')
+        changed = await createGradingRevision(
+            transaction,
+            previous,
+            assignment,
+            actor,
+            mutation.input,
+            downstream,
+        )
+    } else {
+        changed = await changeGrading(
+            transaction,
+            actor,
+            mutation,
+            assignment,
+            downstream,
+            previous,
+        )
+    }
+    const grading =
+        mutation.action === 'approve'
+            ? await activateGradingRevision(transaction, changed, assignment, actor, downstream)
+            : changed
+    await transaction.put('gradings', grading)
+    await transaction.put('metadata', { ...metadata, revision: metadata.revision + 1 })
+    await transaction.put('audit', {
+        id: crypto.randomUUID(),
+        resource: 'gradings',
+        recordId: grading.id,
+        actorId: actor.id,
+        version: grading.version,
+        action: mutation.action,
+        ...('reason' in mutation.input ? { reason: mutation.input.reason } : {}),
+    })
+    await transaction.put('gradingMutations', {
+        id: receiptId,
+        payloadHash: mutation.hash,
+        expiresAt: Date.now() + 86400000,
+        result: grading,
+    })
+    return grading
+}
+
+async function changeGrading(
+    transaction: DemoTransaction,
+    actor: SessionUser,
+    mutation: GradingMutation,
+    assignment: Assignment,
+    downstream: GradingDownstream,
+    previous?: Grading,
+): Promise<Grading> {
     const reviewing = mutation.action === 'approve' || mutation.action === 'reject'
     if (
         previous &&
@@ -58,12 +129,20 @@ export async function writeGrading(
         throw new ApiError('validation', { assignmentId: ['gradings.parentLocked'] })
     const grader = await transaction.get('graders', assignment.graderId)
     if (!grader || grader.provisioningStatus !== 'active') throw new ApiError('conflict')
-    await assertGradingCapacity(transaction, input, assignment, previous ? [previous.id] : [])
+    const parent = previous
+        ? await assertRevisionParent(transaction, previous, input.rows, downstream)
+        : undefined
+    await assertGradingCapacity(
+        transaction,
+        input,
+        assignment,
+        [previous?.id, parent?.id].filter((id): id is string => !!id),
+    )
     const submitting = mutation.action === 'submit'
     if ((submitting || reviewing) && assignment.orderStatus !== 'approved')
         throw new ApiError('conflict')
     const now = new Date().toISOString()
-    const grading: Grading = labelGrading(
+    return labelGrading(
         {
             assignmentId: input.assignmentId,
             gradingDate: input.gradingDate,
@@ -100,22 +179,4 @@ export async function writeGrading(
         },
         assignment,
     )
-    await transaction.put('gradings', grading)
-    await transaction.put('metadata', { ...metadata, revision: metadata.revision + 1 })
-    await transaction.put('audit', {
-        id: crypto.randomUUID(),
-        resource: 'gradings',
-        recordId: grading.id,
-        actorId: actor.id,
-        version: grading.version,
-        action: mutation.action,
-        ...('reason' in mutation.input ? { reason: mutation.input.reason } : {}),
-    })
-    await transaction.put('gradingMutations', {
-        id: receiptId,
-        payloadHash: mutation.hash,
-        expiresAt: Date.now() + 86400000,
-        result: grading,
-    })
-    return grading
 }

@@ -83,3 +83,38 @@ test('sends versioned grading review and preserves returned rejection reason', a
         ['/api/v1/gradings/grading-one/reject', { version: 2, reason: 'Measure again' }],
     ])
 })
+
+test('creates a versioned revision from the HTTP 200 detail envelope', async () => {
+    const client = axios.create()
+    const post = vi.spyOn(client, 'post').mockResolvedValue({
+        status: 200,
+        data: {
+            data: {
+                ...gradingFixture,
+                id: 'revision-one',
+                revisionOfId: gradingFixture.id,
+                revisionReason: 'Correct diameter',
+            },
+        },
+    })
+    const api = createHttpGradings(client)
+    const input = {
+        version: 3,
+        reason: 'Correct diameter',
+        gradingDate: gradingFixture.gradingDate,
+        rows: gradingFixture.rows,
+    }
+    const options = { signal: new AbortController().signal, idempotencyKey: 'revision-key' }
+    expect((await api.revise(gradingFixture.id, input, options)).revisionOfId).toBe(
+        gradingFixture.id,
+    )
+    expect(post).toHaveBeenCalledWith('/api/v1/gradings/grading-one/revisions', input, {
+        signal: options.signal,
+        headers: { 'Idempotency-Key': 'revision-key' },
+    })
+    post.mockClear()
+    await expect(
+        api.revise(gradingFixture.id, { ...input, reason: ' ' }, options),
+    ).rejects.toMatchObject({ kind: 'validation' })
+    expect(post).not.toHaveBeenCalled()
+})

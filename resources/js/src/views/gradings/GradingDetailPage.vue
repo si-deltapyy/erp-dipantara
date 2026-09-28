@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import GradingComparison from './components/GradingComparison.vue'
+import GradingHistory from './components/GradingHistory.vue'
 import { computed, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import { useGradingReview } from './composables/useGradingReview'
@@ -67,8 +69,35 @@ function closeReview(): void {
                         >{{ t('gradings.reject') }}</AppButton
                     >
                 </div>
-                <GradingMeasurements :grading="grading" />
+                <p v-if="grading.revisionReason" class="whitespace-pre-wrap">
+                    {{ t('gradings.revisionReason') }}: {{ grading.revisionReason }}
+                </p>
+                <p
+                    v-if="
+                        grading.revisionOfId &&
+                        grading.status !== 'approved' &&
+                        grading.status !== 'superseded'
+                    "
+                    class="text-sm text-muted"
+                >
+                    {{ t('gradings.revisionHint') }}
+                </p>
+                <p
+                    v-if="grading.invoiceRevisionRequired"
+                    role="status"
+                    class="rounded-md border border-amber-300 bg-amber-50 p-4"
+                >
+                    {{ t('gradings.invoiceRevisionRequired') }}
+                </p>
+                <GradingComparison v-if="grading.revisionOfId" :grading="grading" />
+                <GradingMeasurements v-else :grading="grading" />
                 <div class="flex flex-wrap gap-3">
+                    <RouterLink
+                        v-if="canActOnGrading(session.user, grading, 'revise') && !review.pending"
+                        :to="{ name: 'grading-revise', params: { id: grading.id } }"
+                        class="primary-button"
+                        >{{ t('gradings.revise') }}</RouterLink
+                    >
                     <RouterLink
                         v-if="editable && !submission.pending && !submission.uncertain"
                         :to="{ name: 'grading-edit', params: { id: grading.id } }"
@@ -95,6 +124,7 @@ function closeReview(): void {
                 <p v-if="submission.uncertain">{{ t('gradings.uncertain') }}</p>
                 <AppButton v-else @click="refresh">{{ t('gradings.refresh') }}</AppButton>
             </div>
+            <GradingHistory :key="grading.id" :grading="grading" />
         </template>
         <div v-if="review.error && !review.action" class="panel space-y-3" role="alert">
             <p>{{ t(review.error) }}</p>

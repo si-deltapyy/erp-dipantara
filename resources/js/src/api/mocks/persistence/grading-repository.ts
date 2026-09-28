@@ -1,3 +1,6 @@
+import { parseGradingRevision } from '@/api/contracts/grading-revision'
+import type { GradingDownstream } from '../grading-downstream'
+import { gradingDownstreamFixtures } from '../grading-downstream'
 import type { Grading, GradingQuery } from '@/core/types/grading'
 import type { PageResponse } from '@/core/types/contracts'
 import type { SessionUser } from '@/core/types/session'
@@ -26,7 +29,10 @@ const readStores: readonly DemoStore[] = [
     'timber-products',
 ]
 export class GradingRepository {
-    constructor(private readonly options: DatabaseOptions = {}) {}
+    constructor(
+        private readonly options: DatabaseOptions = {},
+        private readonly downstream: GradingDownstream = gradingDownstreamFixtures,
+    ) {}
     async list(
         user: SessionUser | null,
         query: GradingQuery,
@@ -122,11 +128,13 @@ export class GradingRepository {
         if (mutation.action !== 'create') parseId(mutation.id)
         if (!mutation.key.trim() || mutation.key.length > 100) throw new ApiError('validation')
         const input =
-            mutation.action === 'reject'
-                ? parseWorkflowRejection(mutation.input)
-                : mutation.action === 'submit' || mutation.action === 'approve'
-                  ? parseWorkflowVersion(mutation.input)
-                  : parseGradingInput(mutation.input, mutation.action === 'update')
+            mutation.action === 'revise'
+                ? parseGradingRevision(mutation.input)
+                : mutation.action === 'reject'
+                  ? parseWorkflowRejection(mutation.input)
+                  : mutation.action === 'submit' || mutation.action === 'approve'
+                    ? parseWorkflowVersion(mutation.input)
+                    : parseGradingInput(mutation.input, mutation.action === 'update')
         const hash = await hashMutationPayload({ ...input, generation })
         return runDemoTransaction(
             this.options,
@@ -135,11 +143,17 @@ export class GradingRepository {
             async (transaction) => {
                 const metadata = await requireDataset(transaction)
                 if (metadata.generation !== generation) throw new ApiError('conflict')
-                const grading = await writeGrading(transaction, metadata, actor, {
-                    ...mutation,
-                    input,
-                    hash,
-                })
+                const grading = await writeGrading(
+                    transaction,
+                    metadata,
+                    actor,
+                    {
+                        ...mutation,
+                        input,
+                        hash,
+                    },
+                    this.downstream,
+                )
                 return presentGrading(
                     grading,
                     await gradingAssignment(transaction, grading.assignmentId),

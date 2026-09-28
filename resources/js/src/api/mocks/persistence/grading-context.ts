@@ -50,12 +50,18 @@ export async function assertGradingCapacity(
                 [`rows.${index}.gradeCode`]: ['gradings.invalidGrade'],
             })
     }
-    const existing = (await transaction.list('gradings')).filter(
+    const records = await transaction.list('gradings')
+    const existing = records.filter(
         (grading) =>
             grading.assignmentId === assignment.id &&
             grading.status !== 'superseded' &&
             !excludeIds.includes(grading.id) &&
-            !grading.revisionOfId,
+            !(
+                grading.revisionOfId &&
+                records.some(
+                    (parent) => parent.id === grading.revisionOfId && parent.status === 'approved',
+                )
+            ),
     )
     const allocated = [...existing.flatMap((grading) => grading.rows), ...input.rows].reduce(
         (sum, row) => sum + BigInt(row.quantity),

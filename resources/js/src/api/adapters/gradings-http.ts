@@ -1,3 +1,4 @@
+import { parseGradingRevision } from '@/api/contracts/grading-revision'
 import type { WorkflowWriteOptions } from '@/core/types/workflow'
 import { parseWorkflowVersion, parseWorkflowRejection } from '@/api/contracts/workflow-parsers'
 import type { AxiosInstance } from 'axios'
@@ -71,6 +72,17 @@ export function createHttpGradings(client: AxiosInstance = createHttpClient()): 
                     await client.post<unknown>(
                         `${path(id)}/reject`,
                         parseWorkflowRejection(input),
+                        config(options),
+                    )
+                ).data,
+            )
+        },
+        async revise(id, input, options) {
+            return mutationResponse(
+                (
+                    await client.post<unknown>(
+                        `${path(id)}/revisions`,
+                        parseGradingRevision(input),
                         config(options),
                     )
                 ).data,

@@ -68,7 +68,11 @@ export function useGradingFormContext(): FormContext {
         () =>
             !!assignment.value &&
             (grading.value
-                ? canActOnGrading(store.user, grading.value, 'update')
+                ? canActOnGrading(
+                      store.user,
+                      grading.value,
+                      route.name === 'grading-revise' ? 'revise' : 'update',
+                  )
                 : evaluateRecordAccess(store.user, 'gradings.create', assignment.value) ===
                   'allowed'),
     )
