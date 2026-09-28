@@ -16,6 +16,14 @@ const canCreate = computed(() => canCreatePayment(session.user))
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const hasFilters = computed(() =>
+    ['search', 'purchaseOrderId', 'invoiceId', 'status', 'direction'].some(
+        (key) => !!route.query[key],
+    ),
+)
+async function clearFilters(): Promise<void> {
+    await router.replace({ query: {} })
+}
 const direction = computed(() =>
     typeof route.query.direction === 'string' ? route.query.direction : '',
 )
@@ -86,6 +94,9 @@ const { response, query, search, loading, error, refresh, searchRecords, changeP
                     t('payments.refresh')
                 }}</AppButton>
             </form>
+            <AppButton v-if="hasFilters" variant="secondary" @click="clearFilters">{{
+                t('payments.clearFilters')
+            }}</AppButton>
             <p v-if="loading" role="status">{{ t('payments.loading') }}</p>
             <p v-else-if="error" role="alert">{{ t(error) }}</p>
             <template v-else-if="response">

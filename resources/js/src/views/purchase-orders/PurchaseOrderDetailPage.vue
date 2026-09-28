@@ -56,6 +56,12 @@ const canEdit = computed(
             <AppButton @click="refresh">{{ t('purchase-orders.refresh') }}</AppButton>
         </div>
         <template v-else-if="order">
+            <RouterLink
+                v-if="evaluateRecordAccess(session.user, 'payments.read', order) === 'allowed'"
+                :to="{ name: 'payments', query: { purchaseOrderId: order.id } }"
+                class="secondary-button"
+                >{{ t('payments.monitor') }}</RouterLink
+            >
             <div class="panel space-y-5">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <h2 class="break-words text-xl font-semibold">{{ order.number }}</h2>

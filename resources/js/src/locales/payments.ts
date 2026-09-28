@@ -4,6 +4,8 @@ export default {
         counterpartyName: 'Buyer / Mitra',
         sourceAccountLabel: 'Rekening sumber',
         destinationAccountLabel: 'Rekening tujuan',
+        monitor: 'Pantau pembayaran',
+        clearFilters: 'Hapus filter',
         title: 'Pembayaran',
         section: 'Keuangan',
         subtitle: 'Pembayaran draft dan submitted belum mengurangi saldo invoice.',

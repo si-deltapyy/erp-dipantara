@@ -132,6 +132,12 @@ const canEdit = computed(
                 class="primary-button"
                 >{{ t('payments.start') }}</RouterLink
             >
+            <RouterLink
+                v-if="evaluateRecordAccess(session.user, 'payments.read', invoice) === 'allowed'"
+                :to="{ name: 'payments', query: { invoiceId: invoice.id } }"
+                class="secondary-button"
+                >{{ t('payments.monitor') }}</RouterLink
+            >
             <InvoiceSettlement :key="invoice.version" :invoice-id="invoice.id" />
             <InvoiceDocument :invoice="invoice" />
             <InvoiceHistory
