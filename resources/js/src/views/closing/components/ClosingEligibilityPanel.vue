@@ -35,7 +35,15 @@ const {
         </div>
         <template v-else-if="eligibility">
             <p class="font-semibold" role="status">
-                {{ t(eligibility.eligible ? 'closings.eligible' : 'closings.blocked') }}
+                {{
+                    t(
+                        eligibility.reasons.includes('purchase_order_closed')
+                            ? 'closings.closed'
+                            : eligibility.eligible
+                              ? 'closings.eligible'
+                              : 'closings.blocked',
+                    )
+                }}
             </p>
             <p class="break-words text-sm text-muted">
                 {{ t('closings.evaluatedAt', { date: eligibility.evaluatedAt }) }}

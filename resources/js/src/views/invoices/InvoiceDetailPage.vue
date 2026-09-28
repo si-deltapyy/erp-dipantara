@@ -125,7 +125,7 @@ const canEdit = computed(
             >
             <RouterLink
                 v-if="
-                    invoice.issuedRevisionNumber &&
+                    invoice.allowedActions.includes('record-payment') &&
                     evaluateRecordAccess(session.user, 'payments.create', invoice) === 'allowed'
                 "
                 :to="{ name: 'payment-new', query: { invoiceId: invoice.id } }"

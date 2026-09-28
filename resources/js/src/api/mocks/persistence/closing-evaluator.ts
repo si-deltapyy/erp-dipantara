@@ -37,7 +37,8 @@ export async function closingEligibility(
         )
     )
         reasons.push('active_request')
-    if (purchaseOrder.status !== 'approved') reasons.unshift('purchase_order_not_approved')
+    if (purchaseOrder.status === 'closed') reasons.unshift('purchase_order_closed')
+    else if (purchaseOrder.status !== 'approved') reasons.unshift('purchase_order_not_approved')
     return {
         purchaseOrderId,
         version: purchaseOrder.version,

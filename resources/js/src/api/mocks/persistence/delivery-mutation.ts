@@ -1,3 +1,4 @@
+import { assertOpenPurchaseOrder } from './closed-order-guard'
 import type { WorkflowVersion } from '@/core/types/workflow'
 import { assertDeliveryDocuments, transitionDelivery } from './delivery-readiness'
 import type { Delivery, DeliveryInput } from '@/core/types/delivery'
@@ -24,6 +25,10 @@ export async function writeDelivery(
 ): Promise<Delivery> {
     const previous = mutation.id ? await transaction.get('deliveries', mutation.id) : undefined
     if (mutation.id && !previous) throw new ApiError('not-found')
+    const purchaseOrderId =
+        previous?.purchaseOrderId ??
+        ('purchaseOrderId' in mutation.input ? mutation.input.purchaseOrderId : '')
+    await assertOpenPurchaseOrder(transaction, purchaseOrderId)
     const receiptId = JSON.stringify([actor.id, mutation.action, mutation.id ?? '', mutation.key])
     const receipt = await transaction.get('deliveryMutations', receiptId)
     if (receipt && receipt.expiresAt > Date.now()) {

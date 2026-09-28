@@ -1,3 +1,4 @@
+import { assertOpenPurchaseOrder, orderPurchaseOrderId } from './closed-order-guard'
 import type { Assignment, AssignmentInput } from '@/core/types/assignment'
 import type { SessionUser } from '@/core/types/session'
 import { ApiError } from '@/core/types/api-error'
@@ -26,6 +27,12 @@ export async function writeAssignment(
     const order = await transaction.get('orders', mutation.input.orderId)
     if (!order) throw new ApiError('validation', { orderId: ['assignments.invalid'] })
     assertRecordAccess(actor, 'orders.update', order)
+    await assertOpenPurchaseOrder(transaction, order.purchaseOrderId)
+    if (previous)
+        await assertOpenPurchaseOrder(
+            transaction,
+            await orderPurchaseOrderId(transaction, previous.orderId),
+        )
     const receiptId = JSON.stringify([actor.id, mutation.action, mutation.id ?? '', mutation.key])
     const receipt = await transaction.get('assignmentMutations', receiptId)
     if (receipt && receipt.expiresAt > Date.now()) {

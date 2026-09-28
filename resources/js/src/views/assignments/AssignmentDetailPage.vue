@@ -65,6 +65,7 @@ const {
             >
             <RouterLink
                 v-if="
+                    assignment.allowedActions.includes('create-grading') &&
                     evaluateRecordAccess(session.user, 'gradings.create', assignment) === 'allowed'
                 "
                 :to="{ name: 'grading-new', query: { assignmentId: assignment.id } }"

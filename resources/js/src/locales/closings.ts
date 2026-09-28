@@ -1,6 +1,7 @@
 import invoices from './invoices'
 export default {
     closings: {
+        closed: 'PO telah ditutup',
         reviewCsrf: 'Sesi telah diperbarui. Periksa keputusan lalu konfirmasi kembali.',
         approve: 'Setujui closing',
         reject: 'Tolak closing',
@@ -56,6 +57,8 @@ export default {
             received: 'Diterima',
         },
         reasons: {
+            purchase_order_closed:
+                'PO sudah ditutup. Histori dan dokumen tetap dapat dibaca sesuai akses.',
             active_request: 'PO sudah memiliki pengajuan closing yang menunggu persetujuan.',
             purchase_order_not_approved: 'PO harus berstatus disetujui.',
             orders_incomplete: 'Order belum tersedia atau belum seluruhnya disetujui.',

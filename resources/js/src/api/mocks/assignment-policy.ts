@@ -18,10 +18,14 @@ export function presentAssignment(
     return {
         ...assignment,
         snapshotGeneration: generation,
-        allowedActions:
-            ['draft', 'rejected'].includes(assignment.orderStatus) &&
+        allowedActions: [
+            ...(evaluateRecordAccess(actor, 'gradings.create', assignment) === 'allowed'
+                ? ['create-grading']
+                : []),
+            ...(['draft', 'rejected'].includes(assignment.orderStatus) &&
             evaluateRecordAccess(actor, 'assignments.update', assignment) === 'allowed'
                 ? ['update']
-                : [],
+                : []),
+        ],
     }
 }

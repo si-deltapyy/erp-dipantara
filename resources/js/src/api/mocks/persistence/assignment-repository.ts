@@ -1,3 +1,4 @@
+import { presentStoredAssignment } from './closed-record-presentation'
 import type { Assignment, AssignmentQuery } from '@/core/types/assignment'
 import type { PageResponse } from '@/core/types/contracts'
 import type { SessionUser } from '@/core/types/session'
@@ -5,7 +6,7 @@ import { ApiError } from '@/core/types/api-error'
 import { assertRecordAccess, evaluateRecordAccess } from '@/core/domain/record-policy'
 import { parseAssignmentInput, parseAssignmentQuery } from '@/api/assignment-mapper'
 import { parseId } from '@/api/contracts/value-parsers'
-import { presentAssignment, requireAssignmentPermission } from '../assignment-policy'
+import { requireAssignmentPermission } from '../assignment-policy'
 import { requireDataset } from './demo-repository'
 import { runDemoTransaction } from './transaction'
 import type { DatabaseOptions } from './database'
@@ -66,11 +67,18 @@ export class AssignmentRepository {
                         return filter.sort === 'createdAt' ? assignment : -assignment
                     })
                 return {
-                    data: matches
-                        .slice((filter.page - 1) * filter.perPage, filter.page * filter.perPage)
-                        .map((assignment) =>
-                            presentAssignment(assignment, actor, metadata.generation),
-                        ),
+                    data: await Promise.all(
+                        matches
+                            .slice((filter.page - 1) * filter.perPage, filter.page * filter.perPage)
+                            .map((assignment) =>
+                                presentStoredAssignment(
+                                    transaction,
+                                    assignment,
+                                    actor,
+                                    metadata.generation,
+                                ),
+                            ),
+                    ),
                     meta: { page: filter.page, perPage: filter.perPage, total: matches.length },
                 }
             },
@@ -89,7 +97,8 @@ export class AssignmentRepository {
                 const assignment = await transaction.get('assignments', id)
                 if (!assignment) throw new ApiError('not-found')
                 assertRecordAccess(actor, 'assignments.read', assignment)
-                return presentAssignment(
+                return presentStoredAssignment(
+                    transaction,
                     await resolveAssignmentLabels(transaction, assignment),
                     actor,
                     metadata.generation,
@@ -121,7 +130,7 @@ export class AssignmentRepository {
                     input,
                     hash,
                 })
-                return presentAssignment(assignment, actor, generation)
+                return presentStoredAssignment(transaction, assignment, actor, generation)
             },
             signal,
         )

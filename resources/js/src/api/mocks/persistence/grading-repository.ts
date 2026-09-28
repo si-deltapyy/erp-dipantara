@@ -1,3 +1,4 @@
+import { presentStoredGrading } from './closed-record-presentation'
 import { persistentGradingDownstream } from './grading-downstream-resolver'
 import { parseGradingRevision } from '@/api/contracts/grading-revision'
 import type { GradingDownstream } from '../grading-downstream'
@@ -17,7 +18,7 @@ import { runDemoTransaction } from './transaction'
 import { hashMutationPayload } from './idempotency'
 import { writeGrading } from './grading-mutation'
 import { gradingAssignment, labelGrading } from './grading-context'
-import { gradingAccess, presentGrading, requireGradingPermission } from '../grading-policy'
+import { gradingAccess, requireGradingPermission } from '../grading-policy'
 const readStores: readonly DemoStore[] = [
     'metadata',
     'deliveries',
@@ -60,7 +61,8 @@ export class GradingRepository {
                     )
                         continue
                     records.push(
-                        presentGrading(
+                        await presentStoredGrading(
+                            transaction,
                             labelGrading(grading, assignment),
                             assignment,
                             actor,
@@ -110,7 +112,8 @@ export class GradingRepository {
                 if (!grading) throw new ApiError('not-found')
                 const assignment = await gradingAssignment(transaction, grading.assignmentId)
                 assertRecordAccess(actor, 'gradings.read', gradingAccess(grading, assignment))
-                return presentGrading(
+                return presentStoredGrading(
+                    transaction,
                     labelGrading(grading, assignment),
                     assignment,
                     actor,
@@ -156,7 +159,8 @@ export class GradingRepository {
                     },
                     this.downstream ?? (await persistentGradingDownstream(transaction)),
                 )
-                return presentGrading(
+                return presentStoredGrading(
+                    transaction,
                     grading,
                     await gradingAssignment(transaction, grading.assignmentId),
                     actor,

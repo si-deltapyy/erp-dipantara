@@ -1,3 +1,4 @@
+import { assertOpenPurchaseOrder, orderPurchaseOrderId } from './closed-order-guard'
 import type { Assignment } from '@/core/types/assignment'
 import type { GradingDownstream } from '../grading-downstream'
 import {
@@ -48,6 +49,10 @@ export async function writeGrading(
         actor,
         `gradings.${mutation.action}`,
         previous ? gradingAccess(previous, assignment) : assignment,
+    )
+    await assertOpenPurchaseOrder(
+        transaction,
+        await orderPurchaseOrderId(transaction, assignment.orderId),
     )
     const receiptId = JSON.stringify([actor.id, mutation.action, mutation.id ?? '', mutation.key])
     const receipt = await transaction.get('gradingMutations', receiptId)

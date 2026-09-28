@@ -73,8 +73,9 @@ export function useGradingFormContext(): FormContext {
                       grading.value,
                       route.name === 'grading-revise' ? 'revise' : 'update',
                   )
-                : evaluateRecordAccess(store.user, 'gradings.create', assignment.value) ===
-                  'allowed'),
+                : assignment.value.allowedActions.includes('create-grading') &&
+                  evaluateRecordAccess(store.user, 'gradings.create', assignment.value) ===
+                      'allowed'),
     )
     return { grading, assignment, loading, error, permitted, refresh }
 }

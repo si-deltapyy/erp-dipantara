@@ -1,3 +1,4 @@
+import { assertOpenPurchaseOrder } from './closed-order-guard'
 import { draftInvoiceRevision, archiveInvoiceVersions } from './invoice-revisions'
 import {
     assertInvoiceCredit,
@@ -34,6 +35,10 @@ export async function writeInvoice(
     const previous = stored ? normalizeIssuedInvoice(stored) : undefined
     if (mutation.id && !previous) throw new ApiError('not-found')
     if (previous) assertRecordAccess(actor, `invoices.${mutation.action}`, previous)
+    const purchaseOrderId =
+        previous?.purchaseOrderId ??
+        ('purchaseOrderId' in mutation.input ? mutation.input.purchaseOrderId : '')
+    await assertOpenPurchaseOrder(transaction, purchaseOrderId)
     const receiptId = JSON.stringify([actor.id, mutation.action, mutation.id ?? '', mutation.key])
     const receipt = await transaction.get('invoiceMutations', receiptId)
     if (receipt && receipt.expiresAt > Date.now()) {

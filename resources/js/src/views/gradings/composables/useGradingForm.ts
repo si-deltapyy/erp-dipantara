@@ -39,7 +39,8 @@ export function useGradingForm(
             store.user?.id === actorId &&
             (baseline
                 ? canActOnGrading(store.user, baseline, 'update')
-                : evaluateRecordAccess(store.user, 'gradings.create', assignment) === 'allowed'),
+                : assignment.allowedActions.includes('create-grading') &&
+                  evaluateRecordAccess(store.user, 'gradings.create', assignment) === 'allowed'),
     )
     const form = useMasterForm<GradingInput>({
         resource: 'gradings',

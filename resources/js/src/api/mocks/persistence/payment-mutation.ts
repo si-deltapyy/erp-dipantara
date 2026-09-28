@@ -1,3 +1,4 @@
+import { assertOpenPurchaseOrder } from './closed-order-guard'
 import { reviewPayment } from './payment-review'
 import { parseId } from '@/api/contracts/value-parsers'
 import type { Payment, PaymentInput } from '@/core/types/payment'
@@ -27,6 +28,9 @@ export async function writePayment(
     const previous = mutation.id ? await transaction.get('payments', mutation.id) : undefined
     if (mutation.id && !previous) throw new ApiError('not-found')
     if (previous) assertRecordAccess(actor, `payments.${mutation.action}`, previous)
+    if (previous) await assertOpenPurchaseOrder(transaction, previous.purchaseOrderId)
+    if ('invoiceId' in mutation.input)
+        await paymentInvoice(transaction, actor, mutation.input.invoiceId)
     const receiptId = JSON.stringify([actor.id, mutation.action, mutation.id ?? '', mutation.key])
     const receipt = await transaction.get('paymentMutations', receiptId)
     if (receipt && receipt.expiresAt > Date.now()) {

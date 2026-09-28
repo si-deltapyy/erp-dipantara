@@ -1,3 +1,4 @@
+import { assertOpenPurchaseOrder } from './closed-order-guard'
 import type { SessionUser } from '@/core/types/session'
 import type { DocumentParent } from '@/core/types/document'
 import { ApiError } from '@/core/types/api-error'
@@ -26,6 +27,7 @@ export async function assertDocumentParentAccess(
         assertRecordAccess(actor, 'payments.read', payment)
         assertRecordAccess(actor, `documents.${action}`, payment)
         if (action === 'upload') {
+            await assertOpenPurchaseOrder(transaction, payment.purchaseOrderId)
             if (!['draft', 'rejected'].includes(payment.status)) throw new ApiError('forbidden')
             assertRecordAccess(actor, 'payments.update', payment)
         }
@@ -44,6 +46,8 @@ export async function assertDocumentParentAccess(
         if (!delivery) throw new ApiError('not-found')
         const po = await transaction.get('purchase-orders', delivery.purchaseOrderId)
         if (!po) throw new ApiError('not-found')
+        if (action === 'upload')
+            await assertOpenPurchaseOrder(transaction, delivery.purchaseOrderId)
         const scope = { ...delivery, ownerUserId: po.createdByUserId }
         assertRecordAccess(actor, 'deliveries.read', scope)
         assertRecordAccess(actor, `documents.${action}`, scope)
@@ -59,6 +63,7 @@ export async function assertDocumentParentAccess(
     if (!order) throw new ApiError('not-found')
     assertRecordAccess(actor, 'purchase-orders.read', order)
     assertRecordAccess(actor, `documents.${action}`, order)
+    if (action === 'upload') await assertOpenPurchaseOrder(transaction, order.id)
 }
 export async function assertStoredDocumentAccess(
     transaction: DemoTransaction,

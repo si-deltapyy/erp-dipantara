@@ -1,3 +1,4 @@
+import { presentStoredInvoice } from './closed-record-presentation'
 import type { PurchaseOrderInvoiceSummary } from '@/core/types/invoice-summary'
 import { purchaseOrderInvoiceSummary } from './invoice-summary'
 import { approvedPaymentCredit } from './payment-credit'
@@ -20,7 +21,7 @@ import {
     parseInvoiceRevision,
 } from '@/api/contracts/invoice-input'
 import { evaluateRecordAccess, assertRecordAccess } from '@/core/domain/record-policy'
-import { requireInvoicePermission, presentInvoice } from './invoice-policy'
+import { requireInvoicePermission } from './invoice-policy'
 import { runDemoTransaction } from './transaction'
 import { requireDataset } from './demo-repository'
 import { hashMutationPayload } from './idempotency'
@@ -81,7 +82,8 @@ export class InvoiceRepository {
                         matches
                             .slice((filter.page - 1) * filter.perPage, filter.page * filter.perPage)
                             .map(async (invoice) =>
-                                presentInvoice(
+                                presentStoredInvoice(
+                                    transaction,
                                     invoiceOutstanding(
                                         invoice,
                                         await this.credits(transaction, invoice.id),
@@ -109,7 +111,8 @@ export class InvoiceRepository {
                 const invoice = await transaction.get('invoices', id)
                 if (!invoice) throw new ApiError('not-found')
                 assertRecordAccess(actor, 'invoices.read', invoice)
-                return presentInvoice(
+                return presentStoredInvoice(
+                    transaction,
                     invoiceOutstanding(
                         normalizeIssuedInvoice(invoice),
                         await this.credits(transaction, invoice.id),
@@ -200,7 +203,12 @@ export class InvoiceRepository {
                     }))
                 return [
                     ...versions,
-                    presentInvoice(normalizeIssuedInvoice(current), actor, metadata.generation),
+                    await presentStoredInvoice(
+                        transaction,
+                        normalizeIssuedInvoice(current),
+                        actor,
+                        metadata.generation,
+                    ),
                 ].sort((a, b) => b.revisionNumber - a.revisionNumber)
             },
             signal,
@@ -229,7 +237,8 @@ export class InvoiceRepository {
             async (transaction) => {
                 const metadata = await requireDataset(transaction)
                 if (metadata.generation !== generation) throw new ApiError('conflict')
-                return presentInvoice(
+                return presentStoredInvoice(
+                    transaction,
                     await writeInvoice(
                         transaction,
                         metadata,

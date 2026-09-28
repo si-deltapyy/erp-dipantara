@@ -38,7 +38,8 @@ const permitted = computed(
         !!invoice.value?.issuedRevisionNumber &&
         (editing.value
             ? !!payment.value && canActOnPayment(session.user, payment.value, 'update')
-            : evaluateRecordAccess(session.user, 'payments.create', invoice.value) === 'allowed'),
+            : invoice.value.allowedActions.includes('record-payment') &&
+              evaluateRecordAccess(session.user, 'payments.create', invoice.value) === 'allowed'),
 )
 async function refreshAll(): Promise<void> {
     await refresh()

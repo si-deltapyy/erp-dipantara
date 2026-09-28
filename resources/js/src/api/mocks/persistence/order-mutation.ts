@@ -1,3 +1,4 @@
+import { assertOpenPurchaseOrder } from './closed-order-guard'
 import type { Order, OrderInput } from '@/core/types/order'
 import type { WorkflowVersion, WorkflowRejection } from '@/core/types/workflow'
 import type { SessionUser } from '@/core/types/session'
@@ -25,6 +26,10 @@ export async function writeOrder(
     const previous = mutation.id ? await transaction.get('orders', mutation.id) : undefined
     if (mutation.id && !previous) throw new ApiError('not-found')
     if (previous) assertRecordAccess(actor, `orders.${mutation.action}`, previous)
+    const purchaseOrderId =
+        previous?.purchaseOrderId ??
+        ('purchaseOrderId' in mutation.input ? mutation.input.purchaseOrderId : '')
+    await assertOpenPurchaseOrder(transaction, purchaseOrderId)
     const receiptId = JSON.stringify([actor.id, mutation.action, mutation.id ?? '', mutation.key])
     const receipt = await transaction.get('orderMutations', receiptId)
     if (receipt && receipt.expiresAt > Date.now()) {

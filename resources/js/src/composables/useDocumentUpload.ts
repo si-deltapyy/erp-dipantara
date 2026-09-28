@@ -12,7 +12,7 @@ export function useDocumentUpload(
             parentId: order().id,
             purpose: 'approved_po',
             scope: order(),
-            permitted: true,
+            permitted: order().status !== 'closed',
         }),
         onUploaded,
     )

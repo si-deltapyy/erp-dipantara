@@ -4,6 +4,7 @@ import type { WorkflowWriteOptions, WorkflowVersion, WorkflowRejection } from '.
 import type { PurchaseOrderInvoiceSummary } from './invoice-summary'
 export const closingReasonCodes = [
     'purchase_order_not_approved',
+    'purchase_order_closed',
     'active_request',
     'orders_incomplete',
     'assignments_incomplete',

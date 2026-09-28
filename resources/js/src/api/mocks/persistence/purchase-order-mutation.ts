@@ -1,3 +1,4 @@
+import { assertOpenPurchaseOrder } from './closed-order-guard'
 import { parseId } from '@/api/contracts/value-parsers'
 import type {
     PurchaseOrder,
@@ -43,6 +44,7 @@ export async function writePurchaseOrder(
         if (!previous) throw new ApiError('not-found')
         assertRecordAccess(actor, `purchase-orders.${mutation.action}`, previous)
     }
+    if (previous) await assertOpenPurchaseOrder(transaction, previous.id)
     const receipt = await transaction.get('purchaseOrderMutations', receiptId)
     if (receipt && receipt.expiresAt > Date.now()) {
         if (receipt.payloadHash !== mutation.hash) throw new ApiError('conflict')
