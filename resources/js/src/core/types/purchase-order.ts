@@ -42,6 +42,8 @@ export interface PurchaseOrderRejection {
 export type PurchaseOrderReviewAction = 'approve' | 'reject'
 export interface PurchaseOrderQuery extends MasterListQuery {
     readonly buyerId?: string
+    readonly mitraId?: string
+    readonly graderId?: string
     readonly status?: PurchaseOrderStatus
 }
 export interface PurchaseOrderWriteOptions {

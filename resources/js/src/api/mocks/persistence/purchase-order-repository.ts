@@ -19,6 +19,7 @@ import { hashMutationPayload } from './idempotency'
 import { writePurchaseOrder } from './purchase-order-mutation'
 import type { PurchaseOrderMutation } from './purchase-order-mutation'
 import { resolvePurchaseOrderLabels } from './purchase-order-labels'
+import { relatedPurchaseOrderIds } from './purchase-order-history'
 import type { DemoStore } from './schema'
 
 const readStores: readonly DemoStore[] = [
@@ -26,6 +27,8 @@ const readStores: readonly DemoStore[] = [
     'purchase-orders',
     'buyers',
     'timber-products',
+    'orders',
+    'assignments',
 ]
 export class PurchaseOrderRepository {
     constructor(private readonly options: DatabaseOptions = {}) {}
@@ -49,10 +52,12 @@ export class PurchaseOrderRepository {
                 const labeled = await Promise.all(
                     scoped.map((order) => resolvePurchaseOrderLabels(transaction, order)),
                 )
+                const related = await relatedPurchaseOrderIds(transaction, actor, filter)
                 const search = filter.search.trim().toLocaleLowerCase('id')
                 const matches = labeled
                     .filter(
                         (order) =>
+                            (!related || related.has(order.id)) &&
                             (!filter.buyerId || order.buyerId === filter.buyerId) &&
                             (!filter.status || order.status === filter.status) &&
                             [order.number, order.buyerName].some((value) =>

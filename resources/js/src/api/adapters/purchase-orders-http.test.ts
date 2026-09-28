@@ -28,6 +28,8 @@ test('maps five PO operations, filters, versions, headers and response labels', 
         sort: '-createdAt' as const,
         status: 'draft' as const,
         buyerId: order.buyerId,
+        mitraId: 'demo-mitra-01',
+        graderId: 'demo-grader-01',
     }
     get.mockResolvedValueOnce({ data: { data: [order], meta: { page: 1, perPage: 20, total: 1 } } })
     expect((await api.list(query, signal)).data).toEqual([order])

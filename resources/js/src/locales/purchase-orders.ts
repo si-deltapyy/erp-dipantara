@@ -1,5 +1,6 @@
 export default {
     'purchase-orders': {
+        history: 'Riwayat Buyer',
         title: 'Purchase Order',
         section: 'Pesanan',
         subtitle: 'Ajukan dan pantau pesanan Buyer sesuai akses Anda.',

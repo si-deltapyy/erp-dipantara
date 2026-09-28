@@ -7,6 +7,16 @@ const meta = {
 }
 export const purchaseOrderRoutes: RouteRecordRaw[] = [
     {
+        path: '/reports/buyer-history',
+        name: 'buyer-history',
+        component: () => import('@/views/purchase-orders/PurchaseOrderListPage.vue'),
+        meta: {
+            ...meta,
+            titleKey: 'purchase-orders.history',
+            requiredPermissions: ['reports.read.all'],
+        },
+    },
+    {
         path: '/purchase-orders',
         name: 'purchase-orders',
         component: () => import('@/views/purchase-orders/PurchaseOrderListPage.vue'),

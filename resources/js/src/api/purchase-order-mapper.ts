@@ -142,6 +142,8 @@ export function parsePurchaseOrderQuery(query: PurchaseOrderQuery): PurchaseOrde
         return invalidContract('status')
     return {
         ...parseBuyerQuery(query),
+        ...(query.mitraId ? { mitraId: parseId(query.mitraId, 'mitraId') } : {}),
+        ...(query.graderId ? { graderId: parseId(query.graderId, 'graderId') } : {}),
         ...(query.buyerId ? { buyerId: parseId(query.buyerId, 'buyerId') } : {}),
         ...(query.status ? { status: query.status } : {}),
     }

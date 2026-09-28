@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useSessionStore } from '@/stores/session'
+import { hasBusinessPermission } from '@/core/domain/record-policy'
 import { useI18n } from 'vue-i18n'
 import { purchaseOrderStatuses } from '@/core/types/purchase-order'
 import { usePurchaseOrderList } from './composables/usePurchaseOrderList'
@@ -9,12 +11,15 @@ import AppSelect from '@/components/ui/AppSelect.vue'
 import AppPagination from '@/components/ui/AppPagination.vue'
 import PurchaseOrderLookup from './components/PurchaseOrderLookup.vue'
 const { t } = useI18n()
+const session = useSessionStore()
 const {
     response,
     query,
     search,
     status,
     buyerId,
+    mitraId,
+    graderId,
     sort,
     loading,
     error,
@@ -30,7 +35,15 @@ const {
         <header class="flex flex-wrap items-start justify-between gap-4">
             <div>
                 <p class="text-sm font-semibold text-primary">{{ t('purchase-orders.section') }}</p>
-                <h1 class="mt-1 text-2xl font-bold">{{ t('purchase-orders.title') }}</h1>
+                <h1 class="mt-1 text-2xl font-bold">
+                    {{
+                        t(
+                            $route.name === 'buyer-history'
+                                ? 'purchase-orders.history'
+                                : 'purchase-orders.title',
+                        )
+                    }}
+                </h1>
                 <p class="mt-2 text-sm text-muted">{{ t('purchase-orders.subtitle') }}</p>
             </div>
             <RouterLink
@@ -75,6 +88,20 @@ const {
                         v-model="buyerId"
                         kind="buyer"
                         :label="t('purchase-orders.buyerFilter')"
+                    />
+                    <PurchaseOrderLookup
+                        v-if="hasBusinessPermission(session.user, 'mitras.lookup')"
+                        id="po-filter-mitra"
+                        v-model="mitraId"
+                        kind="mitra"
+                        :label="t('mitras.title')"
+                    />
+                    <PurchaseOrderLookup
+                        v-if="hasBusinessPermission(session.user, 'graders.lookup')"
+                        id="po-filter-grader"
+                        v-model="graderId"
+                        kind="grader"
+                        :label="t('graders.title')"
                     />
                     <AppSelect
                         id="po-sort"

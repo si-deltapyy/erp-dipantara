@@ -17,6 +17,8 @@ interface PurchaseOrderListState {
     search: Ref<string>
     status: Ref<string>
     buyerId: Ref<string>
+    mitraId: Ref<string>
+    graderId: Ref<string>
     sort: Ref<string>
     loading: Ref<boolean>
     error: Ref<string>
@@ -39,6 +41,12 @@ export function usePurchaseOrderList(): PurchaseOrderListState {
         search: typeof route.query.search === 'string' ? route.query.search.slice(0, 200) : '',
         sort: route.query.sort === 'createdAt' ? 'createdAt' : '-createdAt',
         status: purchaseOrderStatuses.find((status) => status === route.query.status),
+        mitraId:
+            typeof route.query.mitraId === 'string' ? route.query.mitraId.slice(0, 100) : undefined,
+        graderId:
+            typeof route.query.graderId === 'string'
+                ? route.query.graderId.slice(0, 100)
+                : undefined,
         buyerId:
             typeof route.query.buyerId === 'string' && route.query.buyerId.length <= 100
                 ? route.query.buyerId
@@ -46,6 +54,8 @@ export function usePurchaseOrderList(): PurchaseOrderListState {
     }))
     const search = ref(query.value.search)
     const status = ref(query.value.status ?? '')
+    const mitraId = ref(query.value.mitraId ?? '')
+    const graderId = ref(query.value.graderId ?? '')
     const buyerId = ref(query.value.buyerId ?? '')
     const sort = ref(query.value.sort)
     const response = shallowRef<PageResponse<PurchaseOrder>>()
@@ -85,6 +95,8 @@ export function usePurchaseOrderList(): PurchaseOrderListState {
                 search: search.value.trim() || undefined,
                 status: status.value || undefined,
                 buyerId: buyerId.value || undefined,
+                mitraId: mitraId.value || undefined,
+                graderId: graderId.value || undefined,
                 sort: sort.value,
             },
         })
@@ -95,6 +107,8 @@ export function usePurchaseOrderList(): PurchaseOrderListState {
             search.value = query.value.search
             status.value = query.value.status ?? ''
             buyerId.value = query.value.buyerId ?? ''
+            mitraId.value = query.value.mitraId ?? ''
+            graderId.value = query.value.graderId ?? ''
             sort.value = query.value.sort
             void refresh()
         },
@@ -111,6 +125,8 @@ export function usePurchaseOrderList(): PurchaseOrderListState {
         search,
         status,
         buyerId,
+        mitraId,
+        graderId,
         sort,
         loading,
         error,

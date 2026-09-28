@@ -6,6 +6,13 @@ export interface NavigationEntry extends AccessRule {
     readonly icon: 'home' | 'flask' | 'layers'
 }
 export const navigation: readonly NavigationEntry[] = [
+    {
+        name: 'buyer-history',
+        label: 'purchase-orders.history',
+        icon: 'layers',
+        requiredPermissions: ['reports.read.all'],
+        anyPermissions: ['purchase-orders.read.all', 'purchase-orders.read.own'],
+    },
     { name: 'closings', label: 'closings.title', icon: 'layers', ...accessRules.closings },
     { name: 'home', label: 'navigation.home', icon: 'home', ...accessRules.home },
     {

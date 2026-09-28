@@ -2,7 +2,7 @@
 import MasterLookup from '@/views/master-data/components/MasterLookup.vue'
 defineProps<{
     id: string
-    kind: 'buyer' | 'timber'
+    kind: 'buyer' | 'timber' | 'mitra' | 'grader'
     label: string
     modelValue: string
     selectedLabel?: string
