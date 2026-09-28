@@ -46,7 +46,6 @@ export async function purchaseOrderInvoiceSummary(
     purchaseOrderId: string,
     credits: InvoiceCreditResolver,
 ): Promise<PurchaseOrderInvoiceSummary> {
-    const operationalDate = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' })
     const invoices = (await transaction.list('invoices'))
         .map(normalizeIssuedInvoice)
         .filter(
@@ -55,6 +54,15 @@ export async function purchaseOrderInvoiceSummary(
                 !!invoice.issuedRevisionNumber &&
                 evaluateRecordAccess(actor, 'invoices.read', invoice) === 'allowed',
         )
+    return aggregateInvoiceSummary(transaction, purchaseOrderId, invoices, credits)
+}
+export async function aggregateInvoiceSummary(
+    transaction: DemoTransaction,
+    purchaseOrderId: string,
+    invoices: readonly Invoice[],
+    credits: InvoiceCreditResolver,
+): Promise<PurchaseOrderInvoiceSummary> {
+    const operationalDate = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' })
     const balances: IssuedBalance[] = []
     for (const invoice of invoices)
         balances.push({

@@ -1,3 +1,4 @@
+import closings from './closings'
 import payments from './payments'
 import invoices from './invoices'
 import deliveries from './deliveries'
@@ -26,6 +27,7 @@ export const i18n = createI18n({
             ...orders,
             ...invoices,
             ...payments,
+            ...closings,
             ...deliveries,
             ...gradings,
             ...assignments,

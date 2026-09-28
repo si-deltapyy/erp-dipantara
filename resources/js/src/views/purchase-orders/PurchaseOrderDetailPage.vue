@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ClosingEligibilityPanel from '@/views/closing/components/ClosingEligibilityPanel.vue'
 import PurchaseOrderInvoiceSummary from '@/views/invoices/components/PurchaseOrderInvoiceSummary.vue'
 import { evaluateRecordAccess } from '@/core/domain/record-policy'
 import { computed, reactive } from 'vue'
@@ -57,6 +58,10 @@ const canEdit = computed(
             <AppButton @click="refresh">{{ t('purchase-orders.refresh') }}</AppButton>
         </div>
         <template v-else-if="order">
+            <ClosingEligibilityPanel
+                v-if="session.user?.permissions.includes('closings.read.all')"
+                :purchase-order-id="order.id"
+            />
             <PurchaseOrderInvoiceSummary
                 v-if="evaluateRecordAccess(session.user, 'invoices.read', order) === 'allowed'"
                 :purchase-order-id="order.id"
