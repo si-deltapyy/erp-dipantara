@@ -8,7 +8,7 @@ import { i18n } from '@/locales'
 
 const routes: RouteRecordRaw[] = [
     {
-        path: '/',
+        path: '/app/',
         name: 'home',
         component: () => import('@/views/home/HomePage.vue'),
         meta: {
@@ -29,7 +29,7 @@ routes.push({
 })
 
 export const router = createRouter({
-    history: createWebHistory('/dipantara/'),
+    history: createWebHistory('/'),
     routes,
     scrollBehavior: () => ({ top: 0 }),
 })

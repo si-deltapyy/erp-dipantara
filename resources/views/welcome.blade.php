@@ -88,15 +88,15 @@
                 <div class="hidden md:flex items-center space-x-4">
                     @if (Route::has('login'))
                         @auth
-                            <a href="{{ url('/dashboard') }}" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-accent to-amber-700 text-white font-semibold hover:shadow-lg hover:shadow-brand-accent/30 hover:-translate-y-0.5 transition-all duration-200">
+                            <a href="/app" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-accent to-amber-700 text-white font-semibold hover:shadow-lg hover:shadow-brand-accent/30 hover:-translate-y-0.5 transition-all duration-200">
                                 Dashboard ERP &rarr;
                             </a>
                         @else
-                            <a href="{{ route('login') }}" class="px-5 py-2.5 rounded-xl text-emerald-200 font-medium hover:text-white hover:bg-white/5 transition duration-200">
+                            <a href="/auth/login" class="px-5 py-2.5 rounded-xl text-emerald-200 font-medium hover:text-white hover:bg-white/5 transition duration-200">
                                 Log in
                             </a>
                             @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="px-6 py-2.5 rounded-xl bg-brand-accent hover:bg-amber-800 text-white font-semibold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
+                                <a href="/auth/register" class="px-6 py-2.5 rounded-xl bg-brand-accent hover:bg-amber-800 text-white font-semibold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
                                     Akses Sistem
                                 </a>
                             @endif

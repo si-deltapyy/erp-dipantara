@@ -19,8 +19,9 @@ use App\Http\Controllers\GraderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RekeningController;
 use App\Http\Controllers\BankAccountNumberController;
+use App\Http\Controllers\Api\Auth\SocialiteController;
 
-Route::prefix('api/v1')->middleware('auth')->group(function () {
+Route::prefix('api/v1')->group(function () {
 
     // --- DASHBOARD ---
     Route::get('/dashboard', [Dashboard::class, 'index']); // Atau method dashboard yang sesuai
@@ -63,4 +64,7 @@ Route::prefix('api/v1')->middleware('auth')->group(function () {
     // --- USER PROFILE ---
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::put('/profile', [ProfileController::class, 'update']);
+
+    Route::get('/auth/google', [SocialiteController::class, 'redirectToGoogle']);
+    Route::get('/auth/google/callback', [SocialiteController::class, 'handleGoogleCallback']);
 });
