@@ -1,6 +1,6 @@
 import { onScopeDispose, ref } from 'vue'
 import type { Ref } from 'vue'
-import { onBeforeRouteLeave } from 'vue-router'
+import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 
 interface UnsavedChanges {
     readonly confirming: Ref<boolean>
@@ -24,14 +24,16 @@ export function useUnsavedChanges(dirty: () => boolean, pending: () => boolean):
             if (accepted) action()
         }
     }
-    onBeforeRouteLeave(() => {
+    function guardNavigation(): boolean | Promise<boolean> {
         if (pending()) return false
         if (!dirty()) return true
         confirming.value = true
         return new Promise<boolean>((resolve) => {
             decision = resolve
         })
-    })
+    }
+    onBeforeRouteLeave(guardNavigation)
+    onBeforeRouteUpdate(guardNavigation)
     const beforeUnload = (event: BeforeUnloadEvent): void => {
         if (!dirty() && !pending()) return
         event.preventDefault()

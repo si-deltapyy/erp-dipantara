@@ -1,14 +1,33 @@
+import { reportRoutes } from './reports'
+import { closingRoutes } from './closing'
+import { paymentRoutes } from './payments'
+import { invoiceRoutes } from './invoices'
+import { deliveryRoutes } from './deliveries'
+import { gradingRoutes } from './gradings'
+import { orderRoutes } from './orders'
+import { assignmentRoutes } from './assignments'
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import type { DevelopmentCapability } from '@/core/types/session'
 import { accessRules } from './access-rules'
 import { authRoutes } from './auth-routes'
+import { purchaseOrderRoutes } from './purchase-orders'
 import { masterDataRoutes } from './master-data'
 import { i18n } from '@/locales'
 
 const routes: RouteRecordRaw[] = [
     {
-        path: '/app',
+        path: '/dashboard/queue',
+        name: 'dashboard-queue',
+        component: () => import('@/views/home/DashboardQueuePage.vue'),
+        meta: {
+            titleKey: 'dashboard.queueTitle',
+            requiresAuth: true,
+            requiredPermissions: ['dashboard.read.all'],
+        },
+    },
+    {
+        path: '/',
         name: 'home',
         component: () => import('@/views/home/HomePage.vue'),
         meta: {
@@ -19,7 +38,19 @@ const routes: RouteRecordRaw[] = [
     },
 ]
 
-routes.push(...authRoutes, ...masterDataRoutes)
+routes.push(
+    ...reportRoutes,
+    ...closingRoutes,
+    ...paymentRoutes,
+    ...invoiceRoutes,
+    ...deliveryRoutes,
+    ...gradingRoutes,
+    ...assignmentRoutes,
+    ...orderRoutes,
+    ...authRoutes,
+    ...masterDataRoutes,
+    ...purchaseOrderRoutes,
+)
 
 routes.push({
     path: '/:pathMatch(.*)*',
@@ -35,7 +66,7 @@ export const router = createRouter({
 })
 
 router.afterEach((route) => {
-    document.title = `${i18n.global.t(route.meta.titleKey ?? 'brand.name')} · WoodFlow`
+    document.title = `${i18n.global.t(route.meta.titleKey ?? 'brand.name')} Â· WoodFlow`
 })
 
 declare module 'vue-router' {
@@ -44,6 +75,7 @@ declare module 'vue-router' {
         layout?: 'auth' | 'app'
         requiresAuth?: boolean
         requiredPermissions?: readonly string[]
+        anyPermissions?: readonly string[]
         developmentCapability?: DevelopmentCapability
     }
 }

@@ -39,18 +39,19 @@ function watchSessionRoute(router: Router, store: ReturnType<typeof useSessionSt
             if (store.status === 'guest')
                 void router.replace({
                     name: 'login',
-                    query: { expired: '1', returnTo: '/app' + route.fullPath },
+                    query: { expired: '1', returnTo: '/dipantara' + route.fullPath },
                 })
             else if (store.status === 'error')
                 void router.replace({
                     name: 'session-error',
-                    query: { returnTo: '/app' + route.fullPath },
+                    query: { returnTo: '/dipantara' + route.fullPath },
                 })
             else if (
                 !canAccess(
                     store.user,
                     route.meta.requiredPermissions ?? [],
                     route.meta.developmentCapability,
+                    route.meta.anyPermissions,
                 )
             )
                 void router.replace({ name: 'forbidden' })

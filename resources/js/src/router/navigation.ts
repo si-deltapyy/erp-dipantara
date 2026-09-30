@@ -6,8 +6,53 @@ export interface NavigationEntry extends AccessRule {
     readonly icon: 'home' | 'flask' | 'layers'
 }
 export const navigation: readonly NavigationEntry[] = [
+    {
+        name: 'purchase-price-report',
+        label: 'reports.prices',
+        icon: 'layers',
+        requiredPermissions: ['reports.read.all', 'timber-prices.read.all'],
+    },
+    {
+        name: 'production-report',
+        label: 'production.title',
+        icon: 'layers',
+        requiredPermissions: [],
+        anyPermissions: ['reports.read.all', 'reports.read.assigned'],
+    },
+    {
+        name: 'buyer-history',
+        label: 'purchase-orders.history',
+        icon: 'layers',
+        requiredPermissions: ['reports.read.all'],
+        anyPermissions: ['purchase-orders.read.all', 'purchase-orders.read.own'],
+    },
+    { name: 'closings', label: 'closings.title', icon: 'layers', ...accessRules.closings },
     { name: 'home', label: 'navigation.home', icon: 'home', ...accessRules.home },
+    {
+        name: 'purchase-orders',
+        label: 'purchase-orders.title',
+        icon: 'layers',
+        ...accessRules['purchase-orders'],
+    },
+    { name: 'payments', label: 'payments.title', icon: 'layers', ...accessRules.payments },
+    { name: 'invoices', label: 'invoices.title', icon: 'layers', ...accessRules.invoices },
+    { name: 'deliveries', label: 'deliveries.title', icon: 'layers', ...accessRules.deliveries },
+    { name: 'gradings', label: 'gradings.title', icon: 'layers', ...accessRules.gradings },
+    { name: 'orders', label: 'orders.title', icon: 'layers', ...accessRules.orders },
+    {
+        name: 'assignments',
+        label: 'assignments.assignedTitle',
+        icon: 'layers',
+        ...accessRules.assignments,
+    },
+    { name: 'graders', label: 'graders.title', icon: 'layers', ...accessRules.graders },
     { name: 'mitras', label: 'mitras.title', icon: 'layers', ...accessRules.mitras },
+    {
+        name: 'bank-accounts',
+        label: 'bank-accounts.title',
+        icon: 'layers',
+        ...accessRules['bank-accounts'],
+    },
     {
         name: 'timber-products',
         label: 'timber-products.title',

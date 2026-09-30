@@ -1,0 +1,1 @@
+function i(e){return!!e?.permissions.includes("invoices.create.all")}function c(e,n,s){return n.status===(s==="revise"?"issued":"draft")&&n.allowedActions.includes(s)&&!!e?.permissions.includes(`invoices.${s}.all`)}export{i as a,c};

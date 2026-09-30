@@ -14,6 +14,7 @@ export function loginDestination(
             user,
             destination.meta.requiredPermissions ?? [],
             destination.meta.developmentCapability,
+            destination.meta.anyPermissions,
         )
     if (allowed) return destination.fullPath
     return canAccess(user, []) ? '/' : '/forbidden'

@@ -22,12 +22,17 @@ interface MasterListSource<T> {
     list(query: MasterListQuery, signal: AbortSignal): Promise<PageResponse<T>>
     subscribe(listener: () => void): () => void
 }
-export function useMasterList<T>(api: MasterListSource<T>, resource: string): MasterListState<T> {
+export function useMasterList<T>(
+    api: MasterListSource<T>,
+    resource: string,
+    filters: () => Record<string, string | undefined> = () => ({}),
+): MasterListState<T> {
     const session = useSession()
     const store = useSessionStore()
     const route = useRoute()
     const router = useRouter()
     const query = computed<MasterListQuery>(() => ({
+        ...filters(),
         page: validPage(route.query.page),
         perPage: 20,
         search: typeof route.query.search === 'string' ? route.query.search.slice(0, 200) : '',
@@ -67,10 +72,12 @@ export function useMasterList<T>(api: MasterListSource<T>, resource: string): Ma
         await router.replace({ query: { ...route.query, page: page === 1 ? undefined : page } })
     }
     async function searchRecords(): Promise<void> {
-        await router.replace({ query: { search: search.value.trim() || undefined } })
+        await router.replace({
+            query: { ...route.query, page: undefined, search: search.value.trim() || undefined },
+        })
     }
     watch(
-        () => [query.value.page, query.value.search, store.user],
+        () => [query.value, store.user],
         () => {
             search.value = query.value.search
             void refresh()

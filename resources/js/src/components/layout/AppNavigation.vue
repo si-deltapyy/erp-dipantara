@@ -5,15 +5,19 @@ import { canAccess } from '@/core/domain/access-policy'
 import { navigation } from '@/router/navigation'
 import { useI18n } from 'vue-i18n'
 import AppIcon from '@/components/ui/AppIcon.vue'
-import { mockEnabled } from '@/core/constants/environment'
 
 defineEmits<{ navigate: [] }>()
 const { t } = useI18n()
 const store = useSessionStore()
 const links = computed(() =>
     navigation.filter((entry) => {
-        if (!mockEnabled && entry.developmentCapability) return false
-        return canAccess(store.user, entry.requiredPermissions, entry.developmentCapability)
+        if (entry.developmentCapability) return false
+        return canAccess(
+            store.user,
+            entry.requiredPermissions,
+            entry.developmentCapability,
+            entry.anyPermissions,
+        )
     }),
 )
 </script>
