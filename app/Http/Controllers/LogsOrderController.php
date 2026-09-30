@@ -9,7 +9,7 @@ class LogsOrderController extends Controller
 {
     public function index(): JsonResponse
     {
-        $logs = LogsOrder::with('order')->latest()->get();
+        $logs = LogsOrder::with('order', 'logPayment')->latest()->get();
         return response()->json(['status' => 'success', 'data' => $logs]);
     }
 
@@ -17,8 +17,8 @@ class LogsOrderController extends Controller
     {
         $validated = $request->validate([
             'order_id' => 'required|exists:orders,id',
-            'status' => 'required|string',
-            'description' => 'required|string'
+            'pre_order_id' => 'required|exists:pre_orders,id',
+            'log_payment_id' => 'required|exists:logs_payments,id',
         ]);
 
         $log = LogsOrder::create($validated);

@@ -8,7 +8,7 @@ import { i18n } from '@/locales'
 
 const routes: RouteRecordRaw[] = [
     {
-        path: '/app/',
+        path: '/app',
         name: 'home',
         component: () => import('@/views/home/HomePage.vue'),
         meta: {

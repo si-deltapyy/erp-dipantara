@@ -36,10 +36,47 @@ class Dashboard extends Controller
         $poMenungguDp = PreOrders::where('pre_order_status', 'pending')->count();
         $poDalamProses = PreOrders::where('pre_order_status', 'on_process')->count();
         $poMenungguPelunasan = PreOrders::where('pre_order_status', 'delivered')->count();
+        $countDebtorsToMitra = Invoice::whereHas('transaction', function ($query) {
+                $query->where('status_payment', 'unpaid')
+                    ->where('type_invoice', 'invoice_in');
+            })
+            ->with(['transaction.logPayments']) 
+            ->get()
+            ->sum(function ($invoice) {
+                return $invoice->transaction ? $invoice->transaction->logPayments->sum('payment_amount') : 0;
+            });
 
-        // $pemasukan = LogsPayment::where('type', 'masuk')->sum('payment_amount');
-        // $pengeluaran = LogsPayment::where('type', 'keluar')->sum('payment_amount');
-        // $netCashflow = $pemasukan - $pengeluaran;
+        $countDebtorsFromBuyer = Invoice::whereHas('transaction', function ($query) {
+                $query->where('status_payment', 'unpaid')
+                    ->where('type_invoice', 'invoice_outstanding');
+            })
+            ->with(['transaction.logPayments'])
+            ->get()
+            ->sum(function ($invoice) {
+                return $invoice->transaction ? $invoice->transaction->logPayments->sum('payment_amount') : 0;
+            });
+
+        $pemasukan = Invoice::whereHas('transaction', function ($query) {
+                $query->where('status_payment', 'paid')
+                    ->where('type_invoice', 'invoice_in');
+            })
+            ->with(['transaction.logPayments']) 
+            ->get()
+            ->sum(function ($invoice) {
+                return $invoice->transaction ? $invoice->transaction->logPayments->sum('payment_amount') : 0;
+            });
+
+        $pengeluaran = Invoice::whereHas('transaction', function ($query) {
+                $query->where('status_payment', 'paid')
+                    ->where('type_invoice', 'invoice_outstanding');
+            })
+            ->with(['transaction.logPayments'])
+            ->get()
+            ->sum(function ($invoice) {
+                return $invoice->transaction ? $invoice->transaction->logPayments->sum('payment_amount') : 0;
+            });
+
+        $netCashflow = $pemasukan - $pengeluaran;
 
         return response()->json([
             'status' => 'success',
@@ -49,9 +86,13 @@ class Dashboard extends Controller
                     'po_menunggu_dp' => $poMenungguDp,
                     'po_dalam_proses' => $poDalamProses,
                     'po_menunggu_pelunasan' => $poMenungguPelunasan,
-                    // 'pemasukan' => $pemasukan,
-                    // 'pengeluaran' => $pengeluaran,
-                    // 'net_cashflow' => $netCashflow
+                    'total_piutang' => $countDebtorsToMitra,
+                    'total_hutang' => $countDebtorsFromBuyer,
+                ],
+                'cashflow' => [
+                    'pemasukan' => $pemasukan,
+                    'pengeluaran' => $pengeluaran,
+                    'net' => $netCashflow
                 ]
             ]
         ]);

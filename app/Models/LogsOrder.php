@@ -8,6 +8,12 @@ class LogsOrder extends Model
 {
     public $table = 'logs_orders';
 
+    protected $fillable = [
+        'order_id',
+        'pre_order_id',
+        'log_payment_id',
+    ];
+
     function order()
     {
         return $this->belongsTo(Order::class, 'order_id');

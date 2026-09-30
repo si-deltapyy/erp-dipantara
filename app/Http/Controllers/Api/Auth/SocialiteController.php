@@ -110,41 +110,33 @@ class SocialiteController extends Controller
         try {
             $googleUser = Socialite::driver('google')->stateless()->user();
 
-            // 1. Cari user berdasarkan google_id atau email
+            // 1. Cari atau buat user (Kode Anda sudah benar)
             $user = User::where('google_id', $googleUser->id)
                 ->orWhere('email', $googleUser->email)
                 ->first();
 
             if (!$user) {
-                // 2. Buat user baru jika belum terdaftar
                 $user = User::create([
                     'name' => $googleUser->name,
                     'email' => $googleUser->email,
                     'google_id' => $googleUser->id,
                     'google_token' => $googleUser->token,
-                    'password' => null, // Login SSO Google tidak butuh password
+                    'password' => null,
                 ]);
 
-                // 3. Tetapkan Role Default dari Spatie Laravel-Permission
-                // Pastikan Role 'buyer' atau 'user' sudah ada di database/Seeder
                 $defaultRole = Role::firstOrCreate(['name' => 'buyer', 'guard_name' => 'web']);
                 $user->assignRole($defaultRole);
             } else {
-                // Update google_id & token jika user sebelumnya mendaftar via email biasa
                 $user->update([
                     'google_id' => $googleUser->id,
                     'google_token' => $googleUser->token,
                 ]);
             }
 
-            // 4. Generate Token Sanctum untuk Rest API (Gunakan jika SPA/Vue3)
             $token = $user->createToken('auth_token')->plainTextToken;
 
-            // Ambil daftar roles & permissions spatie
-            $roles = $user->getRoleNames(); // Returns collection of role names
-            $permissions = $user->getAllPermissions()->pluck('name');
-
-            return redirect()->away(env('FRONTEND_URL') . '/auth/callback?token=' . $token . '&token_type=Bearer');
+            $frontendUrl = rtrim(env('FRONTEND_URL', 'http://127.0.0.1:8000'), '/');
+            return redirect()->away('http://127.0.0.1:8000?token=' . $token . '&token_type=Bearer');
 
         } catch (\Exception $e) {
             return response()->json([
@@ -153,4 +145,5 @@ class SocialiteController extends Controller
             ], 500);
         }
     }
+
 }

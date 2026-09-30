@@ -4,14 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Rekening;
 use Illuminate\Http\Request;
-use App\Models\BankAccountNumber;
 use Illuminate\Http\JsonResponse;
 
 class RekeningController extends Controller
 {
    public function index(): JsonResponse
     {
-        return response()->json(['status' => 'success', 'data' => BankAccountNumber::all()]);
+        return response()->json(['status' => 'success', 'data' => Rekening::all()]);
     }
 
     /**

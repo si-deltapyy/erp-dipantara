@@ -10,22 +10,19 @@ class GradingController extends Controller
 {
     public function index(): JsonResponse
     {
-        $gradings = Grading::with(['order.mitra', 'order.grader.user', 'product'])->get();
+        $gradings = Grading::with(['preOrder', 'product', 'mitra', 'grader'])->latest()->get();
         return response()->json(['status' => 'success', 'data' => $gradings]);
     }
 
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'order_id' => 'required|exists:orders,id',
+            'pre_order_id' => 'required|exists:pre_orders,id',
+            'mitra_id' => 'required|exists:mitras,id',
+            'grader_id' => 'required|exists:graders,id',
             'product_id' => 'required|exists:products,id',
-            'length' => 'required|numeric',
-            'diameter' => 'required|numeric',
-            'volume' => 'required|numeric',
-            'quality' => 'required|string',
-            'buy_price' => 'required|integer',
-            'sell_price' => 'required|integer',
-            'notes' => 'nullable|string'
+            'grading_date' => 'required|date',
+            'note' => 'nullable|string'
         ]);
 
         $grading = Grading::create($validated);

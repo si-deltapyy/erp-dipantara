@@ -7,31 +7,25 @@ use Illuminate\Database\Eloquent\Model;
 class Transaction extends Model
 {
     protected $fillable = [
-        'buyer_id',
-        'invoice_id',
-        'rekening_id',
-        'bank_account_number_id',
-        'amount',
-        'status',
+        'pre_order_id',
+        'order_id',
+        'log_payment_id',
+        'status_payment',
+        'note',
     ];
 
-    function buyer()
+    function preOrder()
     {
-        return $this->belongsTo(Buyer::class);
+        return $this->belongsTo(PreOrders::class, 'pre_order_id');
     }
 
-    function invoice()
+    function order()
     {
-        return $this->belongsTo(Invoice::class);
+        return $this->belongsTo(Order::class, 'order_id');
     }
 
-    function rekening()
+    function logPayments()
     {
-        return $this->belongsTo(Rekening::class);
-    }
-
-    function bankAccountNumber()
-    {
-        return $this->belongsTo(BankAccountNumber::class);
+        return $this->belongsTo(LogsPayment::class, 'log_payment_id');
     }
 }

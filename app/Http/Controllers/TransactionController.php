@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PreOrders;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -10,8 +11,8 @@ class TransactionController extends Controller
 {
     public function index(): JsonResponse
     {
-        $closingList = PreOrders::with(['buyer', 'orders.mitra', 'invoices.logsPayments'])->get();
-        return response()->json(['status' => 'success', 'data' => $closingList]);
+        $transactions = Transaction::with('preOrder', 'order', 'logPayment')->latest()->get();
+        return response()->json(['status' => 'success', 'data' => $transactions]);
     }
 
     public function closePo(Request $request, $id): JsonResponse

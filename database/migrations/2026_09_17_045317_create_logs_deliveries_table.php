@@ -13,13 +13,14 @@ return new class extends Migration
     {
         Schema::create('logs_deliveries', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('pre_order_id')->unsigned();
-            $table->bigInteger('mitra_id')->unsigned();
-            $table->bigInteger('grader_id')->unsigned();
+            $table->foreignId('pre_order_id')->constrained('pre_orders')->onDelete('cascade');
+            $table->foreignId('mitra_id')->constrained('mitras')->onDelete('cascade');
+            $table->foreignId('grader_id')->constrained('gradings')->onDelete('cascade');
             $table->string('SAKR_number_to_buyer')->nullable();
             $table->string('SAKR_number_to_company')->nullable();
             $table->date('delivery_date');
             $table->string('car_plate_number');
+            $table->enum('delivery_status', ['pending', 'delivered', 'cancelled', 'returned', 'in_transit', 'on_the_way'])->default('pending');
             $table->string('note')->nullable();
             $table->timestamps();
         });
