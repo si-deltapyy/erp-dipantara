@@ -1,6 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { accessRules } from '../access-rules'
 const meta = {
+    featureUnavailable: true,
     titleKey: 'invoices.title',
     requiresAuth: true,
     ...accessRules['invoices'],
@@ -16,7 +17,7 @@ export const invoiceRoutes: RouteRecordRaw[] = [
         path: '/invoices',
         name: 'invoices',
         component: () => import('@/views/invoices/InvoiceListPage.vue'),
-        meta,
+        meta: { ...meta, featureUnavailable: false },
     },
     {
         path: '/invoices/new',

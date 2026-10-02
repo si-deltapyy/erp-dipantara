@@ -1,0 +1,1 @@
+import{T as r}from"./main-Cm2MPYco.js";import{f as t}from"./runtime-dom.esm-bundler-vX6VNcEy.js";function i(){const o=t(r);if(!o)throw new Error("Documents API is not configured");return o}export{i as u};

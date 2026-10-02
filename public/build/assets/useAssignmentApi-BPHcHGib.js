@@ -1,1 +1,0 @@
-import{I as s}from"./main-BRmp8mMi.js";import{f as i}from"./runtime-dom.esm-bundler-vX6VNcEy.js";function o(){const n=i(s);if(!n)throw new Error("Assignments API is not configured");return n}export{o as u};
