@@ -1,12 +1,9 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { canReadPrices } from '@/core/domain/record-policy'
-import { computed, ref, shallowRef } from 'vue'
-import { useI18n } from 'vue-i18n'
-import type { TimberProduct } from '@/core/types/timber-product'
 import { useSessionStore } from '@/stores/session'
-import { useTimberProductRecoveryStore } from '@/stores/timber-product-recovery'
+import { useI18n } from 'vue-i18n'
 import { useTimberProductList } from './composables/useTimberProductList'
-import TimberProductEditor from './components/TimberProductEditor.vue'
 import TimberProductTable from './components/TimberProductTable.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
@@ -15,43 +12,9 @@ import AppPageHeader from '@/components/ui/AppPageHeader.vue'
 import AppPanel from '@/components/ui/AppPanel.vue'
 const { t } = useI18n()
 const session = useSessionStore()
-const recovery = useTimberProductRecoveryStore()
-const {
-    response,
-    query,
-    search,
-    loading,
-    error,
-    canCreate: canCreateRecord,
-    refresh,
-    searchTimberProducts,
-    changePage,
-} = useTimberProductList()
 const canReadPrice = computed(() => canReadPrices(session.user))
-const canCreate = computed(() => canCreateRecord.value && canReadPrice.value)
-const canUpdate = computed(
-    () => canReadPrice.value && !!session.user?.permissions.includes('timber-products.update.all'),
-)
-const recovered = recovery.snapshot?.actorId === session.user?.id ? recovery.snapshot : null
-const editing = ref(!!recovered)
-const selected = shallowRef<TimberProduct | undefined>(recovered?.timberProduct)
-const success = ref(false)
-function open(timberProduct?: TimberProduct): void {
-    selected.value = timberProduct
-    success.value = false
-    editing.value = true
-}
-function saved(): void {
-    editing.value = false
-    selected.value = undefined
-    success.value = true
-    void refresh()
-}
-function close(): void {
-    editing.value = false
-    selected.value = undefined
-    recovery.$reset()
-}
+const { response, query, search, loading, error, refresh, searchTimberProducts, changePage } =
+    useTimberProductList()
 </script>
 <template>
     <section class="space-y-6">
@@ -60,18 +23,13 @@ function close(): void {
             :description="t('timber-products.subtitle')"
         >
             <template #actions
-                ><AppButton v-if="canCreate" @click="open()">{{
+                ><AppButton disabled :title="t('ui.writeUnavailable')">{{
                     t('timber-products.add')
                 }}</AppButton></template
             >
         </AppPageHeader>
-        <p
-            v-if="success"
-            role="status"
-            class="rounded-md border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary"
-        >
-            {{ t('timber-products.saved') }}
-        </p>
+        <p role="status" class="text-sm text-muted">{{ t('ui.writeUnavailable') }}</p>
+        <p class="text-sm text-muted">{{ t('timber-products.unitsUnconfirmed') }}</p>
         <AppPanel :title="t('timber-products.list')" class="space-y-5">
             <template #actions
                 ><span v-if="response" class="text-sm text-muted">{{
@@ -101,11 +59,9 @@ function close(): void {
 
             <p v-if="error" role="alert" class="text-sm text-danger">{{ t(error) }}</p>
             <TimberProductTable
+                :can-read-prices="canReadPrice"
                 :timber-products="response?.data ?? []"
                 :state="loading ? 'loading' : error ? 'error' : 'ready'"
-                :can-update="canUpdate"
-                :can-read-prices="canReadPrice"
-                @edit="open"
                 @retry="refresh"
             />
             <template #footer
@@ -119,11 +75,5 @@ function close(): void {
                     @update:page="changePage"
             /></template>
         </AppPanel>
-        <TimberProductEditor
-            v-if="editing && (selected ? canUpdate : canCreate)"
-            :timber-product="selected"
-            @close="close"
-            @saved="saved"
-        />
     </section>
 </template>

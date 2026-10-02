@@ -1,5 +1,6 @@
 import type {
     TimberProduct,
+    TimberProductRecord,
     TimberProductInput,
     TimberProductUpdate,
     TimberSpecification,
@@ -15,6 +16,9 @@ import { parseTimestamp } from './contracts/timestamp-parser'
 import {
     invalidContract,
     parseId,
+    parseNumericId,
+    parseNumericDecimal,
+    parseNumericMoney,
     parseInteger,
     parseObject,
     parseString,
@@ -96,5 +100,23 @@ export function parseTimberProduct(value: unknown): TimberProduct {
         id: parseId(record.id),
         createdAt: parseTimestamp(record.createdAt, 'createdAt'),
         updatedAt: parseTimestamp(record.updatedAt, 'updatedAt'),
+    }
+}
+
+export function parseTimberProductRecord(value: unknown): TimberProductRecord {
+    const product = parseObject(value, 'product')
+    return {
+        id: parseNumericId(product.id),
+        name: parseString(product.name, 'name'),
+        type: parseString(product.type, 'type'),
+        grade: parseString(product.grade, 'grade'),
+        dimensionLength: parseNumericDecimal(product.dimension_length, 'dimension_length'),
+        dimensionWidth: parseNumericDecimal(product.dimension_width, 'dimension_width'),
+        dimensionHeight: parseNumericDecimal(product.dimension_height, 'dimension_height'),
+        dimensionDiameter: parseNumericDecimal(product.dimension_diameter, 'dimension_diameter'),
+        volume: parseNumericDecimal(product.volume, 'volume'),
+        price: parseNumericMoney(product.price, 'price'),
+        createdAt: parseTimestamp(product.created_at, 'created_at'),
+        updatedAt: parseTimestamp(product.updated_at, 'updated_at'),
     }
 }
