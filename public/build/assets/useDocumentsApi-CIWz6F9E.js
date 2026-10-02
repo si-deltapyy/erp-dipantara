@@ -1,1 +1,0 @@
-import{Z as r}from"./main-CSgKfPMk.js";import{f as t}from"./runtime-dom.esm-bundler-Y1jFVCKV.js";function i(){const o=t(r);if(!o)throw new Error("Documents API is not configured");return o}export{i as u};
