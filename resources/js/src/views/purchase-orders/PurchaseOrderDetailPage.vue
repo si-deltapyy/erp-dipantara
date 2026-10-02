@@ -15,6 +15,9 @@ import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
 import PurchaseOrderReviewDialog from './components/PurchaseOrderReviewDialog.vue'
 import PurchaseOrderDocuments from './components/PurchaseOrderDocuments.vue'
 import AppButton from '@/components/ui/AppButton.vue'
+import AppPageHeader from '@/components/ui/AppPageHeader.vue'
+import PurchaseOrderStatus from './components/PurchaseOrderStatus.vue'
+import PurchaseOrderLines from './components/PurchaseOrderLines.vue'
 import AppConfirmDialog from '@/components/ui/AppConfirmDialog.vue'
 const { t } = useI18n()
 const session = useSessionStore()
@@ -44,41 +47,25 @@ const canEdit = computed(
 </script>
 <template>
     <section class="space-y-6">
-        <header class="flex flex-wrap items-center justify-between gap-4">
-            <h1 class="text-2xl font-bold">{{ t('purchase-orders.detail') }}</h1>
-            <RouterLink
-                :to="{ name: 'purchase-orders', query: $route.query }"
-                class="secondary-button"
-                >{{ t('purchase-orders.back') }}</RouterLink
-            >
-        </header>
+        <AppPageHeader :title="t('purchase-orders.detail')"
+            ><template #actions>
+                <RouterLink
+                    :to="{ name: 'purchase-orders', query: $route.query }"
+                    class="secondary-button"
+                    >{{ t('purchase-orders.back') }}</RouterLink
+                >
+            </template></AppPageHeader
+        >
         <p v-if="loading" role="status">{{ t('purchase-orders.loading') }}</p>
         <div v-else-if="error" role="alert" class="panel space-y-3">
             <p>{{ t(error) }}</p>
             <AppButton @click="refresh">{{ t('purchase-orders.refresh') }}</AppButton>
         </div>
         <template v-else-if="order">
-            <ClosingEligibilityPanel
-                v-if="session.user?.permissions.includes('closings.read.all')"
-                :purchase-order-id="order.id"
-            />
-            <PurchaseOrderInvoiceSummary
-                v-if="evaluateRecordAccess(session.user, 'invoices.read', order) === 'allowed'"
-                :purchase-order-id="order.id"
-            />
-            <RouterLink
-                v-if="evaluateRecordAccess(session.user, 'payments.read', order) === 'allowed'"
-                :to="{ name: 'payments', query: { purchaseOrderId: order.id } }"
-                class="secondary-button"
-                >{{ t('payments.monitor') }}</RouterLink
-            >
             <div class="panel space-y-5">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <h2 class="break-words text-xl font-semibold">{{ order.number }}</h2>
-                    <span
-                        class="rounded-md bg-primary-light px-3 py-2 text-sm font-semibold text-primary-strong"
-                        >{{ t('purchase-orders.statuses.' + order.status) }}</span
-                    >
+                    <PurchaseOrderStatus :status="order.status" />
                 </div>
                 <dl class="grid gap-4 sm:grid-cols-2">
                     <div>
@@ -105,19 +92,22 @@ const canEdit = computed(
                 <h2 class="font-semibold">{{ t('purchase-orders.rejectionReason') }}</h2>
                 <p class="whitespace-pre-wrap break-words">{{ order.rejectionReason }}</p>
             </div>
-            <div class="panel space-y-4">
-                <h2 class="font-semibold">{{ t('purchase-orders.lines') }}</h2>
-                <div
-                    v-for="(line, index) in order.lines"
-                    :key="index"
-                    class="grid gap-2 border-b border-line pb-4 sm:grid-cols-3"
-                >
-                    <p class="break-words font-semibold">{{ line.timberProductName }}</p>
-                    <p>{{ t('purchase-orders.quantityValue', { count: line.quantity }) }}</p>
-                    <p class="break-words">{{ formatPurchaseOrderMoney(line.unitPrice) }}</p>
-                </div>
-            </div>
-            <div v-if="submitError" role="alert" class="panel space-y-2 text-red-700">
+            <PurchaseOrderLines :lines="order.lines" />
+            <ClosingEligibilityPanel
+                v-if="session.user?.permissions.includes('closings.read.all')"
+                :purchase-order-id="order.id"
+            />
+            <PurchaseOrderInvoiceSummary
+                v-if="evaluateRecordAccess(session.user, 'invoices.read', order) === 'allowed'"
+                :purchase-order-id="order.id"
+            />
+            <RouterLink
+                v-if="evaluateRecordAccess(session.user, 'payments.read', order) === 'allowed'"
+                :to="{ name: 'payments', query: { purchaseOrderId: order.id } }"
+                class="secondary-button"
+                >{{ t('payments.monitor') }}</RouterLink
+            >
+            <div v-if="submitError" role="alert" class="panel space-y-2 text-danger">
                 <p>{{ t(submitError) }}</p>
                 <p v-if="uncertain">{{ t('purchase-orders.uncertain') }}</p>
                 <AppButton v-if="!uncertain" variant="secondary" @click="refresh">{{
@@ -143,7 +133,7 @@ const canEdit = computed(
                 >{{ t('invoices.monitor') }}</RouterLink
             >
             <PurchaseOrderDocuments :key="order.id" :order="order" />
-            <div class="flex flex-wrap justify-end gap-3">
+            <div class="wf-form-actions">
                 <AppButton
                     v-if="review.canApprove"
                     :disabled="review.pending"

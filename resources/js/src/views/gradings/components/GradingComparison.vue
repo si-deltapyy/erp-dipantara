@@ -4,6 +4,7 @@ import type { Grading } from '@/core/types/grading'
 import { useGradingRevisionSource } from '../composables/useGradingRevisionSource'
 import GradingMeasurements from './GradingMeasurements.vue'
 import AppButton from '@/components/ui/AppButton.vue'
+import AppPanel from '@/components/ui/AppPanel.vue'
 const props = defineProps<{ grading: Grading }>()
 const { t } = useI18n()
 const { parent, loading, error, refresh } = useGradingRevisionSource(() => props.grading)
@@ -16,22 +17,18 @@ const { parent, loading, error, refresh } = useGradingRevisionSource(() => props
             <AppButton @click="refresh">{{ t('gradings.refresh') }}</AppButton>
         </div>
         <div class="grid gap-6 xl:grid-cols-2">
-            <section v-if="parent" :aria-label="t('gradings.previousResult')" class="space-y-4">
-                <h3 class="font-bold">
-                    {{ t('gradings.previousResult') }} /
-                    {{ t('gradings.statuses.' + parent.status) }}
-                </h3>
+            <AppPanel v-if="parent" :title="t('gradings.previousResult')" class="min-w-0 space-y-4">
+                <p class="text-sm text-muted">{{ t('gradings.statuses.' + parent.status) }}</p>
                 <GradingMeasurements :grading="parent" />
                 <RouterLink
                     :to="{ name: 'grading-detail', params: { id: parent.id } }"
                     class="secondary-button"
                     >{{ t('gradings.openPrevious') }}</RouterLink
                 >
-            </section>
-            <section :aria-label="t('gradings.revisedResult')" class="space-y-4">
-                <h3 class="font-bold">{{ t('gradings.revisedResult') }}</h3>
+            </AppPanel>
+            <AppPanel :title="t('gradings.revisedResult')" class="min-w-0 space-y-4">
                 <GradingMeasurements :grading="grading" />
-            </section>
+            </AppPanel>
         </div>
     </div>
 </template>

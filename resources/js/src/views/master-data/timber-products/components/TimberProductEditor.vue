@@ -50,6 +50,7 @@ async function submit(): Promise<void> {
 </script>
 <template>
     <AppModal
+        class="max-w-2xl"
         :open="true"
         :title="t(timberProduct ? 'timber-products.edit' : 'timber-products.add')"
         initial-focus="#timber-product-name"
@@ -67,7 +68,7 @@ async function submit(): Promise<void> {
             <div
                 v-if="error"
                 role="alert"
-                class="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800"
+                class="rounded-md border border-danger/20 bg-danger-light p-3 text-sm text-danger"
             >
                 <p>{{ t(error) }}</p>
                 <p v-if="error === 'timber-products.errors.conflict'" class="mt-2">
@@ -75,7 +76,7 @@ async function submit(): Promise<void> {
                 </p>
                 <p v-if="uncertain" class="mt-2">{{ t('timber-products.uncertain') }}</p>
             </div>
-            <div class="flex flex-wrap justify-end gap-3">
+            <div class="wf-form-actions">
                 <AppButton variant="secondary" :disabled="pending" @click="close">{{
                     t('timber-products.cancel')
                 }}</AppButton>

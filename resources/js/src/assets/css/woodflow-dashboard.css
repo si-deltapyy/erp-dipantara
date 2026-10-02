@@ -1,0 +1,467 @@
+.woodflow-theme .wf-dashboard {
+    display: grid;
+    gap: var(--wf-space);
+}
+.woodflow-theme .wf-page-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin: 0 0 4px;
+}
+.woodflow-theme .wf-page-heading h1 {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.03em;
+}
+.woodflow-theme .wf-page-heading p {
+    color: var(--wf-muted-foreground);
+    font-size: 14px;
+    margin-top: 8px;
+}
+.woodflow-theme .wf-period {
+    display: flex;
+    align-items: center;
+    position: relative;
+    flex-shrink: 0;
+}
+.woodflow-theme .wf-period > svg {
+    position: absolute;
+    left: 13px;
+    z-index: 1;
+    color: var(--wf-primary);
+    pointer-events: none;
+}
+.woodflow-theme .wf-period select {
+    padding-left: 39px;
+    min-width: 166px;
+    height: 44px;
+    font-size: 14px;
+}
+.woodflow-theme .wf-period label,
+.woodflow-theme .wf-table-controls label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+.woodflow-theme .wf-period .space-y-2 > *,
+.woodflow-theme .wf-table-controls .space-y-2 > * {
+    margin-top: 0;
+}
+.woodflow-theme .wf-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+}
+.woodflow-theme .wf-metric {
+    text-align: left;
+}
+.woodflow-theme .wf-metric-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    color: var(--wf-muted-foreground);
+    font-size: 14px;
+    font-weight: 500;
+}
+.woodflow-theme .wf-metric-value {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 6px;
+}
+.woodflow-theme .wf-metric-value strong {
+    font-size: 36px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.45;
+}
+.woodflow-theme .wf-metric p {
+    margin-top: 6px;
+    padding-top: 0;
+    color: var(--wf-muted-foreground);
+    font-size: 12px;
+}
+.woodflow-theme .wf-dashboard-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.85fr) minmax(290px, 1fr);
+    gap: var(--wf-space);
+    align-items: start;
+}
+.woodflow-theme .wf-dashboard-bottom {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: var(--wf-space);
+}
+.woodflow-theme .wf-count {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--wf-line);
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--wf-canvas);
+    flex-shrink: 0;
+}
+.woodflow-theme .wf-table-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 0 0 20px;
+}
+.woodflow-theme .wf-search {
+    position: relative;
+    flex: 1;
+    min-width: 100px;
+}
+.woodflow-theme .wf-search > svg {
+    position: absolute;
+    left: 12px;
+    top: 14px;
+    color: var(--wf-muted-foreground);
+    pointer-events: none;
+}
+.woodflow-theme .wf-search input {
+    padding-left: 37px;
+    font-size: 14px;
+}
+.woodflow-theme .wf-table-controls select {
+    font-size: 14px;
+    width: 184px;
+}
+.woodflow-theme .wf-order-link {
+    display: inline-flex;
+    gap: 5px;
+    align-items: center;
+    min-height: 28px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--wf-primary);
+    text-underline-offset: 4px;
+}
+.woodflow-theme .wf-order-link:hover {
+    text-decoration: underline;
+}
+.woodflow-theme .wf-row-secondary {
+    display: block;
+    font-size: 12px;
+    line-height: 1.8;
+    color: var(--wf-muted-foreground);
+}
+.woodflow-theme .wf-row-secondary.wf-overdue {
+    color: var(--wf-danger);
+}
+.woodflow-theme .wf-buyer {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.woodflow-theme .wf-buyer strong {
+    font-size: 14px;
+    font-weight: 600;
+}
+.woodflow-theme .wf-buyer-avatar {
+    display: grid;
+    place-items: center;
+    width: 31px;
+    height: 31px;
+    border-radius: var(--wf-radius);
+    background: var(--wf-muted);
+    color: var(--wf-primary);
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+.woodflow-theme .wf-priorities .wf-panel-footer {
+    justify-content: space-between;
+    padding-block: 9px;
+}
+.woodflow-theme .wf-priorities .wf-panel-footer button {
+    min-height: 44px;
+    padding: 8px 12px;
+    font-size: 12px;
+}
+
+.woodflow-theme .wf-balances-body {
+    padding: 0 0 20px;
+}
+.woodflow-theme .wf-balance {
+    padding: 0 0 20px;
+    border-bottom: 1px solid var(--wf-border);
+}
+.woodflow-theme .wf-balance + .wf-balance {
+    margin-top: 20px;
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+.woodflow-theme .wf-balance-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--wf-primary);
+    font-size: 14px;
+    font-weight: 500;
+}
+.woodflow-theme .wf-balance > strong {
+    display: block;
+    font-size: clamp(19px, 1.65vw, 26px);
+    letter-spacing: -0.03em;
+    margin-top: 10px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+.woodflow-theme .wf-balance > p {
+    font-size: 12px;
+    color: var(--wf-muted-foreground);
+    margin-top: 4px;
+}
+.woodflow-theme .wf-balance-due {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--wf-line);
+    font-size: 12px;
+    color: var(--wf-muted-foreground);
+}
+.woodflow-theme .wf-balance-due svg {
+    flex-shrink: 0;
+}
+.woodflow-theme .wf-balances .wf-panel-footer {
+    padding-block: 17px;
+    font-size: 12px;
+}
+.woodflow-theme .wf-distribution-body {
+    padding: 0 0 20px;
+}
+.woodflow-theme .wf-queue-total {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 14px;
+}
+.woodflow-theme .wf-distribution-bar {
+    display: flex;
+    gap: 4px;
+    height: 16px;
+    overflow: hidden;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+.woodflow-theme .wf-distribution-bar span {
+    flex-basis: 0;
+}
+.woodflow-theme .wf-queue-color--review {
+    background: var(--wf-primary);
+}
+.woodflow-theme .wf-queue-color--preparing {
+    background: var(--wf-tan);
+}
+.woodflow-theme .wf-queue-color--shipping {
+    background: var(--wf-chart-3);
+}
+.woodflow-theme .wf-queue-color--payment {
+    background: var(--wf-chart-5);
+}
+.woodflow-theme .wf-queue-legend {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 22px;
+    row-gap: 3px;
+}
+.woodflow-theme .wf-queue-legend button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    min-height: 44px;
+    text-align: left;
+    border-radius: 4px;
+}
+.woodflow-theme .wf-queue-legend button:hover,
+.woodflow-theme .wf-queue-legend button[aria-pressed='true'] {
+    background: var(--wf-cream);
+}
+.woodflow-theme .wf-queue-legend button strong {
+    margin-left: auto;
+}
+.woodflow-theme .wf-queue-legend button svg {
+    color: var(--wf-muted-foreground);
+}
+.woodflow-theme .wf-legend-dot {
+    height: 7px;
+    width: 7px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+.woodflow-theme .wf-timeline-list {
+    padding: 0;
+}
+.woodflow-theme .wf-timeline-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    position: relative;
+}
+.woodflow-theme .wf-timeline-list li + li {
+    border-top: 1px solid var(--wf-line);
+}
+.woodflow-theme .wf-timeline-icon {
+    background: var(--wf-cream);
+    color: var(--wf-primary);
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.woodflow-theme .wf-timeline-list strong {
+    font-size: 14px;
+    font-weight: 600;
+}
+.woodflow-theme .wf-timeline-list p {
+    font-size: 12px;
+    color: var(--wf-muted-foreground);
+    margin-top: 3px;
+}
+.woodflow-theme .wf-timeline-list time {
+    margin-left: auto;
+    flex-shrink: 0;
+    font-size: 12px;
+    color: var(--wf-muted-foreground);
+    padding-top: 3px;
+}
+
+@media (max-width: 1199px) and (min-width: 1024px) {
+    .woodflow-theme .wf-dashboard-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .woodflow-theme .wf-balances-body {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    .woodflow-theme .wf-balance + .wf-balance {
+        margin: 0;
+    }
+}
+@media (max-width: 900px) {
+    .woodflow-theme .wf-dashboard-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .woodflow-theme .wf-balances-body {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    .woodflow-theme .wf-balance + .wf-balance {
+        margin: 0;
+    }
+    .woodflow-theme .wf-page-heading {
+        align-items: flex-start;
+    }
+    .woodflow-theme .wf-metric {
+        padding: 16px;
+    }
+    .woodflow-theme .wf-metric-heading {
+        font-size: 14px;
+    }
+    .woodflow-theme .wf-metric p {
+        min-height: 46px;
+    }
+    .woodflow-theme .wf-dashboard-bottom {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+@media (max-width: 639px) {
+    .woodflow-theme .wf-page-heading {
+        flex-direction: column;
+        gap: 18px;
+    }
+    .woodflow-theme .wf-page-heading p {
+        max-width: 35ch;
+        line-height: 1.8;
+    }
+    .woodflow-theme .wf-page-heading h1 {
+        font-size: 24px;
+    }
+    .woodflow-theme .wf-metrics {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .woodflow-theme .wf-metric {
+        padding: 16px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        column-gap: 16px;
+    }
+    .woodflow-theme .wf-metric-heading {
+        font-size: 14px;
+        justify-content: flex-start;
+        flex-direction: row;
+    }
+    .woodflow-theme .wf-metric-value {
+        grid-column: 2;
+        grid-row: 1 / 3;
+        margin: 0;
+    }
+    .woodflow-theme .wf-metric-value strong {
+        font-size: 32px;
+    }
+    .woodflow-theme .wf-metric p {
+        min-height: 0;
+        border: 0;
+        padding: 0;
+        margin: 5px 0 0;
+        font-size: 12px;
+    }
+    .woodflow-theme .wf-panel-heading {
+        padding: 0 0 16px;
+    }
+    .woodflow-theme .wf-panel-heading p {
+        max-width: 30ch;
+    }
+    .woodflow-theme .wf-table-controls {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0 0 16px;
+    }
+    .woodflow-theme .wf-table-controls select {
+        width: 100%;
+    }
+    .woodflow-theme .wf-balances-body {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+        padding-inline: 0;
+    }
+    .woodflow-theme .wf-balance > strong {
+        font-size: 24px;
+    }
+    .woodflow-theme .wf-distribution-body {
+        padding-inline: 0;
+    }
+    .woodflow-theme .wf-timeline-list {
+        padding-inline: 0;
+    }
+}
+
+.woodflow-theme .wf-priorities .wf-panel-footer > nav {
+    flex: 1;
+}
+.woodflow-theme .wf-priorities .wf-panel-footer > nav p {
+    font-size: 12px;
+}
+@media (max-width: 639px) {
+}

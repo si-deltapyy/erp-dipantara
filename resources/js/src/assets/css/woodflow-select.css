@@ -1,0 +1,79 @@
+.woodflow-theme select.selectize {
+    display: none;
+}
+.woodflow-theme .nice-select {
+    height: 44px;
+    min-width: 184px;
+    padding: 0 36px 0 16px;
+    border: 1px solid var(--wf-input);
+    border-radius: var(--wf-radius);
+    background: var(--wf-card);
+    color: var(--wf-foreground);
+    line-height: 42px;
+    font-size: 14px;
+    transition: border-color 150ms ease;
+}
+.woodflow-theme .nice-select:is(:focus-visible, .open) {
+    border-color: var(--wf-ring);
+    outline: 2px solid color-mix(in srgb, var(--wf-ring) 20%, transparent);
+    outline-offset: 2px;
+}
+.woodflow-theme .nice-select::after {
+    border-color: var(--wf-muted-foreground);
+}
+.woodflow-theme .nice-select .nice-select-dropdown {
+    min-width: 100%;
+    margin-top: 8px;
+    max-height: 260px;
+    border: 1px solid var(--wf-border);
+    border-radius: var(--wf-radius);
+    background: var(--wf-popover);
+    box-shadow: var(--wf-shadow);
+    overflow-y: auto;
+    z-index: 30;
+    visibility: hidden;
+    transform: scale(0.95);
+    transition:
+        opacity 75ms ease-in,
+        transform 75ms ease-in,
+        visibility 75ms;
+}
+.woodflow-theme .nice-select.open .nice-select-dropdown {
+    visibility: visible;
+    transform: scale(1);
+    transition-duration: 100ms;
+    transition-timing-function: ease-out;
+}
+.woodflow-theme .nice-select .list {
+    padding: 4px;
+}
+.woodflow-theme .nice-select .option {
+    min-height: 40px;
+    padding: 0 12px;
+    border-radius: 4px;
+    color: var(--wf-popover-foreground);
+}
+.woodflow-theme .nice-select .option:is(:hover, .focus) {
+    background: var(--wf-accent);
+}
+.woodflow-theme .nice-select .option.selected {
+    background: var(--wf-secondary);
+    color: var(--wf-secondary-foreground);
+    font-weight: 600;
+}
+.woodflow-theme .nice-select.disabled {
+    background: var(--wf-muted);
+    opacity: 0.6;
+}
+.woodflow-theme .nice-select[aria-invalid='true'] {
+    border-color: var(--wf-destructive);
+}
+.woodflow-theme .wf-period .nice-select {
+    padding-left: 40px;
+    min-width: 204px;
+}
+@media (max-width: 639px) {
+    .woodflow-theme .wf-table-controls .nice-select {
+        width: 100%;
+    }
+}

@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import AppTable from '@/components/ui/AppTable.vue'
+
+import { computed } from 'vue'
+import type { TableColumn } from '@/core/types/table'
 import { useI18n } from 'vue-i18n'
 import type { AvailableTimber, DeliveryAllocation } from '@/core/types/delivery'
 import AppNumberInput from '@/components/ui/AppNumberInput.vue'
@@ -39,53 +43,50 @@ function rowError(row: AvailableTimber): string {
     const error = props.errors?.[`allocations.${index}.quantity`]
     return error ? t(error) : ''
 }
+const columns = computed<readonly TableColumn<AvailableTimber>[]>(() => [
+    { key: 'timberProductName', label: t('deliveries.timber') },
+    { key: 'mitraName', label: t('deliveries.mitra') },
+    { key: 'availableQuantity', label: t('deliveries.available') },
+    { key: 'rowId', label: t('deliveries.quantity') },
+])
 </script>
 <template>
-    <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-            <caption class="sr-only">
-                {{
-                    t('deliveries.allocation')
-                }}
-            </caption>
-            <thead>
-                <tr class="border-b border-line">
-                    <th scope="col" class="p-3">{{ t('deliveries.timber') }}</th>
-                    <th scope="col" class="p-3">{{ t('deliveries.mitra') }}</th>
-                    <th scope="col" class="p-3">{{ t('deliveries.available') }}</th>
-                    <th scope="col" class="p-3">{{ t('deliveries.quantity') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr
-                    v-for="row in rows"
-                    :key="row.gradingId + ':' + row.rowId"
-                    class="border-b border-line"
-                >
-                    <td class="min-w-40 p-3">{{ row.timberProductName }}</td>
-                    <td class="min-w-36 p-3">{{ row.mitraName }}</td>
-                    <td class="min-w-44 p-3">
-                        <strong>{{ row.availableQuantity }}</strong>
-                        <p class="text-xs text-muted">
-                            {{ t('deliveries.reserved') }}: {{ row.reservedQuantity }} ·
-                            {{ t('deliveries.shipped') }}: {{ row.shippedQuantity }}
-                        </p>
-                    </td>
-                    <td class="min-w-48 p-3">
-                        <AppNumberInput
-                            :id="'allocation-' + row.gradingId + '-' + row.rowId"
-                            :label="t('deliveries.quantity') + ' — ' + row.timberProductName"
-                            :model-value="quantity(row)"
-                            :error="rowError(row)"
-                            :disabled="disabled"
-                            min="0"
-                            :max="row.availableQuantity"
-                            step="1"
-                            @update:model-value="update(row, $event)"
-                        />
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <AppTable
+        :rows="rows"
+        :columns="columns"
+        :row-key="(row) => row.gradingId + ':' + row.rowId"
+        :caption="t('deliveries.allocation')"
+    >
+        <template #cell-timberProductName="{ row }"
+            ><span class="block max-w-64 whitespace-normal break-words">{{
+                row.timberProductName
+            }}</span></template
+        >
+        <template #cell-mitraName="{ row }"
+            ><span class="block max-w-56 whitespace-normal break-words">{{
+                row.mitraName
+            }}</span></template
+        >
+        <template #cell-availableQuantity="{ row }"
+            ><strong class="tabular-nums">{{ row.availableQuantity }}</strong>
+            <p class="mt-1 text-xs text-muted">
+                {{ t('deliveries.reserved') }}: {{ row.reservedQuantity }} /
+                {{ t('deliveries.shipped') }}: {{ row.shippedQuantity }}
+            </p></template
+        >
+        <template #cell-rowId="{ row }"
+            ><div class="min-w-48 whitespace-normal">
+                <AppNumberInput
+                    :id="'allocation-' + row.gradingId + '-' + row.rowId"
+                    :label="t('deliveries.quantity') + ' ? ' + row.timberProductName"
+                    :model-value="quantity(row)"
+                    :error="rowError(row)"
+                    :disabled="disabled"
+                    min="0"
+                    :max="row.availableQuantity"
+                    step="1"
+                    @update:model-value="update(row, $event)"
+                /></div
+        ></template>
+    </AppTable>
 </template>

@@ -10,6 +10,8 @@ import MitraTable from './components/MitraTable.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
 import AppPagination from '@/components/ui/AppPagination.vue'
+import AppPageHeader from '@/components/ui/AppPageHeader.vue'
+import AppPanel from '@/components/ui/AppPanel.vue'
 const { t } = useI18n()
 const session = useSessionStore()
 const recovery = useMitraRecoveryStore()
@@ -39,14 +41,13 @@ function close(): void {
 </script>
 <template>
     <section class="space-y-6">
-        <header class="flex flex-wrap items-start justify-between gap-4">
-            <div>
-                <p class="mb-1 text-sm font-semibold text-primary">{{ t('mitras.section') }}</p>
-                <h1 class="text-2xl font-bold tracking-tight">{{ t('mitras.title') }}</h1>
-                <p class="mt-2 text-sm text-muted">{{ t('mitras.subtitle') }}</p>
-            </div>
-            <AppButton v-if="canCreate" @click="open()">{{ t('mitras.add') }}</AppButton>
-        </header>
+        <AppPageHeader :title="t('mitras.title')" :description="t('mitras.subtitle')">
+            <template #actions
+                ><AppButton v-if="canCreate" @click="open()">{{
+                    t('mitras.add')
+                }}</AppButton></template
+            >
+        </AppPageHeader>
         <p
             v-if="success"
             role="status"
@@ -54,8 +55,16 @@ function close(): void {
         >
             {{ t('mitras.saved') }}
         </p>
-        <div class="panel space-y-5">
-            <form class="flex flex-wrap items-end gap-3" @submit.prevent="searchMitras">
+        <AppPanel :title="t('mitras.list')" class="space-y-5">
+            <template #actions
+                ><span v-if="response" class="text-sm text-muted">{{
+                    t('mitras.total', { count: response.meta.total })
+                }}</span></template
+            >
+            <form
+                class="flex flex-wrap items-end gap-3 border-b border-line pb-5"
+                @submit.prevent="searchMitras"
+            >
                 <div class="min-w-0 flex-1 basis-64">
                     <AppTextInput
                         id="mitra-search"
@@ -72,13 +81,8 @@ function close(): void {
                     t('mitras.refresh')
                 }}</AppButton>
             </form>
-            <div class="flex flex-wrap items-center justify-between gap-2">
-                <h2 class="font-semibold">{{ t('mitras.list') }}</h2>
-                <p v-if="response" class="text-sm text-muted">
-                    {{ t('mitras.total', { count: response.meta.total }) }}
-                </p>
-            </div>
-            <p v-if="error" role="alert" class="text-sm text-red-700">{{ t(error) }}</p>
+
+            <p v-if="error" role="alert" class="text-sm text-danger">{{ t(error) }}</p>
             <MitraTable
                 :mitras="response?.data ?? []"
                 :state="loading ? 'loading' : error ? 'error' : 'ready'"
@@ -86,15 +90,17 @@ function close(): void {
                 @edit="open"
                 @retry="refresh"
             />
-            <AppPagination
-                v-if="response && !error"
-                :page="query.page"
-                :page-size="response.meta.perPage"
-                :total="response.meta.total"
-                :disabled="loading"
-                @update:page="changePage"
-            />
-        </div>
+            <template #footer
+                ><AppPagination
+                    v-if="response && !error"
+                    numbered
+                    :page="query.page"
+                    :page-size="response.meta.perPage"
+                    :total="response.meta.total"
+                    :disabled="loading"
+                    @update:page="changePage"
+            /></template>
+        </AppPanel>
         <MitraEditor
             v-if="editing && (selected ? canUpdate : canCreate)"
             :mitra="selected"

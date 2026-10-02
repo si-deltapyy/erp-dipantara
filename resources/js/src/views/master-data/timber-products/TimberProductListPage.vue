@@ -11,6 +11,8 @@ import TimberProductTable from './components/TimberProductTable.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
 import AppPagination from '@/components/ui/AppPagination.vue'
+import AppPageHeader from '@/components/ui/AppPageHeader.vue'
+import AppPanel from '@/components/ui/AppPanel.vue'
 const { t } = useI18n()
 const session = useSessionStore()
 const recovery = useTimberProductRecoveryStore()
@@ -53,16 +55,16 @@ function close(): void {
 </script>
 <template>
     <section class="space-y-6">
-        <header class="flex flex-wrap items-start justify-between gap-4">
-            <div>
-                <p class="mb-1 text-sm font-semibold text-primary">
-                    {{ t('timber-products.section') }}
-                </p>
-                <h1 class="text-2xl font-bold tracking-tight">{{ t('timber-products.title') }}</h1>
-                <p class="mt-2 text-sm text-muted">{{ t('timber-products.subtitle') }}</p>
-            </div>
-            <AppButton v-if="canCreate" @click="open()">{{ t('timber-products.add') }}</AppButton>
-        </header>
+        <AppPageHeader
+            :title="t('timber-products.title')"
+            :description="t('timber-products.subtitle')"
+        >
+            <template #actions
+                ><AppButton v-if="canCreate" @click="open()">{{
+                    t('timber-products.add')
+                }}</AppButton></template
+            >
+        </AppPageHeader>
         <p
             v-if="success"
             role="status"
@@ -70,8 +72,16 @@ function close(): void {
         >
             {{ t('timber-products.saved') }}
         </p>
-        <div class="panel space-y-5">
-            <form class="flex flex-wrap items-end gap-3" @submit.prevent="searchTimberProducts">
+        <AppPanel :title="t('timber-products.list')" class="space-y-5">
+            <template #actions
+                ><span v-if="response" class="text-sm text-muted">{{
+                    t('timber-products.total', { count: response.meta.total })
+                }}</span></template
+            >
+            <form
+                class="flex flex-wrap items-end gap-3 border-b border-line pb-5"
+                @submit.prevent="searchTimberProducts"
+            >
                 <div class="min-w-0 flex-1 basis-64">
                     <AppTextInput
                         id="timber-product-search"
@@ -88,13 +98,8 @@ function close(): void {
                     t('timber-products.refresh')
                 }}</AppButton>
             </form>
-            <div class="flex flex-wrap items-center justify-between gap-2">
-                <h2 class="font-semibold">{{ t('timber-products.list') }}</h2>
-                <p v-if="response" class="text-sm text-muted">
-                    {{ t('timber-products.total', { count: response.meta.total }) }}
-                </p>
-            </div>
-            <p v-if="error" role="alert" class="text-sm text-red-700">{{ t(error) }}</p>
+
+            <p v-if="error" role="alert" class="text-sm text-danger">{{ t(error) }}</p>
             <TimberProductTable
                 :timber-products="response?.data ?? []"
                 :state="loading ? 'loading' : error ? 'error' : 'ready'"
@@ -103,15 +108,17 @@ function close(): void {
                 @edit="open"
                 @retry="refresh"
             />
-            <AppPagination
-                v-if="response && !error"
-                :page="query.page"
-                :page-size="response.meta.perPage"
-                :total="response.meta.total"
-                :disabled="loading"
-                @update:page="changePage"
-            />
-        </div>
+            <template #footer
+                ><AppPagination
+                    v-if="response && !error"
+                    numbered
+                    :page="query.page"
+                    :page-size="response.meta.perPage"
+                    :total="response.meta.total"
+                    :disabled="loading"
+                    @update:page="changePage"
+            /></template>
+        </AppPanel>
         <TimberProductEditor
             v-if="editing && (selected ? canUpdate : canCreate)"
             :timber-product="selected"

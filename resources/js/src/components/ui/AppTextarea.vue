@@ -27,7 +27,7 @@ function update(event: Event): void {
                 undefined
             "
             rows="3"
-            class="w-full rounded-md border border-line bg-white px-3 py-2 text-ink focus:border-primary focus:ring-primary disabled:bg-canvas"
+            class="wf-form-input w-full rounded-md border border-line bg-white px-3 py-2 text-ink focus:border-primary focus:ring-primary disabled:bg-canvas"
             @input="update"
         />
     </AppFormField>

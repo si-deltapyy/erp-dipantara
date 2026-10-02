@@ -11,6 +11,8 @@ import GraderTable from './components/GraderTable.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
 import AppPagination from '@/components/ui/AppPagination.vue'
+import AppPageHeader from '@/components/ui/AppPageHeader.vue'
+import AppPanel from '@/components/ui/AppPanel.vue'
 const { t } = useI18n()
 const session = useSessionStore()
 const recovery = useGraderRecoveryStore()
@@ -59,14 +61,13 @@ function closeProvision(): void {
 </script>
 <template>
     <section class="space-y-6">
-        <header class="flex flex-wrap items-start justify-between gap-4">
-            <div>
-                <p class="mb-1 text-sm font-semibold text-primary">{{ t('graders.section') }}</p>
-                <h1 class="text-2xl font-bold tracking-tight">{{ t('graders.title') }}</h1>
-                <p class="mt-2 text-sm text-muted">{{ t('graders.subtitle') }}</p>
-            </div>
-            <AppButton v-if="canCreate" @click="open()">{{ t('graders.add') }}</AppButton>
-        </header>
+        <AppPageHeader :title="t('graders.title')" :description="t('graders.subtitle')">
+            <template #actions
+                ><AppButton v-if="canCreate" @click="open()">{{
+                    t('graders.add')
+                }}</AppButton></template
+            >
+        </AppPageHeader>
         <p
             v-if="success"
             role="status"
@@ -74,8 +75,16 @@ function closeProvision(): void {
         >
             {{ t(success) }}
         </p>
-        <div class="panel space-y-5">
-            <form class="flex flex-wrap items-end gap-3" @submit.prevent="searchGraders">
+        <AppPanel :title="t('graders.list')" class="space-y-5">
+            <template #actions
+                ><span v-if="response" class="text-sm text-muted">{{
+                    t('graders.total', { count: response.meta.total })
+                }}</span></template
+            >
+            <form
+                class="flex flex-wrap items-end gap-3 border-b border-line pb-5"
+                @submit.prevent="searchGraders"
+            >
                 <div class="min-w-0 flex-1 basis-64">
                     <AppTextInput
                         id="grader-search"
@@ -92,13 +101,8 @@ function closeProvision(): void {
                     t('graders.refresh')
                 }}</AppButton>
             </form>
-            <div class="flex flex-wrap items-center justify-between gap-2">
-                <h2 class="font-semibold">{{ t('graders.list') }}</h2>
-                <p v-if="response" class="text-sm text-muted">
-                    {{ t('graders.total', { count: response.meta.total }) }}
-                </p>
-            </div>
-            <p v-if="error" role="alert" class="text-sm text-red-700">{{ t(error) }}</p>
+
+            <p v-if="error" role="alert" class="text-sm text-danger">{{ t(error) }}</p>
             <GraderTable
                 :graders="response?.data ?? []"
                 :state="loading ? 'loading' : error ? 'error' : 'ready'"
@@ -108,15 +112,17 @@ function closeProvision(): void {
                 @edit="open"
                 @retry="refresh"
             />
-            <AppPagination
-                v-if="response && !error"
-                :page="query.page"
-                :page-size="response.meta.perPage"
-                :total="response.meta.total"
-                :disabled="loading"
-                @update:page="changePage"
-            />
-        </div>
+            <template #footer
+                ><AppPagination
+                    v-if="response && !error"
+                    numbered
+                    :page="query.page"
+                    :page-size="response.meta.perPage"
+                    :total="response.meta.total"
+                    :disabled="loading"
+                    @update:page="changePage"
+            /></template>
+        </AppPanel>
         <GraderProvisionDialog
             v-if="provisioning && canProvision"
             :grader="provisioning"

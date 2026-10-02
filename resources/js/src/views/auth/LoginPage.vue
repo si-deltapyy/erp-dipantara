@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
+import AppPageHeader from '@/components/ui/AppPageHeader.vue'
 import { useLoginForm } from './composables/useLoginForm'
 const { t, te } = useI18n()
 const route = useRoute()
@@ -20,12 +21,7 @@ async function submitForm(): Promise<void> {
 </script>
 <template>
     <div class="space-y-6">
-        <div>
-            <h1 class="mt-4 text-2xl font-bold">{{ t('auth.title') }}</h1>
-            <p class="mt-2 text-sm leading-6 text-muted">
-                {{ t('auth.liveIntroduction') }}
-            </p>
-        </div>
+        <AppPageHeader :title="t('auth.title')" :description="t('workspace.accessDescription')" />
         <p v-if="route.query.expired" role="status" class="text-sm text-muted">
             {{ t('auth.expired') }}
         </p>
@@ -35,7 +31,7 @@ async function submitForm(): Promise<void> {
                 ref="summary"
                 tabindex="-1"
                 role="alert"
-                class="space-y-2 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+                class="space-y-2 rounded-md border border-danger/20 bg-danger-light p-4 text-sm text-danger"
             >
                 <p>{{ error ? t(error) : t('auth.errors') }}</p>
                 <a v-if="emailError" href="#login-email" class="block underline">{{

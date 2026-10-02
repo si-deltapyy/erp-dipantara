@@ -1,7 +1,28 @@
 <script setup lang="ts">
 withDefaults(
     defineProps<{
-        name: 'home' | 'menu' | 'close' | 'arrow' | 'layers' | 'screen' | 'link' | 'flask' | 'check'
+        name:
+            | 'home'
+            | 'menu'
+            | 'close'
+            | 'arrow'
+            | 'layers'
+            | 'screen'
+            | 'link'
+            | 'flask'
+            | 'check'
+            | 'document'
+            | 'truck'
+            | 'wallet'
+            | 'chart'
+            | 'users'
+            | 'box'
+            | 'search'
+            | 'calendar'
+            | 'chevron'
+            | 'clock'
+            | 'arrow-up'
+            | 'arrow-down'
         size?: number
     }>(),
     { size: 20 },
@@ -17,6 +38,18 @@ const paths = {
     link: 'm10 13 4-4m-6 7-2 2a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0m4 0 2-2a4 4 0 0 0-6-6l-2 2',
     flask: 'M9 3h6m-5 0v6L4 19a1 1 0 0 0 1 2h14a1 1 0 0 0 1-2L14 9V3M8 14h8',
     check: 'm5 12 4 4L19 6',
+    document: 'M14 3H5v18h14V8Zm0 0v5h5M8 12h8M8 16h5',
+    truck: 'M2 5h12v12H2Zm12 5h4l4 4v3h-8M7 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0m13 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0',
+    wallet: 'M20 8H5a2 2 0 0 1 0-4h13v4M3 6v13a1 1 0 0 0 1 1h16V8m0 4h-5v4h5m-3-2h.01',
+    chart: 'M4 3v17h17M8 15v-4m5 4V7m5 8V4',
+    users: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8m8-7a4 4 0 0 1 0 8m3 9v-2a4 4 0 0 0-3-4',
+    box: 'm12 3 9 5v9l-9 5-9-5V8Zm-9 5 9 5 9-5m-9 5v9M7.5 5.5l9 5',
+    search: 'M21 21l-5-5m2-6a8 8 0 1 1-16 0 8 8 0 0 1 16 0',
+    calendar: 'M4 5h16v16H4ZM8 3v4m8-4v4M4 11h16m-12 4h2m4 0h2',
+    chevron: 'm9 5 7 7-7 7',
+    clock: 'M12 8v5l3 2m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0',
+    'arrow-up': 'M12 19V5m-6 6 6-6 6 6',
+    'arrow-down': 'M12 5v14m-6-6 6 6 6-6',
 }
 </script>
 

@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import AppPageHeader from '@/components/ui/AppPageHeader.vue'
+import AppPanel from '@/components/ui/AppPanel.vue'
+import AppState from '@/components/ui/AppState.vue'
+import AppStatusBadge from '@/components/ui/AppStatusBadge.vue'
+
 import { useRoute } from 'vue-router'
 import { usePaymentReview } from './composables/usePaymentReview'
 import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
@@ -40,26 +45,30 @@ const canEdit = computed(
 )
 </script>
 <template>
-    <section class="space-y-6">
-        <header class="flex flex-wrap items-center justify-between gap-3">
-            <h1 class="text-2xl font-bold">{{ t('payments.detail') }}</h1>
-            <RouterLink :to="{ name: 'payments', query: $route.query }" class="secondary-button">{{
-                t('payments.back')
-            }}</RouterLink>
-        </header>
-        <p v-if="loading" role="status">{{ t('payments.loading') }}</p>
-        <div v-else-if="error" role="alert" class="panel space-y-3">
-            <p>{{ t(error) }}</p>
-            <AppButton @click="refresh">{{ t('payments.refresh') }}</AppButton>
-        </div>
+    <section class="min-w-0 space-y-6">
+        <AppPageHeader :title="t('payments.detail')" :description="t('payments.subtitle')"
+            ><template #actions>
+                <RouterLink
+                    :to="{ name: 'payments', query: $route.query }"
+                    class="secondary-button"
+                    >{{ t('payments.back') }}</RouterLink
+                >
+            </template></AppPageHeader
+        >
+        <AppState v-if="loading" kind="loading" :message="t('payments.loading')" />
+        <AppState v-else-if="error" kind="error" :message="t(error)" @retry="refresh" />
         <template v-else-if="payment">
-            <div class="panel space-y-4">
+            <AppPanel
+                :title="t('payments.invoiceContext')"
+                :description="t('payments.' + payment.direction)"
+                class="space-y-5 break-words"
+            >
                 <RouterLink
                     :to="{ name: 'invoice-detail', params: { id: payment.invoiceId } }"
                     class="break-words font-semibold text-primary underline"
                     >{{ payment.invoiceNumber }}</RouterLink
                 >
-                <dl class="grid gap-4 sm:grid-cols-2">
+                <dl class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                     <div
                         v-for="field in [
                             'purchaseOrderNumber',
@@ -75,8 +84,25 @@ const canEdit = computed(
                     </div>
                     <div>
                         <dt class="text-muted">{{ t('payments.status') }}</dt>
-                        <dd>{{ t('payments.statuses.' + payment.status) }}</dd>
+                        <dd>
+                            <AppStatusBadge
+                                :tone="
+                                    payment.status === 'approved'
+                                        ? 'success'
+                                        : payment.status === 'submitted'
+                                          ? 'warning'
+                                          : payment.status === 'rejected'
+                                            ? 'danger'
+                                            : 'neutral'
+                                "
+                                >{{ t('payments.statuses.' + payment.status) }}</AppStatusBadge
+                            >
+                        </dd>
                     </div>
+                </dl>
+            </AppPanel>
+            <AppPanel :title="t('payments.amounts')" class="space-y-5 break-words">
+                <dl class="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
                     <div
                         v-for="field in [
                             'cashAmount',
@@ -87,7 +113,9 @@ const canEdit = computed(
                         :key="field"
                     >
                         <dt class="text-muted">{{ t('payments.' + field) }}</dt>
-                        <dd>{{ formatMoney(payment[field]) }}</dd>
+                        <dd class="mt-1 text-xl font-semibold tabular-nums">
+                            {{ formatMoney(payment[field]) }}
+                        </dd>
                     </div>
                 </dl>
                 <p v-if="payment.notes" class="whitespace-pre-wrap break-words">
@@ -100,34 +128,49 @@ const canEdit = computed(
                     class="secondary-button"
                     >{{ t('payments.edit') }}</RouterLink
                 >
-            </div>
+            </AppPanel>
             <InvoiceSettlement :key="payment.version" :invoice-id="payment.invoiceId" />
             <PaymentDocument :payment="payment" />
         </template>
-        <p v-if="submission.error" role="alert">{{ t(submission.error) }}</p>
-        <p v-if="submission.uncertain" role="status">{{ t('payments.uncertain') }}</p>
-        <AppButton
-            v-if="submission.canSubmit"
-            :pending="submission.pending"
-            @click="submission.confirming = true"
-            >{{ t(submission.uncertain ? 'payments.retryWrite' : 'payments.submit') }}</AppButton
+        <AppPanel
+            v-if="
+                submission.canSubmit ||
+                submission.error ||
+                submission.uncertain ||
+                review.canApprove ||
+                review.canReject ||
+                (review.error && !review.action)
+            "
+            :title="t('payments.review')"
+            class="space-y-4 break-words"
         >
-        <div class="flex flex-wrap gap-3">
+            <p v-if="submission.error" role="alert">{{ t(submission.error) }}</p>
+            <p v-if="submission.uncertain" role="status">{{ t('payments.uncertain') }}</p>
             <AppButton
-                v-if="review.canApprove"
-                :disabled="review.pending"
-                @click="review.open('approve')"
-                >{{ t('payments.approve') }}</AppButton
+                v-if="submission.canSubmit"
+                :pending="submission.pending"
+                @click="submission.confirming = true"
+                >{{
+                    t(submission.uncertain ? 'payments.retryWrite' : 'payments.submit')
+                }}</AppButton
             >
-            <AppButton
-                v-if="review.canReject"
-                variant="secondary"
-                :disabled="review.pending"
-                @click="review.open('reject')"
-                >{{ t('payments.reject') }}</AppButton
-            >
-        </div>
-        <p v-if="review.error && !review.action" role="alert">{{ t(review.error) }}</p>
+            <div class="flex flex-wrap gap-3">
+                <AppButton
+                    v-if="review.canApprove"
+                    :disabled="review.pending"
+                    @click="review.open('approve')"
+                    >{{ t('payments.approve') }}</AppButton
+                >
+                <AppButton
+                    v-if="review.canReject"
+                    variant="secondary"
+                    :disabled="review.pending"
+                    @click="review.open('reject')"
+                    >{{ t('payments.reject') }}</AppButton
+                >
+            </div>
+            <p v-if="review.error && !review.action" role="alert">{{ t(review.error) }}</p>
+        </AppPanel>
         <AppReviewDialog
             v-model:reason="review.reason"
             resource="payments"

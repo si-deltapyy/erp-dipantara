@@ -1,0 +1,295 @@
+.woodflow-theme.wf-shell {
+    min-height: 100dvh;
+}
+.woodflow-theme .wf-skip {
+    position: fixed;
+    top: -100px;
+    left: 16px;
+    padding: 12px;
+    background: var(--wf-surface);
+    z-index: 100;
+}
+.woodflow-theme .wf-skip:focus {
+    top: 12px;
+}
+.woodflow-theme .wf-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    display: flex;
+    flex-direction: column;
+    width: 248px;
+    z-index: 30;
+    background: var(--wf-sidebar);
+    color: var(--wf-sidebar-foreground);
+    overflow-y: auto;
+    border-right: 1px solid var(--wf-sidebar-border);
+}
+.woodflow-theme .wf-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 28px 24px 32px;
+}
+.woodflow-theme .wf-brand-symbol {
+    color: var(--wf-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.woodflow-theme .wf-brand strong {
+    display: block;
+    font-size: 25px;
+    font-weight: 700;
+    color: var(--wf-sidebar-foreground);
+    letter-spacing: -0.03em;
+    line-height: 1.25;
+}
+.woodflow-theme .wf-brand div > span {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    margin-top: 6px;
+    color: var(--wf-primary);
+}
+.woodflow-theme .wf-navigation {
+    padding: 0 16px 24px;
+}
+.woodflow-theme .wf-navigation-group + .wf-navigation-group {
+    margin-top: 24px;
+}
+.woodflow-theme .wf-navigation-group > p {
+    padding: 0 14px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--wf-primary);
+}
+.woodflow-theme .wf-navigation-group button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    padding: 10px 14px;
+    width: 100%;
+    border-radius: var(--wf-radius);
+    text-align: left;
+    font-size: 14px;
+    margin-top: 4px;
+    color: var(--wf-sidebar-foreground);
+}
+.woodflow-theme .wf-navigation-group button[aria-current] {
+    background: var(--wf-sidebar-primary);
+    color: var(--wf-sidebar-primary-foreground);
+    font-weight: 600;
+}
+.woodflow-theme .wf-navigation-group button:not(:disabled):not([aria-current]):hover {
+    background: var(--wf-sidebar-accent);
+}
+.woodflow-theme .wf-navigation-group button:focus-visible {
+    outline-color: var(--wf-primary);
+}
+.woodflow-theme .wf-navigation-group button svg {
+    flex-shrink: 0;
+}
+.woodflow-theme .wf-nav-dot {
+    height: 5px;
+    width: 5px;
+    border-radius: 50%;
+    background: var(--wf-primary);
+    margin-left: auto;
+}
+.woodflow-theme .wf-navigation-note {
+    font-size: 12px;
+    line-height: 1.8;
+    padding: 22px 14px 0;
+    color: var(--wf-sidebar-foreground);
+}
+.woodflow-theme .wf-sidebar-footer {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin: auto 24px 0;
+    padding: 24px 0;
+    border-top: 1px solid var(--wf-sidebar-border);
+}
+.woodflow-theme .wf-company-monogram {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--wf-sidebar-border);
+    border-radius: var(--wf-radius);
+    color: var(--wf-primary);
+    font-weight: 700;
+    font-size: 17px;
+}
+.woodflow-theme .wf-sidebar-footer strong {
+    font-size: 12px;
+    letter-spacing: 0.07em;
+    color: var(--wf-sidebar-foreground);
+}
+.woodflow-theme .wf-sidebar-footer p {
+    font-size: 12px;
+    margin-top: 2px;
+}
+.woodflow-theme .wf-workspace {
+    margin-left: 248px;
+    min-width: 0;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+}
+.woodflow-theme .wf-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    min-height: 78px;
+    padding: 14px 32px;
+    border-bottom: 1px solid var(--wf-line);
+    background: var(--wf-surface);
+}
+.woodflow-theme .wf-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--wf-muted-foreground);
+}
+.woodflow-theme .wf-breadcrumb strong {
+    font-weight: 600;
+    color: var(--wf-ink);
+}
+.woodflow-theme .wf-topbar-end {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+}
+.woodflow-theme .wf-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-left: 1px solid var(--wf-line);
+    padding-left: 24px;
+}
+.woodflow-theme .wf-avatar {
+    width: 35px;
+    height: 35px;
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--wf-primary);
+    background: var(--wf-cream);
+    border-radius: 50%;
+}
+.woodflow-theme .wf-profile strong {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+}
+.woodflow-theme .wf-profile div > span {
+    display: block;
+    color: var(--wf-muted-foreground);
+    font-size: 12px;
+}
+.woodflow-theme .wf-main {
+    width: 100%;
+    flex: 1;
+    padding: 32px;
+    max-width: none;
+    margin: 0 auto;
+}
+.woodflow-theme .wf-footer {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    max-width: none;
+    margin: 0 auto;
+    padding: 0 32px 24px;
+    font-size: 12px;
+    color: var(--wf-muted-foreground);
+}
+.woodflow-theme .wf-icon-button.wf-mobile-toggle {
+    display: none;
+}
+.woodflow-theme .wf-drawer.wf-mobile-navigation {
+    background: var(--wf-sidebar);
+    color: var(--wf-sidebar-foreground);
+}
+.woodflow-theme .wf-mobile-navigation .wf-drawer-heading {
+    border-color: var(--wf-sidebar-border);
+}
+.woodflow-theme .wf-mobile-navigation .wf-icon-button:hover {
+    background: var(--wf-sidebar-accent);
+}
+.woodflow-theme .wf-mobile-navigation :focus-visible {
+    outline-color: var(--wf-primary);
+}
+
+@media (max-width: 1199px) {
+    .woodflow-theme .wf-main {
+        width: 100%;
+        flex: 1;
+        padding: 24px;
+    }
+    .woodflow-theme .wf-topbar {
+        padding-inline: 24px;
+    }
+    .woodflow-theme .wf-topbar-end {
+        gap: 12px;
+    }
+    .woodflow-theme .wf-breadcrumb > span,
+    .woodflow-theme .wf-breadcrumb > svg {
+        display: none;
+    }
+}
+@media (max-width: 1023px) {
+    .woodflow-theme .wf-sidebar {
+        display: none;
+    }
+    .woodflow-theme .wf-workspace {
+        margin-left: 0;
+    }
+    .woodflow-theme .wf-icon-button.wf-mobile-toggle {
+        display: inline-flex;
+    }
+    .woodflow-theme .wf-breadcrumb {
+        margin-right: auto;
+    }
+    .woodflow-theme .wf-topbar {
+        gap: 10px;
+    }
+}
+@media (max-width: 639px) {
+    .woodflow-theme .wf-main {
+        width: 100%;
+        flex: 1;
+        padding: 24px 16px;
+    }
+    .woodflow-theme .wf-topbar {
+        padding: 10px 12px;
+        min-height: 70px;
+        flex-wrap: wrap;
+    }
+    .woodflow-theme .wf-topbar-end {
+        display: contents;
+    }
+    .woodflow-theme .wf-profile {
+        border: 0;
+        padding-left: 0;
+    }
+    .woodflow-theme .wf-profile > div {
+        display: none;
+    }
+    .woodflow-theme .wf-footer {
+        width: 100%;
+        padding: 0 16px 24px;
+        flex-direction: column;
+        gap: 3px;
+    }
+}

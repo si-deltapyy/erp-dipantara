@@ -1,0 +1,1 @@
+import{q as s,B as t,L as n,K as o,D as r}from"./runtime-dom.esm-bundler-Y1jFVCKV.js";const c=s({__name:"AppStatusBadge",props:{tone:{default:"neutral"}},setup(e){return(a,l)=>(r(),t("span",{class:o(["wf-badge",`wf-badge--${e.tone}`])},[n(a.$slots,"default")],2))}});export{c as _};

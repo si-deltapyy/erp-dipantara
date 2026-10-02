@@ -22,8 +22,8 @@ function fieldError(field: MitraField): string | undefined {
 }
 </script>
 <template>
-    <div class="space-y-4">
-        <p class="text-sm text-muted">{{ t('mitras.requiredHint') }}</p>
+    <div class="grid gap-5 sm:grid-cols-2">
+        <p class="text-sm text-muted sm:col-span-2">{{ t('mitras.requiredHint') }}</p>
         <AppTextInput
             id="mitra-name"
             :model-value="modelValue.name"
@@ -49,6 +49,7 @@ function fieldError(field: MitraField): string | undefined {
         />
         <AppTextarea
             id="mitra-address"
+            class="sm:col-span-2"
             :model-value="modelValue.address"
             :label="t('mitras.address')"
             :hint="t('mitras.optional')"

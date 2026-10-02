@@ -66,6 +66,6 @@ function choose(value: string): void {
                 >{{ t('purchase-orders.more') }}</AppButton
             >
         </div>
-        <p v-if="lookupError" role="alert" class="text-sm text-red-700">{{ t(lookupError) }}</p>
+        <p v-if="lookupError" role="alert" class="text-sm text-danger">{{ t(lookupError) }}</p>
     </div>
 </template>

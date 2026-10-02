@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import AppPanel from '@/components/ui/AppPanel.vue'
+
 import { computed, nextTick, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -59,72 +61,78 @@ async function submit(): Promise<void> {
 }
 </script>
 <template>
-    <form ref="formElement" class="panel space-y-6" novalidate @submit.prevent="submit">
-        <ApprovedPurchaseOrderLookup
-            v-if="!invoice"
-            id="invoice-po"
-            :model-value="draft.purchaseOrderId"
-            :label="t('invoices.purchaseOrder')"
-            :error="errors.purchaseOrderId ? t(errors.purchaseOrderId) : ''"
-            :disabled="disabled"
-            @update:model-value="update('purchaseOrderId', $event)"
-        />
-        <p v-else>{{ invoice.purchaseOrderNumber }} / {{ invoice.counterpartyName }}</p>
-        <div class="grid gap-4 sm:grid-cols-2">
-            <AppSelect
-                id="invoice-direction"
-                :model-value="draft.direction"
-                :options="directions"
-                :label="t('invoices.direction')"
-                :disabled="disabled || !!invoice"
-                @update:model-value="changeDirection"
-            />
-            <MasterLookup
-                v-if="draft.direction === 'payable'"
-                id="invoice-mitra"
-                kind="mitra"
-                :label="t('invoices.mitra')"
-                :model-value="draft.mitraId ?? ''"
-                :selected-label="invoice?.counterpartyName"
-                :disabled="disabled || !!invoice"
-                :error="errors.mitraId ? t(errors.mitraId) : ''"
-                @update:model-value="update('mitraId', $event)"
-            />
-            <AppTextInput
-                id="invoice-date"
-                type="date"
-                :model-value="draft.invoiceDate"
-                :label="t('invoices.invoiceDate')"
-                :error="errors.invoiceDate ? t(errors.invoiceDate) : ''"
+    <form ref="formElement" class="min-w-0 space-y-6" novalidate @submit.prevent="submit">
+        <AppPanel :title="t('invoices.context')" class="space-y-5">
+            <ApprovedPurchaseOrderLookup
+                v-if="!invoice"
+                id="invoice-po"
+                :model-value="draft.purchaseOrderId"
+                :label="t('invoices.purchaseOrder')"
+                :error="errors.purchaseOrderId ? t(errors.purchaseOrderId) : ''"
                 :disabled="disabled"
-                @update:model-value="update('invoiceDate', $event)"
+                @update:model-value="update('purchaseOrderId', $event)"
             />
-        </div>
-        <AppSelect
-            id="invoice-kind"
-            :model-value="draft.kind"
-            :options="kinds"
-            :label="t('invoices.kind')"
-            :disabled="disabled || !!invoice"
-            @update:model-value="changeKind"
-        />
+            <p v-else>{{ invoice.purchaseOrderNumber }} / {{ invoice.counterpartyName }}</p>
+            <div class="grid gap-4 sm:grid-cols-2">
+                <AppSelect
+                    id="invoice-direction"
+                    renderer="nice"
+                    :model-value="draft.direction"
+                    :options="directions"
+                    :label="t('invoices.direction')"
+                    :disabled="disabled || !!invoice"
+                    @update:model-value="changeDirection"
+                />
+                <MasterLookup
+                    v-if="draft.direction === 'payable'"
+                    id="invoice-mitra"
+                    kind="mitra"
+                    :label="t('invoices.mitra')"
+                    :model-value="draft.mitraId ?? ''"
+                    :selected-label="invoice?.counterpartyName"
+                    :disabled="disabled || !!invoice"
+                    :error="errors.mitraId ? t(errors.mitraId) : ''"
+                    @update:model-value="update('mitraId', $event)"
+                />
+                <AppTextInput
+                    id="invoice-date"
+                    type="date"
+                    :model-value="draft.invoiceDate"
+                    :label="t('invoices.invoiceDate')"
+                    :error="errors.invoiceDate ? t(errors.invoiceDate) : ''"
+                    :disabled="disabled"
+                    @update:model-value="update('invoiceDate', $event)"
+                />
+            </div>
+            <AppSelect
+                id="invoice-kind"
+                renderer="nice"
+                :model-value="draft.kind"
+                :options="kinds"
+                :label="t('invoices.kind')"
+                :disabled="disabled || !!invoice"
+                @update:model-value="changeKind"
+            />
+        </AppPanel>
         <InvoiceTerms
             :terms="draft.terms"
             :errors="errors"
             :disabled="disabled"
             @change="update('terms', $event)"
         />
-        <AppTextInput
-            id="invoice-notes"
-            :label="t('invoices.notes')"
-            :model-value="draft.notes ?? ''"
-            :maxlength="2000"
-            :disabled="disabled"
-            @update:model-value="update('notes', $event || null)"
-        />
+        <AppPanel :title="t('invoices.notes')">
+            <AppTextInput
+                id="invoice-notes"
+                :label="t('invoices.notes')"
+                :model-value="draft.notes ?? ''"
+                :maxlength="2000"
+                :disabled="disabled"
+                @update:model-value="update('notes', $event || null)"
+            />
+        </AppPanel>
         <p v-if="error" role="alert" class="text-red-700">{{ t(error) }}</p>
         <p v-if="uncertain" role="status">{{ t('invoices.uncertain') }}</p>
-        <div class="flex flex-wrap justify-end gap-3">
+        <div class="wf-form-actions">
             <RouterLink
                 :to="{
                     name: invoice ? 'invoice-detail' : 'invoices',

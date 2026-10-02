@@ -56,6 +56,7 @@ function fieldError(field: 'ownerType' | 'ownerId'): string | undefined {
     <div class="space-y-3">
         <AppSelect
             id="bank-account-owner-type"
+            renderer="nice"
             :label="t('bank-accounts.ownerType')"
             :options="types"
             :model-value="modelValue.ownerType"
@@ -96,7 +97,7 @@ function fieldError(field: 'ownerType' | 'ownerId'): string | undefined {
             <p v-if="loading" role="status" class="text-sm text-muted">
                 {{ t('bank-accounts.ownerLoading') }}
             </p>
-            <div v-else-if="error" role="alert" class="space-y-2 text-sm text-red-700">
+            <div v-else-if="error" role="alert" class="space-y-2 text-sm text-danger">
                 <p>{{ t(error) }}</p>
                 <AppButton variant="secondary" :disabled="disabled" @click="refresh">{{
                     t('bank-accounts.refresh')

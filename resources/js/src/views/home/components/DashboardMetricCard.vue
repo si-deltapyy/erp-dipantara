@@ -14,6 +14,15 @@ const { t } = useI18n()
         "
         :caption="t(metric.unit === 'IDR' ? 'dashboard.simulation' : 'dashboard.countUnit')"
         :target-path="metric.targetPath"
+        :icon="
+            metric.unit === 'IDR'
+                ? 'wallet'
+                : metric.key === 'prepared-deliveries'
+                  ? 'box'
+                  : metric.key === 'dispatched-deliveries'
+                    ? 'truck'
+                    : 'document'
+        "
         :data-testid="'metric-' + metric.key"
     />
 </template>

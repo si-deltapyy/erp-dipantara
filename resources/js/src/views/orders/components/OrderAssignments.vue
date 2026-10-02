@@ -11,6 +11,7 @@ import { useAssignmentRecoveryStore } from '@/stores/assignment-recovery'
 import AssignmentEditor from './AssignmentEditor.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppPagination from '@/components/ui/AppPagination.vue'
+import AppPanel from '@/components/ui/AppPanel.vue'
 const props = defineProps<{ order: Order }>()
 const emit = defineEmits<{ changed: [] }>()
 const { t } = useI18n()
@@ -35,13 +36,12 @@ function saved(): void {
 }
 </script>
 <template>
-    <section class="panel space-y-4">
-        <header class="flex flex-wrap items-center justify-between gap-3">
-            <h2 class="text-xl font-semibold">{{ t('assignments.title') }}</h2>
+    <AppPanel :title="t('assignments.title')" class="space-y-4">
+        <template #actions>
             <AppButton v-if="canCreate && !editing" @click="edit()">{{
                 t('assignments.add')
             }}</AppButton>
-        </header>
+        </template>
         <AssignmentEditor
             v-if="editing"
             :key="selected?.id ?? 'new'"
@@ -56,34 +56,51 @@ function saved(): void {
             <AppButton @click="refresh">{{ t('orders.refresh') }}</AppButton>
         </div>
         <p v-else-if="!visible.length">{{ t('assignments.empty') }}</p>
-        <div v-else class="grid gap-4 lg:grid-cols-2">
-            <article
-                v-for="assignment in visible"
-                :key="assignment.id"
-                class="space-y-3 rounded-lg border border-line p-4"
-            >
-                <h3 class="font-semibold">{{ assignment.mitraName }}</h3>
-                <p>{{ assignment.graderName }}</p>
-                <p>{{ assignment.timberProductName }}</p>
-                <p>{{ t('orders.quantityValue', { count: assignment.quantity }) }}</p>
-                <AppButton
-                    v-if="assignment.allowedActions.includes('update') && !editing"
-                    variant="secondary"
-                    @click="edit(assignment)"
-                    >{{ t('assignments.edit') }}</AppButton
-                ><MitraTerms
+        <div v-else class="divide-y divide-line">
+            <article v-for="assignment in visible" :key="assignment.id" class="space-y-4 py-5">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <h3 class="break-words font-semibold">{{ assignment.mitraName }}</h3>
+                    <AppButton
+                        v-if="assignment.allowedActions.includes('update') && !editing"
+                        variant="secondary"
+                        @click="edit(assignment)"
+                        >{{ t('assignments.edit') }}</AppButton
+                    >
+                </div>
+                <dl
+                    class="grid gap-4 sm:grid-cols-3 [&_dd]:mt-1 [&_dd]:break-words [&_dt]:text-xs [&_dt]:text-muted"
+                >
+                    <div>
+                        <dt>{{ t('assignments.grader') }}</dt>
+                        <dd>{{ assignment.graderName }}</dd>
+                    </div>
+                    <div>
+                        <dt>{{ t('assignments.timber') }}</dt>
+                        <dd>{{ assignment.timberProductName }}</dd>
+                    </div>
+                    <div>
+                        <dt>{{ t('assignments.quantity') }}</dt>
+                        <dd class="font-semibold">
+                            {{ t('orders.quantityValue', { count: assignment.quantity }) }}
+                        </dd>
+                    </div>
+                </dl>
+                <MitraTerms
                     v-if="hasBusinessPermission(session.user, 'invoices.read')"
                     :purchase-order-id="order.purchaseOrderId"
                     :mitra-id="assignment.mitraId"
                 />
             </article>
         </div>
-        <AppPagination
-            v-if="response"
-            :page="page"
-            :page-size="response.meta.perPage"
-            :total="response.meta.total"
-            @update:page="page = $event"
-        />
-    </section>
+        <template #footer
+            ><AppPagination
+                v-if="response"
+                numbered
+                :disabled="loading"
+                :page="page"
+                :page-size="response.meta.perPage"
+                :total="response.meta.total"
+                @update:page="page = $event"
+        /></template>
+    </AppPanel>
 </template>

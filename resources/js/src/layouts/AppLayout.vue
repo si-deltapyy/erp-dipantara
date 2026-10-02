@@ -1,69 +1,39 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import AppBrand from '@/components/layout/AppBrand.vue'
-import AppNavigation from '@/components/layout/AppNavigation.vue'
-import MobileNavigation from '@/components/layout/MobileNavigation.vue'
-import AppIcon from '@/components/ui/AppIcon.vue'
-
+import WorkspaceShell from './WorkspaceShell.vue'
 import SessionActions from '@/views/auth/components/SessionActions.vue'
+import { useSessionStore } from '@/stores/session'
+import { useWorkspaceNavigation } from '@/composables/useWorkspaceNavigation'
+
 const { t } = useI18n()
 const route = useRoute()
-const mobileOpen = ref(false)
-const pageTitle = computed(() => t(route.meta.titleKey))
+const session = useSessionStore()
+const { groups, activeKey, navigate } = useWorkspaceNavigation()
+const initials = computed(
+    () =>
+        session.user?.displayName
+            .trim()
+            .split(/\s+/)
+            .slice(0, 2)
+            .map((part) => part[0])
+            .join('')
+            .toUpperCase() ?? '',
+)
 </script>
 
 <template>
-    <a
-        href="#main-content"
-        class="sr-only z-50 rounded bg-white p-4 focus:not-sr-only focus:fixed"
-        >{{ t('navigation.skip') }}</a
+    <WorkspaceShell
+        :groups="groups"
+        :active-key="activeKey"
+        :title="t(route.meta.titleKey)"
+        :user-name="session.user?.displayName ?? ''"
+        :user-role="session.user?.roles.join(', ') ?? ''"
+        :initials="initials"
+        @navigate="navigate"
     >
-    <aside
-        class="fixed inset-y-0 left-0 hidden w-[260px] flex-col border-r border-line bg-white lg:flex"
-    >
-        <div class="px-6 py-7"><AppBrand /></div>
-        <AppNavigation class="mt-5" />
-        <p class="mt-auto border-t border-line p-6 text-xs leading-5 text-muted">
-            {{ t('brand.description') }}
-        </p>
-    </aside>
-    <MobileNavigation :open="mobileOpen" @close="mobileOpen = false" />
-    <div class="flex min-h-dvh min-w-0 flex-col lg:ml-[260px]">
-        <header
-            class="sticky top-0 z-20 flex min-h-20 items-center gap-3 border-b border-line bg-white px-4 sm:px-8"
-        >
-            <button
-                type="button"
-                class="icon-button lg:hidden"
-                :aria-label="t('navigation.open')"
-                :aria-expanded="mobileOpen"
-                aria-controls="mobile-navigation"
-                @click="mobileOpen = true"
-            >
-                <AppIcon name="menu" />
-            </button>
-            <div class="min-w-0">
-                <p class="text-xs text-muted">{{ t('shell.workspace') }}</p>
-                <p class="truncate text-sm font-semibold">{{ pageTitle }}</p>
-            </div>
-            <span
-                class="ml-auto rounded-full bg-canvas px-3 py-1.5 text-xs font-semibold text-muted"
-                >{{ t('shell.stage') }}</span
-            >
-            <SessionActions />
-        </header>
-        <main
-            id="main-content"
-            tabindex="-1"
-            class="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-8 sm:py-10"
-        >
-            <RouterView />
-        </main>
-        <footer class="flex flex-wrap justify-between gap-2 px-4 py-6 text-xs text-muted sm:px-8">
-            <span>{{ t('shell.footer') }}</span
-            ><span>{{ t('shell.release') }}</span>
-        </footer>
-    </div>
+        <template #account-actions><SessionActions :show-name="false" /></template>
+        <RouterView />
+    </WorkspaceShell>
 </template>

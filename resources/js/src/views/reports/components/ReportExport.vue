@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import AppPanel from '@/components/ui/AppPanel.vue'
+
 import { useI18n } from 'vue-i18n'
 import type { ReportKind } from '@/core/types/report-export'
 import AppButton from '@/components/ui/AppButton.vue'
@@ -10,7 +12,12 @@ const { allowed, pending, error, hasDocument, generate, download } = useReportEx
 )
 </script>
 <template>
-    <div v-if="allowed" class="space-y-3">
+    <AppPanel
+        v-if="allowed"
+        :title="t('reports.export')"
+        :description="t('reports.appliedFiltersHint')"
+        class="space-y-4 break-words"
+    >
         <p class="text-sm text-muted">{{ t('reports.exportNotice') }}</p>
         <div class="flex flex-wrap gap-3">
             <AppButton :pending="pending" @click="generate">{{ t('reports.export') }}</AppButton>
@@ -23,5 +30,5 @@ const { allowed, pending, error, hasDocument, generate, download } = useReportEx
             >
         </div>
         <p v-if="error" role="alert">{{ t(error) }}</p>
-    </div>
+    </AppPanel>
 </template>

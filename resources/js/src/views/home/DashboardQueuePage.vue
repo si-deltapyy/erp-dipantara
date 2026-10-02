@@ -8,6 +8,7 @@ import DashboardTransactionList from './components/DashboardTransactionList.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
 import AppPagination from '@/components/ui/AppPagination.vue'
+import AppPageHeader from '@/components/ui/AppPageHeader.vue'
 const route = useRoute()
 const { t } = useI18n()
 const title = computed(() => {
@@ -19,13 +20,13 @@ const { response, query, search, loading, error, refresh, searchRecords, changeP
 </script>
 <template>
     <section class="space-y-6">
-        <header>
-            <RouterLink :to="{ name: 'home' }" class="text-sm text-primary underline">{{
-                t('dashboard.back')
-            }}</RouterLink>
-            <h1 class="mt-3 text-2xl font-bold">{{ title }}</h1>
-            <p class="mt-2 text-sm text-muted">{{ t('dashboard.queueDescription') }}</p>
-        </header>
+        <AppPageHeader :title="title" :description="t('dashboard.queueDescription')">
+            <template #actions>
+                <RouterLink :to="{ name: 'home' }" class="text-sm text-primary underline">{{
+                    t('dashboard.back')
+                }}</RouterLink>
+            </template>
+        </AppPageHeader>
         <div class="panel space-y-4">
             <form class="flex flex-wrap items-end gap-3" @submit.prevent="searchRecords">
                 <div class="min-w-48 flex-1">
@@ -50,6 +51,8 @@ const { response, query, search, loading, error, refresh, searchRecords, changeP
                 <p v-if="!response.data.length" role="status">{{ t('dashboard.queueEmpty') }}</p>
                 <DashboardTransactionList :records="response.data" />
                 <AppPagination
+                    numbered
+                    :disabled="loading"
                     :page="query.page"
                     :page-size="response.meta.perPage"
                     :total="response.meta.total"

@@ -10,6 +10,10 @@ import AppTextInput from '@/components/ui/AppTextInput.vue'
 import { useDashboard } from './composables/useDashboard'
 import DashboardMetricCard from './components/DashboardMetricCard.vue'
 import AppButton from '@/components/ui/AppButton.vue'
+import AppPageHeader from '@/components/ui/AppPageHeader.vue'
+import AppPanel from '@/components/ui/AppPanel.vue'
+import AppState from '@/components/ui/AppState.vue'
+import { formatMoney } from '@/core/formatting/money'
 const { t } = useI18n()
 const session = useSessionStore()
 const showGrader = computed(
@@ -27,16 +31,13 @@ const { record: snapshot, loading, error, refresh } = useDashboard()
 </script>
 <template>
     <section class="space-y-6">
-        <header class="flex flex-wrap items-start justify-between gap-4">
-            <div class="max-w-2xl">
-                <p class="text-sm font-semibold text-primary">{{ t('dashboard.title') }}</p>
-                <h1 class="mt-1 text-2xl font-bold">{{ t('home.title') }}</h1>
-                <p class="mt-2 text-sm leading-6 text-muted">{{ t('dashboard.description') }}</p>
-            </div>
-            <AppButton variant="secondary" :pending="loading" @click="refresh">{{
-                t('dashboard.refresh')
-            }}</AppButton>
-        </header>
+        <AppPageHeader :title="t('dashboard.title')" :description="t('dashboard.description')">
+            <template #actions>
+                <AppButton variant="secondary" :pending="loading" @click="refresh">{{
+                    t('dashboard.refresh')
+                }}</AppButton>
+            </template>
+        </AppPageHeader>
         <form
             v-if="showGrader"
             class="panel flex flex-wrap items-end gap-3"
@@ -51,7 +52,7 @@ const { record: snapshot, loading, error, refresh } = useDashboard()
             />
             <AppButton type="submit">{{ t('production.apply') }}</AppButton>
         </form>
-        <p v-if="loading" role="status" class="panel">{{ t('dashboard.loading') }}</p>
+        <AppState v-if="loading" kind="loading" :message="t('dashboard.loading')" class="panel" />
         <div v-else-if="error" role="alert" class="panel space-y-3">
             <p>{{ t(error) }}</p>
             <AppButton @click="refresh">{{ t('dashboard.refresh') }}</AppButton>
@@ -72,15 +73,42 @@ const { record: snapshot, loading, error, refresh } = useDashboard()
             >
                 {{ t('dashboard.empty') }}
             </p>
-            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div class="grid gap-6 md:grid-cols-3">
                 <DashboardMetricCard
-                    v-for="metric in snapshot.metrics"
+                    v-for="metric in snapshot.metrics.filter((metric) => metric.unit === 'count')"
                     :key="metric.key"
                     :metric="metric"
                 />
             </div>
+            <div class="grid items-start gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
+                <DashboardQueueCards :queues="snapshot.queues" />
+                <AppPanel
+                    v-if="snapshot.metrics.some((metric) => metric.unit === 'IDR')"
+                    :title="t('overview.balances')"
+                    :description="t('overview.balancesDescription')"
+                >
+                    <dl class="divide-y divide-line">
+                        <div
+                            v-for="metric in snapshot.metrics.filter(
+                                (metric) => metric.unit === 'IDR',
+                            )"
+                            :key="metric.key"
+                            class="py-5"
+                        >
+                            <dt class="text-sm text-muted">
+                                {{ t('dashboard.metrics.' + metric.key) }}
+                            </dt>
+                            <dd class="mt-2 break-words text-2xl font-semibold">
+                                <RouterLink :to="metric.targetPath">{{
+                                    formatMoney(String(metric.value))
+                                }}</RouterLink>
+                            </dd>
+                        </div>
+                    </dl>
+                    <template #footer>{{ t('overview.balanceNote') }}</template>
+                </AppPanel>
+            </div>
             <DashboardActivityList v-if="showActivity" :activity="snapshot.activity" />
-            <DashboardQueueCards :queues="snapshot.queues" />
             <DashboardGraderPanel v-if="snapshot.grader" :snapshot="snapshot.grader" />
         </template>
         <p v-else class="panel text-muted">{{ t('dashboard.unavailable') }}</p>

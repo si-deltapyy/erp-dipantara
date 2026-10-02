@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import AppPageHeader from '@/components/ui/AppPageHeader.vue'
+import AppPanel from '@/components/ui/AppPanel.vue'
+import AppState from '@/components/ui/AppState.vue'
+
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { deliveryStatuses } from '@/core/types/delivery'
@@ -33,52 +37,71 @@ const { response, query, search, loading, error, canCreate, refresh, searchRecor
     useMasterList(useDeliveryApi(), 'deliveries', queryFilters)
 </script>
 <template>
-    <section class="space-y-6">
-        <header class="flex flex-wrap items-start justify-between gap-4">
-            <div>
-                <p class="text-sm font-semibold text-primary">{{ t('deliveries.section') }}</p>
-                <h1 class="mt-1 text-2xl font-bold">{{ t('deliveries.title') }}</h1>
-                <p class="mt-2 text-sm text-muted">{{ t('deliveries.subtitle') }}</p>
-            </div>
-            <RouterLink v-if="canCreate" :to="{ name: 'delivery-new' }" class="primary-button">{{
-                t('deliveries.add')
-            }}</RouterLink>
-        </header>
-        <div class="panel space-y-5">
-            <form class="flex flex-wrap items-end gap-3" @submit.prevent="searchRecords">
-                <div class="min-w-48 flex-1">
-                    <AppTextInput
-                        id="delivery-search"
-                        v-model="search"
-                        :label="t('deliveries.search')"
-                        :maxlength="200"
-                    />
-                </div>
+    <section class="min-w-0 space-y-6">
+        <AppPageHeader :title="t('deliveries.title')" :description="t('deliveries.subtitle')">
+            <template #actions
+                ><RouterLink
+                    v-if="canCreate"
+                    :to="{ name: 'delivery-new' }"
+                    class="primary-button"
+                    >{{ t('deliveries.add') }}</RouterLink
+                ></template
+            >
+        </AppPageHeader>
+        <AppPanel :title="t('deliveries.filters')">
+            <form
+                class="grid items-end gap-4 md:grid-cols-2 xl:grid-cols-3"
+                @submit.prevent="searchRecords"
+            >
+                <AppTextInput
+                    id="delivery-search"
+                    v-model="search"
+                    :label="t('deliveries.search')"
+                    :maxlength="200"
+                />
                 <AppSelect
                     id="delivery-status"
+                    renderer="nice"
                     :model-value="status"
                     :options="statusOptions"
                     :label="t('deliveries.status')"
                     @update:model-value="changeStatus"
                 />
-                <AppButton type="submit">{{ t('deliveries.searchAction') }}</AppButton
-                ><AppButton variant="secondary" :pending="loading" @click="refresh">{{
-                    t('deliveries.refresh')
-                }}</AppButton>
+                <div class="flex flex-wrap gap-3">
+                    <AppButton type="submit">{{ t('deliveries.searchAction') }}</AppButton
+                    ><AppButton variant="secondary" :pending="loading" @click="refresh">{{
+                        t('deliveries.refresh')
+                    }}</AppButton>
+                </div>
             </form>
-            <p v-if="loading" role="status">{{ t('deliveries.loading') }}</p>
-            <p v-else-if="error" role="alert">{{ t(error) }}</p>
+        </AppPanel>
+        <AppPanel
+            :title="t('deliveries.results')"
+            :description="
+                response && !loading && !error
+                    ? t('deliveries.total', { count: response.meta.total })
+                    : undefined
+            "
+            class="min-w-0"
+        >
+            <AppState v-if="loading" kind="loading" :message="t('deliveries.loading')" />
+            <AppState v-else-if="error" kind="error" :message="t(error)" @retry="refresh" />
             <template v-else-if="response"
-                ><p class="text-sm text-muted">
-                    {{ t('deliveries.total', { count: response.meta.total }) }}
-                </p>
-                <p v-if="!response.data.length" role="status">{{ t('deliveries.empty') }}</p>
-                <DeliveryTable v-else :deliveries="response.data" /><AppPagination
+                ><AppState
+                    v-if="!response.data.length"
+                    kind="empty"
+                    :message="t('deliveries.empty')" /><DeliveryTable
+                    v-else
+                    :deliveries="response.data"
+            /></template>
+            <template v-if="response && !loading && !error" #footer
+                ><AppPagination
+                    numbered
                     :page="query.page"
                     :page-size="response.meta.perPage"
                     :total="response.meta.total"
                     @update:page="changePage"
             /></template>
-        </div>
+        </AppPanel>
     </section>
 </template>

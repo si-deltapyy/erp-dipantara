@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import AppPanel from '@/components/ui/AppPanel.vue'
+
 import { reactive, watch, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Delivery } from '@/core/types/delivery'
@@ -33,7 +35,7 @@ useUnsavedChanges(
 )
 </script>
 <template>
-    <div
+    <AppPanel
         v-if="
             dispatch.canSubmit ||
             receive.canSubmit ||
@@ -42,7 +44,8 @@ useUnsavedChanges(
             (delivery.status === 'draft' &&
                 session.user?.permissions.includes('deliveries.dispatch.all'))
         "
-        class="panel space-y-3"
+        :title="t('deliveries.transitions')"
+        class="space-y-4 break-words"
     >
         <p v-if="delivery.status === 'draft' && delivery.documents.length < 2">
             {{ t('deliveries.incompleteDocuments') }}
@@ -75,5 +78,5 @@ useUnsavedChanges(
                 @confirm="entry.state.submit"
                 @cancel="entry.state.confirming = false"
         /></template>
-    </div>
+    </AppPanel>
 </template>

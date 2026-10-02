@@ -28,6 +28,11 @@ export default {
         receiveDescription: 'Konfirmasi bahwa pengiriman telah diterima.',
 
         title: 'Pengiriman',
+        filters: 'Filter pengiriman',
+        results: 'Daftar pengiriman',
+        shipmentContext: 'Informasi perjalanan',
+        transitions: 'Tindak lanjut pengiriman',
+        sakrMetadata: 'Identitas SAKR',
         section: 'Operasional',
         subtitle: 'Alokasikan kayu yang telah disetujui ke pengiriman bertahap.',
         add: 'Tambah pengiriman',

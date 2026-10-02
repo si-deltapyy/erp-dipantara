@@ -18,7 +18,12 @@ function print(): void {
 }
 </script>
 <template>
-    <AppModal :open="!!preview" :title="t('documents.preview')" @close="emit('close')">
+    <AppModal
+        :open="!!preview"
+        :title="t('documents.preview')"
+        class="max-w-4xl"
+        @close="emit('close')"
+    >
         <template v-if="preview"
             ><p class="mb-3 break-all font-semibold">{{ preview.document.fileName }}</p>
             <img

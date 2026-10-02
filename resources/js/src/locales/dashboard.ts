@@ -10,6 +10,7 @@ export default {
         searchAction: 'Cari',
         total: '{count} pekerjaan',
         back: 'Kembali ke dashboard',
+        updatedAt: 'Diperbarui',
         queues: {
             'purchase-orders-review': 'PO menunggu review',
             'orders-review': 'Order menunggu review',
