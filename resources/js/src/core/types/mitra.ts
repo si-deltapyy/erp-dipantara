@@ -6,6 +6,12 @@ export interface MitraInput {
     readonly phone: string
     readonly address: string
 }
+export interface MitraRecord extends MitraInput {
+    readonly id: OpaqueId
+    readonly graderGroup: string
+    readonly createdAt: string
+    readonly updatedAt: string
+}
 export interface Mitra extends MitraInput, RecordMetadata {
     readonly snapshotGeneration?: string
     readonly id: OpaqueId
@@ -26,7 +32,7 @@ export interface MitraWriteOptions {
     readonly idempotencyKey: string
 }
 export interface MitrasApi {
-    list(query: MitraQuery, signal: AbortSignal): Promise<PageResponse<Mitra>>
+    list(query: MitraQuery, signal: AbortSignal): Promise<readonly MitraRecord[]>
     lookup(query: MitraQuery, signal: AbortSignal): Promise<PageResponse<MitraLookup>>
     get(id: string, signal: AbortSignal): Promise<Mitra>
     create(input: MitraInput, options: MitraWriteOptions): Promise<Mitra>

@@ -1,5 +1,6 @@
 export default {
     mitras: {
+        graderGroup: 'Grup Grader',
         title: 'Master Mitra',
         subtitle: 'Kelola mitra pemasok kayu untuk transaksi Order.',
         section: 'Master data',
