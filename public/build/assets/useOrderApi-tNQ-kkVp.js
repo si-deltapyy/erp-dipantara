@@ -1,0 +1,1 @@
+import{I as o}from"./main-BB2GmXRX.js";import{f as e}from"./runtime-dom.esm-bundler-vX6VNcEy.js";function n(){const r=e(o);if(!r)throw new Error("Purchase order API is not configured");return r}export{n as u};

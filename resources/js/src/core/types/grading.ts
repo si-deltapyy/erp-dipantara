@@ -1,4 +1,4 @@
-import type { RecordMetadata, PageResponse } from './contracts'
+import type { RecordMetadata } from './contracts'
 import type { MasterListQuery } from './master-list'
 import type { WorkflowApi, WorkflowWriteOptions } from './workflow'
 export const gradingStatuses = ['draft', 'submitted', 'approved', 'rejected', 'superseded'] as const
@@ -44,7 +44,7 @@ export interface GradingRevisionInput {
 }
 export interface GradingsApi extends WorkflowApi<Grading> {
     revise(id: string, input: GradingRevisionInput, options: WorkflowWriteOptions): Promise<Grading>
-    list(query: GradingQuery, signal: AbortSignal): Promise<PageResponse<Grading>>
+    list(query: GradingQuery, signal: AbortSignal): Promise<readonly Grading[]>
     get(id: string, signal: AbortSignal): Promise<Grading>
     create(input: GradingInput, options: WorkflowWriteOptions): Promise<Grading>
     update(
