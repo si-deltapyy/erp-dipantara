@@ -6,8 +6,8 @@ import AppBrand from '@/components/layout/AppBrand.vue'
 import AppNavigation from '@/components/layout/AppNavigation.vue'
 import MobileNavigation from '@/components/layout/MobileNavigation.vue'
 import AppIcon from '@/components/ui/AppIcon.vue'
-import { mockEnabled } from '@/core/constants/environment'
 
+import SessionActions from '@/views/auth/components/SessionActions.vue'
 const { t } = useI18n()
 const route = useRoute()
 const mobileOpen = ref(false)
@@ -49,15 +49,10 @@ const pageTitle = computed(() => t(route.meta.titleKey))
                 <p class="truncate text-sm font-semibold">{{ pageTitle }}</p>
             </div>
             <span
-                v-if="mockEnabled"
-                class="ml-auto rounded-full bg-primary-light px-3 py-1.5 text-xs font-semibold text-primary-strong"
-                >{{ t('shell.mock') }}</span
-            >
-            <span
-                v-else
                 class="ml-auto rounded-full bg-canvas px-3 py-1.5 text-xs font-semibold text-muted"
                 >{{ t('shell.stage') }}</span
             >
+            <SessionActions />
         </header>
         <main
             id="main-content"

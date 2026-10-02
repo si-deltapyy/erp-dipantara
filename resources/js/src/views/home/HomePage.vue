@@ -1,66 +1,88 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import AppIcon from '@/components/ui/AppIcon.vue'
-
+import { computed } from 'vue'
+import { useSessionStore } from '@/stores/session'
+import DashboardActivityList from './components/DashboardActivityList.vue'
+import DashboardQueueCards from './components/DashboardQueueCards.vue'
+import DashboardGraderPanel from './components/DashboardGraderPanel.vue'
+import { useDashboardPeriod } from './composables/useDashboardPeriod'
+import AppTextInput from '@/components/ui/AppTextInput.vue'
+import { useDashboard } from './composables/useDashboard'
+import DashboardMetricCard from './components/DashboardMetricCard.vue'
+import AppButton from '@/components/ui/AppButton.vue'
 const { t } = useI18n()
-const features = [
-    { key: 'navigation', icon: 'home' as const },
-    { key: 'responsive', icon: 'screen' as const },
-    { key: 'connection', icon: 'layers' as const },
-]
+const session = useSessionStore()
+const showGrader = computed(
+    () =>
+        session.user?.permissions.includes('dashboard.read.assigned') &&
+        !session.user.permissions.includes('dashboard.read.all'),
+)
+const { period, error: periodError, applyPeriod } = useDashboardPeriod()
+const showActivity = computed(
+    () =>
+        session.user?.permissions.includes('dashboard.read.own') &&
+        !session.user.permissions.includes('dashboard.read.all'),
+)
+const { record: snapshot, loading, error, refresh } = useDashboard()
 </script>
-
 <template>
-    <div class="space-y-8">
-        <section
-            class="relative overflow-hidden rounded-xl bg-ink px-6 py-10 text-white sm:px-10 sm:py-14"
+    <section class="space-y-6">
+        <header class="flex flex-wrap items-start justify-between gap-4">
+            <div class="max-w-2xl">
+                <p class="text-sm font-semibold text-primary">{{ t('dashboard.title') }}</p>
+                <h1 class="mt-1 text-2xl font-bold">{{ t('home.title') }}</h1>
+                <p class="mt-2 text-sm leading-6 text-muted">{{ t('dashboard.description') }}</p>
+            </div>
+            <AppButton variant="secondary" :pending="loading" @click="refresh">{{
+                t('dashboard.refresh')
+            }}</AppButton>
+        </header>
+        <form
+            v-if="showGrader"
+            class="panel flex flex-wrap items-end gap-3"
+            @submit.prevent="applyPeriod"
         >
-            <div class="relative z-10 max-w-xl">
-                <p class="mb-4 text-xs font-semibold tracking-[0.16em] text-white/70">
-                    {{ t('home.eyebrow') }}
-                </p>
-                <h1 class="max-w-lg text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
-                    {{ t('home.title') }}
-                </h1>
-                <p class="mt-5 max-w-lg text-sm leading-7 text-white/75">
-                    {{ t('home.description') }}
-                </p>
-            </div>
-            <div
-                aria-hidden="true"
-                class="absolute -right-12 -top-20 h-80 w-80 rounded-full border-[40px] border-white/5"
+            <AppTextInput
+                id="dashboard-period"
+                v-model="period"
+                type="month"
+                :label="t('production.period')"
+                :error="periodError ? t(periodError) : undefined"
             />
-            <div
-                aria-hidden="true"
-                class="absolute -bottom-32 right-12 h-72 w-72 rounded-full border-[40px] border-white/5"
-            />
-        </section>
-        <section class="panel flex items-start gap-4" aria-labelledby="workspace-status">
-            <span
-                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary-light text-primary"
-                ><AppIcon name="layers" :size="24"
-            /></span>
-            <div>
-                <h2 id="workspace-status" class="text-base font-semibold">
-                    {{ t('home.status') }}
-                </h2>
-                <p class="mt-2 text-sm leading-6 text-muted">{{ t('home.statusDescription') }}</p>
+            <AppButton type="submit">{{ t('production.apply') }}</AppButton>
+        </form>
+        <p v-if="loading" role="status" class="panel">{{ t('dashboard.loading') }}</p>
+        <div v-else-if="error" role="alert" class="panel space-y-3">
+            <p>{{ t(error) }}</p>
+            <AppButton @click="refresh">{{ t('dashboard.refresh') }}</AppButton>
+        </div>
+        <template v-else-if="snapshot">
+            <p class="text-sm text-muted">
+                {{ t('dashboard.asOf', { date: new Date(snapshot.asOf).toLocaleString('id-ID') }) }}
+            </p>
+            <p
+                v-if="
+                    !snapshot.metrics.length &&
+                    !snapshot.queues.length &&
+                    !showActivity &&
+                    !snapshot.grader
+                "
+                role="status"
+                class="panel"
+            >
+                {{ t('dashboard.empty') }}
+            </p>
+            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                <DashboardMetricCard
+                    v-for="metric in snapshot.metrics"
+                    :key="metric.key"
+                    :metric="metric"
+                />
             </div>
-        </section>
-        <section aria-labelledby="foundation-title">
-            <h2 id="foundation-title" class="text-lg font-bold">{{ t('home.foundation') }}</h2>
-            <p class="mt-1 text-sm leading-6 text-muted">{{ t('home.foundationDescription') }}</p>
-            <div class="mt-5 grid gap-5 md:grid-cols-3">
-                <article v-for="feature in features" :key="feature.key" class="panel">
-                    <AppIcon :name="feature.icon" :size="24" class="mb-5 text-primary" />
-                    <h3 class="text-sm font-bold">
-                        {{ t('home.cards.' + feature.key + '.title') }}
-                    </h3>
-                    <p class="mt-3 text-sm leading-6 text-muted">
-                        {{ t('home.cards.' + feature.key + '.description') }}
-                    </p>
-                </article>
-            </div>
-        </section>
-    </div>
+            <DashboardActivityList v-if="showActivity" :activity="snapshot.activity" />
+            <DashboardQueueCards :queues="snapshot.queues" />
+            <DashboardGraderPanel v-if="snapshot.grader" :snapshot="snapshot.grader" />
+        </template>
+        <p v-else class="panel text-muted">{{ t('dashboard.unavailable') }}</p>
+    </section>
 </template>

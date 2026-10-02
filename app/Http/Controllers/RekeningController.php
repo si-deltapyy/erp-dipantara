@@ -4,15 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Rekening;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class RekeningController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+   public function index(): JsonResponse
     {
-        //
+        return response()->json(['status' => 'success', 'data' => Rekening::all()]);
     }
 
     /**

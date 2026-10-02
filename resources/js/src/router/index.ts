@@ -1,44 +1,81 @@
+import { reportRoutes } from './reports'
+import { closingRoutes } from './closing'
+import { paymentRoutes } from './payments'
+import { invoiceRoutes } from './invoices'
+import { deliveryRoutes } from './deliveries'
+import { gradingRoutes } from './gradings'
+import { orderRoutes } from './orders'
+import { assignmentRoutes } from './assignments'
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
-import { mockEnabled } from '@/core/constants/environment'
+import type { DevelopmentCapability } from '@/core/types/session'
+import { accessRules } from './access-rules'
+import { authRoutes } from './auth-routes'
+import { purchaseOrderRoutes } from './purchase-orders'
+import { masterDataRoutes } from './master-data'
 import { i18n } from '@/locales'
 
 const routes: RouteRecordRaw[] = [
     {
+        path: '/dashboard/queue',
+        name: 'dashboard-queue',
+        component: () => import('@/views/home/DashboardQueuePage.vue'),
+        meta: {
+            titleKey: 'dashboard.queueTitle',
+            requiresAuth: true,
+            requiredPermissions: ['dashboard.read.all'],
+        },
+    },
+    {
         path: '/',
         name: 'home',
         component: () => import('@/views/home/HomePage.vue'),
-        meta: { titleKey: 'navigation.home' },
+        meta: {
+            titleKey: 'navigation.home',
+            requiresAuth: true,
+            ...accessRules.home,
+        },
     },
 ]
 
-if (mockEnabled) {
-    routes.push({
-        path: '/development/mock',
-        name: 'mock-lab',
-        component: () => import('@/views/development/MockLabPage.vue'),
-        meta: { titleKey: 'navigation.lab' },
-    })
-}
+routes.push(
+    ...reportRoutes,
+    ...closingRoutes,
+    ...paymentRoutes,
+    ...invoiceRoutes,
+    ...deliveryRoutes,
+    ...gradingRoutes,
+    ...assignmentRoutes,
+    ...orderRoutes,
+    ...authRoutes,
+    ...masterDataRoutes,
+    ...purchaseOrderRoutes,
+)
+
 routes.push({
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: () => import('@/views/errors/NotFoundPage.vue'),
-    meta: { titleKey: 'notFound.title' },
+    meta: { titleKey: 'notFound.title', layout: 'auth' },
 })
 
 export const router = createRouter({
-    history: createWebHistory('/app/'),
+    history: createWebHistory('/'),
     routes,
     scrollBehavior: () => ({ top: 0 }),
 })
 
 router.afterEach((route) => {
-    document.title = `${i18n.global.t(route.meta.titleKey)} · WoodFlow`
+    document.title = `${i18n.global.t(route.meta.titleKey ?? 'brand.name')} Â· WoodFlow`
 })
 
 declare module 'vue-router' {
     interface RouteMeta {
         titleKey: string
+        layout?: 'auth' | 'app'
+        requiresAuth?: boolean
+        requiredPermissions?: readonly string[]
+        anyPermissions?: readonly string[]
+        developmentCapability?: DevelopmentCapability
     }
 }

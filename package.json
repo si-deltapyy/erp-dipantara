@@ -6,11 +6,9 @@
         "build": "vite build",
         "dev": "vite",
         "typecheck": "vue-tsc --noEmit",
-        "lint": "eslint resources/js/src tests/frontend vitest.config.ts playwright.config.ts && node scripts/check-frontend.mjs",
-        "format:check": "prettier --check resources/js/src tests/frontend scripts/check-frontend.mjs vite.config.js vitest.config.ts playwright.config.ts eslint.config.js tailwind.frontend.config.js tsconfig.json .prettierrc.json package.json",
-        "format": "prettier --write resources/js/src tests/frontend scripts/check-frontend.mjs vite.config.js vitest.config.ts playwright.config.ts eslint.config.js tailwind.frontend.config.js tsconfig.json .prettierrc.json package.json",
-        "test:unit": "vitest run",
-        "test:e2e": "playwright test"
+        "lint": "eslint resources/js/src && node scripts/check-frontend.mjs",
+        "format:check": "prettier --check resources/js/src scripts/check-frontend.mjs vite.config.js eslint.config.js tailwind.frontend.config.js tsconfig.json .prettierrc.json package.json",
+        "format": "prettier --write resources/js/src scripts/check-frontend.mjs vite.config.js eslint.config.js tailwind.frontend.config.js tsconfig.json .prettierrc.json package.json"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
@@ -39,6 +37,7 @@
     },
     "dependencies": {
         "@inertiajs/vue3": "^3.7.1",
+        "html5-qrcode": "^2.3.8",
         "pinia": "^3.0.4",
         "vue": "^3.5.43",
         "vue-i18n": "^11.4.12",

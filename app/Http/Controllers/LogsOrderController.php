@@ -1,65 +1,27 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\LogsOrder;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class LogsOrderController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $logs = LogsOrder::with('order', 'logPayment')->latest()->get();
+        return response()->json(['status' => 'success', 'data' => $logs]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request): JsonResponse
     {
-        //
-    }
+        $validated = $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'pre_order_id' => 'required|exists:pre_orders,id',
+            'log_payment_id' => 'required|exists:logs_payments,id',
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(LogsOrder $logsOrder)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(LogsOrder $logsOrder)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, LogsOrder $logsOrder)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(LogsOrder $logsOrder)
-    {
-        //
+        $log = LogsOrder::create($validated);
+        return response()->json(['status' => 'success', 'data' => $log], 201);
     }
 }

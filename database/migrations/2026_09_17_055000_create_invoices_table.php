@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('invoice_number');
             $table->date('invoice_date');
             $table->enum('type_invoice', ['invoice_in', 'invoice_outstanding'])->default('invoice_in');
-            $table->foreignId('rekening_id')->constrained('rekenings')->onDelete('cascade');
+            $table->foreignId('rekening_id')->constrained('rekenings')->onDelete('cascade')->nullable();
             $table->foreignId('bank_account_number_id')->constrained('bank_account_numbers')->onDelete('cascade')->nullable();
             $table->string('proff_of_payment')->nullable();
             $table->text('note')->nullable();

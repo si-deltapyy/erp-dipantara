@@ -2,64 +2,32 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PreOrders;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class TransactionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $transactions = Transaction::with('preOrder', 'order', 'logPayment')->latest()->get();
+        return response()->json(['status' => 'success', 'data' => $transactions]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function closePo(Request $request, $id): JsonResponse
     {
-        //
-    }
+        $preOrder = PreOrders::findOrFail($id);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $validated = $request->validate([
+            'note' => 'nullable|string'
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Transaction $transaction)
-    {
-        //
-    }
+        $preOrder->update([
+            'pre_order_status' => 'completed',
+            'note' => $validated['note'] ?? $preOrder->note
+        ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Transaction $transaction)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Transaction $transaction)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Transaction $transaction)
-    {
-        //
+        return response()->json(['status' => 'success', 'message' => 'PO Berhasil Ditutup (Closed)']);
     }
 }

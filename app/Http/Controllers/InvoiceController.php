@@ -1,65 +1,38 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Invoice;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class InvoiceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $invoices = Invoice::with(['rekening', 'transaction', 'BankAccount'])->get();
+        return response()->json(['status' => 'success', 'data' => $invoices]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request): JsonResponse
     {
-        //
+        $validated = $request->validate([
+            'transaction_id' => 'required|exists:transactions,id',
+            'invoice_number' => 'required|string|unique:invoices,invoice_number',
+            'invoice_date' => 'required|date',
+            'type_invoice' => 'required|string',
+            'rekening_id' => 'required|exists:rekenings,id',
+            'bank_account_number_id' => 'required|exists:bank_account_numbers,id',
+            'proff_of_payment' => 'nullable|string',
+            'note' => 'nullable|string'
+        ]);
+
+        $invoice = Invoice::create($validated);
+        return response()->json(['status' => 'success', 'message' => 'Invoice berhasil diterbitkan', 'data' => $invoice], 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function show($id): JsonResponse
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Invoice $invoice)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Invoice $invoice)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Invoice $invoice)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Invoice $invoice)
-    {
-        //
+        $invoice = Invoice::with(['preOrder.buyer', 'logsPayments.rekening'])->findOrFail($id);
+        return response()->json(['status' => 'success', 'data' => $invoice]);
     }
 }

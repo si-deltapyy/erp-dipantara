@@ -13,8 +13,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Alpine.js untuk interaktivitas UI (Navbar Mobile, Dropdown, dll) -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     @vite([
         'resources/css/app.css',
@@ -57,7 +55,7 @@
             <!-- Auth Buttons (Desktop) -->
             <div class="hidden items-center gap-3 md:flex">
                 @auth
-                    <a href="{{ route('dashboard') }}" class="rounded-xl bg-[#1e5b3d] px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-[#1e5b3d]/20 transition hover:bg-[#16472f]">
+                    <a href="/app" class="rounded-xl bg-[#1e5b3d] px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-[#1e5b3d]/20 transition hover:bg-[#16472f]">
                         Dashboard
                     </a>
                     <form method="POST" action="{{ route('logout') }}">
@@ -67,12 +65,12 @@
                         </button>
                     </form>
                 @else
-                    <a href="{{ route('login') }}" class="rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:text-[#1e5b3d]">
+                    <a href="/auth/login" class="rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:text-[#1e5b3d]">
                         Masuk
                     </a>
-                    <a href="{{ route('register') }}" class="rounded-xl bg-[#1e5b3d] px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-[#1e5b3d]/20 transition hover:bg-[#16472f]">
+                    {{-- <a href="{{ route('register') }}" class="rounded-xl bg-[#1e5b3d] px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-[#1e5b3d]/20 transition hover:bg-[#16472f]">
                         Coba Gratis
-                    </a>
+                    </a> --}}
                 @endauth
             </div>
 
@@ -107,7 +105,11 @@
 
     <!-- MAIN CONTENT AREA -->
     <main class="flex-grow">
-        @yield('content')
+        @isset($slot)
+            {{ $slot }}
+        @else
+            @yield('content')
+        @endisset
     </main>
 
     <!-- FOOTER -->

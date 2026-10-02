@@ -1,65 +1,40 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\LogsDelivery;
+use App\Models\PreOrders;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class LogsDeliveryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $deliveries = LogsDelivery::with('preOrder', 'mitra', 'grader')->get();
+        return response()->json(['status' => 'success', 'data' => $deliveries]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request): JsonResponse
     {
-        //
-    }
+        $validated = $request->validate([
+            'pre_order_id' => 'required|exists:pre_orders,id',
+            'mitra_id' => 'required|exists:mitras,id',
+            'grader_id' => 'required|exists:graders,id',
+            'SAKR_number_to_buyer' => 'required|string|unique:logs_deliveries,SAKR_number_to_buyer',
+            'SAKR_number_to_company' => 'required|string|unique:logs_deliveries,SAKR_number_to_company',
+            'delivery_date' => 'required|date',
+            'car_plate_number' => 'required|string',
+            'delivery_status' => 'required|in:pending,delivered,cancelled,returned,in_transit,on_the_way',
+            'note' => 'nullable|string',
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $delivery = LogsDelivery::create($validated);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(LogsDelivery $logsDelivery)
-    {
-        //
-    }
+        // Otomatis update status pre_orders menjadi delivered
+        if ($delivery->order && $delivery->order->pre_order_id) {
+            PreOrders::where('id', $delivery->order->pre_order_id)->update(['pre_order_status' => 'delivered']);
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(LogsDelivery $logsDelivery)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, LogsDelivery $logsDelivery)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(LogsDelivery $logsDelivery)
-    {
-        //
+        return response()->json(['status' => 'success', 'message' => 'Surat Jalan SAKR berhasil dibuat', 'data' => $delivery], 201);
     }
 }

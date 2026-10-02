@@ -1,65 +1,40 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\BankAccountNumber;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class BankAccountNumberController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $accounts = BankAccountNumber::all();
+        return response()->json(['status' => 'success', 'data' => $accounts]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request): JsonResponse
     {
-        //
+        $validated = $request->validate([
+            'bank_name' => 'required|string',
+            'account_number' => 'required|string',
+            'account_holder' => 'required|string'
+        ]);
+
+        $account = BankAccountNumber::create($validated);
+        return response()->json(['status' => 'success', 'message' => 'Rekening berhasil ditambahkan', 'data' => $account], 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function update(Request $request, $id): JsonResponse
     {
-        //
+        $account = BankAccountNumber::findOrFail($id);
+        $account->update($request->only(['bank_name', 'account_number', 'account_holder']));
+        return response()->json(['status' => 'success', 'message' => 'Rekening diperbarui', 'data' => $account]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(BankAccountNumber $bankAccountNumber)
+    public function destroy($id): JsonResponse
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(BankAccountNumber $bankAccountNumber)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, BankAccountNumber $bankAccountNumber)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(BankAccountNumber $bankAccountNumber)
-    {
-        //
+        BankAccountNumber::findOrFail($id)->delete();
+        return response()->json(['status' => 'success', 'message' => 'Rekening dihapus']);
     }
 }
