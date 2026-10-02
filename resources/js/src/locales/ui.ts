@@ -1,5 +1,6 @@
 export default {
     ui: {
+        transactionUnavailable: 'Detail, filter, dan pemrosesan transaksi belum tersedia.',
         writeUnavailable:
             'Tambah dan ubah belum tersedia. Daftar dapat digunakan untuk melihat data.',
         featureUnavailable: 'Fitur ini belum tersedia.',

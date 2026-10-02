@@ -3,6 +3,8 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import WorkspaceShell from './WorkspaceShell.vue'
+import AppPageHeader from '@/components/ui/AppPageHeader.vue'
+import AppState from '@/components/ui/AppState.vue'
 import SessionActions from '@/views/auth/components/SessionActions.vue'
 import { useSessionStore } from '@/stores/session'
 import { useWorkspaceNavigation } from '@/composables/useWorkspaceNavigation'
@@ -34,6 +36,10 @@ const initials = computed(
         @navigate="navigate"
     >
         <template #account-actions><SessionActions :show-name="false" /></template>
-        <RouterView />
+        <section v-if="route.meta.featureUnavailable" class="space-y-6">
+            <AppPageHeader :title="t(route.meta.titleKey)" />
+            <AppState class="panel" kind="empty" :message="t('ui.featureUnavailable')" />
+        </section>
+        <RouterView v-else />
     </WorkspaceShell>
 </template>

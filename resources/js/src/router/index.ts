@@ -71,6 +71,7 @@ router.afterEach((route) => {
 
 declare module 'vue-router' {
     interface RouteMeta {
+        featureUnavailable?: boolean
         titleKey: string
         layout?: 'auth' | 'app'
         requiresAuth?: boolean
