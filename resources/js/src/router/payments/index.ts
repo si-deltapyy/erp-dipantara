@@ -1,12 +1,17 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { accessRules } from '../access-rules'
-const meta = { titleKey: 'payments.title', requiresAuth: true, ...accessRules.payments }
+const meta = {
+    featureUnavailable: true,
+    titleKey: 'payments.title',
+    requiresAuth: true,
+    ...accessRules.payments,
+}
 export const paymentRoutes: RouteRecordRaw[] = [
     {
         path: '/payments',
         name: 'payments',
         component: () => import('@/views/payments/PaymentListPage.vue'),
-        meta,
+        meta: { ...meta, featureUnavailable: false },
     },
     {
         path: '/payments/new',
