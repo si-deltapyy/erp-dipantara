@@ -30,6 +30,6 @@ const columns = computed<readonly TableColumn<GraderRecord>[]>(() => [
                 row.name
             }}</span></template
         >
-        <template #cell-phone="{ row }">{{ row.phone || 'â€”' }}</template>
+        <template #cell-phone="{ row }">{{ row.phone || '—' }}</template>
     </AppTable>
 </template>

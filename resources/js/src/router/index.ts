@@ -66,7 +66,7 @@ export const router = createRouter({
 })
 
 router.afterEach((route) => {
-    document.title = `${i18n.global.t(route.meta.titleKey ?? 'brand.name')} Â· WoodFlow`
+    document.title = `${i18n.global.t(route.meta.titleKey ?? 'brand.name')} · WoodFlow`
 })
 
 declare module 'vue-router' {

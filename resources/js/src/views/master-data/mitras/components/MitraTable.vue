@@ -31,10 +31,10 @@ const columns = computed<readonly TableColumn<MitraRecord>[]>(() => [
                 row.name
             }}</span></template
         >
-        <template #cell-phone="{ row }">{{ row.phone || 'â€”' }}</template>
+        <template #cell-phone="{ row }">{{ row.phone || '—' }}</template>
         <template #cell-address="{ row }"
             ><span class="block min-w-40 max-w-64 whitespace-normal break-words text-muted">{{
-                row.address || 'â€”'
+                row.address || '—'
             }}</span></template
         >
     </AppTable>
