@@ -51,6 +51,10 @@ export function useMasterList<T>(
     let current: AbortController | undefined
     async function refresh(): Promise<void> {
         current?.abort()
+        response.value = undefined
+        error.value = ''
+        loading.value = false
+        if (!store.user) return
         const request = new AbortController()
         current = request
         loading.value = true
@@ -69,7 +73,13 @@ export function useMasterList<T>(
         } catch (cause) {
             if (request.signal.aborted || isRequestCancelled(cause)) return
             response.value = undefined
-            error.value = `${resource}.errors.${normalizeApiError(cause).kind}`
+            const failure = normalizeApiError(cause)
+            error.value =
+                failure.code === 'record.unconfirmed'
+                    ? 'ui.recordUnavailable'
+                    : failure.code === 'feature.unavailable'
+                      ? 'ui.featureUnavailable'
+                      : `${resource}.errors.${failure.kind}`
             await session.handleRequestFailure(cause)
         } finally {
             if (current === request) loading.value = false

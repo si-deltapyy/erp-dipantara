@@ -1,1 +1,0 @@
-import{P as i}from"./main-Cfa-10ix.js";import{f as r}from"./runtime-dom.esm-bundler-vX6VNcEy.js";function t(){const o=r(i);if(!o)throw new Error("Closing API is not configured");return o}export{t as u};
