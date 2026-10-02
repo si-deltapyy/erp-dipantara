@@ -1,0 +1,1 @@
+import{a0 as o}from"./main-BIW7iw5S.js";import{i as r}from"./runtime-dom.esm-bundler-w52lyOrN.js";function t(){const i=r(o);if(!i)throw new Error("Closing API is not configured");return i}export{t as u};
