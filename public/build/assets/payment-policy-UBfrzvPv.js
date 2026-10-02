@@ -1,0 +1,1 @@
+import{o as a,h as r}from"./main-B9KnNfIe.js";function c(e){return r(e,"payments.create")}function n(e){return e.status==="draft"||e.status==="rejected"}function o(e,s,t){return(t==="approve"||t==="reject"?s.status==="submitted":n(s))&&s.allowedActions.includes(t)&&a(e,`payments.${t}`,s)==="allowed"}export{c as a,o as c};
