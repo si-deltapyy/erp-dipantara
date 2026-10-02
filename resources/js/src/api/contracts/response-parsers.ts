@@ -5,6 +5,7 @@ import type {
     PageResponse,
     RecordMetadata,
 } from '@/core/types/contracts'
+import { ApiError } from '@/core/types/api-error'
 import {
     invalidContract,
     parseId,
@@ -28,21 +29,56 @@ export function parseDetail<T>(
     value: unknown,
     parse: (value: unknown, path: string) => T,
 ): DetailResponse<T> {
-    const envelope = parseObject(value, 'response')
-    requireKeys(envelope, ['data'], 'response')
-    return { data: parse(envelope.data, 'data') }
+    return readResponse(() => {
+        const envelope = parseObject(value, 'response')
+        if ('status' in envelope && envelope.status !== 'success') return invalidContract('status')
+        return { data: parse(envelope.data, 'data') }
+    })
+}
+export function parseCollection<T>(
+    value: unknown,
+    parse: (value: unknown, path: string) => T,
+): readonly T[] {
+    return parseDetail(value, (records, path) => {
+        if (!Array.isArray(records)) return invalidContract(path)
+        return records.map((record, index) => parse(record, `${path}.${index}`))
+    }).data
+}
+function readResponse<T>(read: () => T): T {
+    try {
+        return read()
+    } catch (cause) {
+        if (cause instanceof ApiError && cause.kind === 'validation')
+            throw new ApiError('unexpected')
+        throw cause
+    }
 }
 export function parsePage<T>(
     value: unknown,
     parse: (value: unknown, path: string) => T,
 ): PageResponse<T> {
-    const envelope = parseObject(value, 'response')
-    requireKeys(envelope, ['data', 'meta'], 'response')
-    if (!Array.isArray(envelope.data)) return invalidContract('data')
-    return {
-        data: envelope.data.map((record, index) => parse(record, `data.${index}`)),
-        meta: parsePageMeta(envelope.meta),
-    }
+    return readResponse(() => {
+        const envelope = parseObject(value, 'response')
+        if ('status' in envelope) {
+            return parseDetail(value, (value) => {
+                const page = parseObject(value, 'data')
+                if (!Array.isArray(page.data)) return invalidContract('data.data')
+                return {
+                    data: page.data.map((record, index) => parse(record, `data.data.${index}`)),
+                    meta: {
+                        page: parseInteger(page.current_page, 'data.current_page'),
+                        perPage: parseInteger(page.per_page, 'data.per_page'),
+                        total: parseInteger(page.total, 'data.total', 0),
+                    },
+                }
+            }).data
+        }
+        if (!Array.isArray(envelope.data)) return invalidContract('data')
+        return {
+            data: envelope.data.map((record, index) => parse(record, `data.${index}`)),
+            meta: parsePageMeta(envelope.meta),
+        }
+    })
 }
 export function parseMetadata(value: unknown): RecordMetadata {
     const record = parseObject(value, 'record')
