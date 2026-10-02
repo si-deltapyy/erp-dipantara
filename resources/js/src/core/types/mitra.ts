@@ -2,13 +2,13 @@ import type { MasterListQuery } from './master-list'
 import type { OpaqueId, PageResponse, RecordMetadata } from './contracts'
 
 export interface MitraInput {
+    readonly graderGroup: string
     readonly name: string
     readonly phone: string
     readonly address: string
 }
 export interface MitraRecord extends MitraInput {
     readonly id: OpaqueId
-    readonly graderGroup: string
     readonly createdAt: string
     readonly updatedAt: string
 }
@@ -35,7 +35,7 @@ export interface MitrasApi {
     list(query: MitraQuery, signal: AbortSignal): Promise<readonly MitraRecord[]>
     lookup(query: MitraQuery, signal: AbortSignal): Promise<PageResponse<MitraLookup>>
     get(id: string, signal: AbortSignal): Promise<Mitra>
-    create(input: MitraInput, options: MitraWriteOptions): Promise<Mitra>
+    create(input: MitraInput, options: MitraWriteOptions): Promise<MitraRecord>
     update(id: string, input: MitraUpdate, options: MitraWriteOptions): Promise<Mitra>
     subscribe(listener: () => void): () => void
 }

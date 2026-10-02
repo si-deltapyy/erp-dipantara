@@ -29,6 +29,7 @@ function parseMitraFields(record: Record<string, unknown>): MitraInput {
         name: field('name'),
         phone: field('phone'),
         address: field('address'),
+        graderGroup: field('graderGroup'),
     }
 }
 export function parseMitra(value: unknown): Mitra {

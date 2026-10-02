@@ -17,6 +17,7 @@ export function useMitraForm(
     const snapshot = recovery.snapshot?.actorId === store.user?.id ? recovery.snapshot : null
     recovery.$reset()
     return useMasterForm<MitraInput>({
+        retrySafe: false,
         resource: 'mitras',
         initial: mitra ? mitraDraft(mitra) : emptyMitra(),
         snapshot,

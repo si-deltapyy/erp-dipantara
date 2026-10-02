@@ -47,6 +47,15 @@ function fieldError(field: MitraField): string | undefined {
             autocomplete="tel"
             @update:model-value="update('phone', $event)"
         />
+        <AppTextInput
+            id="mitra-grader-group"
+            :model-value="modelValue.graderGroup"
+            :label="t('mitras.graderGroup')"
+            :error="fieldError('graderGroup')"
+            :disabled="disabled"
+            :maxlength="255"
+            @update:model-value="update('graderGroup', $event)"
+        />
         <AppTextarea
             id="mitra-address"
             class="sm:col-span-2"

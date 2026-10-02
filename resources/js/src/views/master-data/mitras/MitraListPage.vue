@@ -1,26 +1,49 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import { ref, watch } from 'vue'
+import { useSessionStore } from '@/stores/session'
 import { useMitraList } from './composables/useMitraList'
 import MitraTable from './components/MitraTable.vue'
+import MitraEditor from './components/MitraEditor.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
 import AppPagination from '@/components/ui/AppPagination.vue'
 import AppPageHeader from '@/components/ui/AppPageHeader.vue'
 import AppPanel from '@/components/ui/AppPanel.vue'
 const { t } = useI18n()
-const { response, query, search, loading, error, refresh, searchMitras, changePage } =
+const { response, query, search, loading, error, canCreate, refresh, searchMitras, changePage } =
     useMitraList()
+const session = useSessionStore()
+const editing = ref(false)
+const success = ref(false)
+function open(): void {
+    success.value = false
+    editing.value = true
+}
+function saved(): void {
+    editing.value = false
+    success.value = true
+    void refresh()
+}
+watch(
+    () => session.user?.id,
+    () => {
+        editing.value = false
+        success.value = false
+    },
+)
 </script>
 <template>
     <section class="space-y-6">
         <AppPageHeader :title="t('mitras.title')" :description="t('mitras.subtitle')">
             <template #actions
-                ><AppButton disabled :title="t('ui.writeUnavailable')">{{
+                ><AppButton v-if="canCreate" @click="open">{{
                     t('mitras.add')
                 }}</AppButton></template
             >
         </AppPageHeader>
-        <p role="status" class="text-sm text-muted">{{ t('ui.writeUnavailable') }}</p>
+        <p role="status" class="text-sm text-muted">{{ t('mitras.updateUnavailable') }}</p>
+        <p v-if="success" role="status" class="text-sm text-primary">{{ t('mitras.saved') }}</p>
         <AppPanel :title="t('mitras.list')" class="space-y-5">
             <template #actions
                 ><span v-if="response" class="text-sm text-muted">{{
@@ -65,5 +88,6 @@ const { response, query, search, loading, error, refresh, searchMitras, changePa
                     @update:page="changePage"
             /></template>
         </AppPanel>
+        <MitraEditor v-if="editing && canCreate" @close="editing = false" @saved="saved" />
     </section>
 </template>

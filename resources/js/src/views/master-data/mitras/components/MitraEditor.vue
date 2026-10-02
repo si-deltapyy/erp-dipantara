@@ -55,8 +55,8 @@ async function submit(): Promise<void> {
                 <AppButton variant="secondary" :disabled="pending" @click="close">{{
                     t('mitras.cancel')
                 }}</AppButton>
-                <AppButton type="submit" :pending="pending">{{
-                    t(uncertain ? 'mitras.retry' : 'mitras.save')
+                <AppButton type="submit" :pending="pending" :disabled="uncertain">{{
+                    t('mitras.save')
                 }}</AppButton>
             </div>
         </form>
