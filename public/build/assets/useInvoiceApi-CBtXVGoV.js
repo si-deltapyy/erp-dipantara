@@ -1,1 +1,0 @@
-import{K as r}from"./main-CJ4v04TL.js";import{f as o}from"./runtime-dom.esm-bundler-vX6VNcEy.js";function t(){const i=o(r);if(!i)throw new Error("Purchase delivery API is not configured");return i}export{t as u};
