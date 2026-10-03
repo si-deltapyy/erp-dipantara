@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
-import type { Mitra, MitraInput } from '@/core/types/mitra'
+import type { MitraRecord, MitraInput } from '@/core/types/mitra'
 
 export interface MitraRecovery {
     readonly actorId: string
-    readonly mitra?: Mitra
+    readonly mitra?: MitraRecord
     readonly draft: MitraInput
     readonly idempotencyKey: string
 }
