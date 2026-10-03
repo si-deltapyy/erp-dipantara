@@ -18,7 +18,8 @@ export async function configurePurchaseOrders(app: App, pinia: Pinia): Promise<v
             if (
                 session.status === 'guest' ||
                 (session.user &&
-                    ((recovery.snapshot && recovery.snapshot.actorId !== session.user.id) ||
+                    ((recovery.form && recovery.form.actorId !== session.user.id) ||
+                        (recovery.snapshot && recovery.snapshot.actorId !== session.user.id) ||
                         (recovery.review && recovery.review.actorId !== session.user.id)))
             )
                 recovery.$reset()

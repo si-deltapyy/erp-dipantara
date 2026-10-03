@@ -93,7 +93,7 @@ export function useMasterForm<Input extends object>(
         }
     }
     watch(
-        () => store.user,
+        () => JSON.stringify([store.user?.id, [...(store.user?.permissions ?? [])].sort()]),
         () => {
             request?.abort()
             draft.value = { ...options.initial }
