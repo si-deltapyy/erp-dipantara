@@ -1,5 +1,15 @@
 export default {
     'timber-products': {
+        unitsUnconfirmed:
+            'Satuan ukuran dan volume belum terkonfirmasi. Nilai ditampilkan sesuai catatan sistem.',
+        type: 'Jenis',
+        grade: 'Mutu',
+        dimensionLength: 'Panjang',
+        dimensionWidth: 'Lebar',
+        dimensionHeight: 'Tinggi',
+        dimensionDiameter: 'Diameter',
+        volume: 'Volume',
+        price: 'Harga',
         title: 'Master Kayu',
         subtitle: 'Kelola jenis, mutu, ukuran, dan harga referensi kayu.',
         section: 'Master data',

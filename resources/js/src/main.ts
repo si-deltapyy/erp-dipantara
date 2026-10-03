@@ -15,6 +15,7 @@ import App from './App.vue'
 import { router } from '@/router'
 import { i18n } from '@/locales'
 import '@/assets/css/app.css'
+import '@/assets/css/woodflow.css'
 import { configureSession } from '@/composables/configureSession'
 import { createHttpSession } from '@/api/adapters/session-http'
 import { configureTimberProducts } from '@/composables/configureTimberProducts'
@@ -24,6 +25,7 @@ import { configureMitras } from '@/composables/configureMitras'
 import { configureBuyers } from '@/composables/configureBuyers'
 
 async function start(): Promise<void> {
+    document.documentElement.classList.add('woodflow-theme')
     const pinia = createPinia()
     const app = createApp(App).use(pinia).use(i18n)
     configureSession(app, pinia, router, createHttpSession())

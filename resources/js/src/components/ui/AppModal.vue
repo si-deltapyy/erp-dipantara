@@ -22,7 +22,7 @@ function close(): void {
         ref="dialog"
         tabindex="-1"
         :aria-labelledby="titleId"
-        class="fixed inset-0 m-auto max-h-[90dvh] w-[calc(100%-2rem)] max-w-lg overflow-auto rounded-lg border-0 bg-white p-6 text-ink shadow-xl backdrop:bg-ink/40"
+        class="wf-modal fixed inset-0 m-auto max-h-[90dvh] w-[calc(100%-2rem)] max-w-lg overflow-auto rounded-lg border-0 bg-white p-6 text-ink shadow-xl backdrop:bg-ink/40"
         @cancel.prevent="close"
         @keydown="retainFocus"
     >

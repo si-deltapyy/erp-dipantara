@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import AppPanel from '@/components/ui/AppPanel.vue'
+
 import { computed, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Delivery } from '@/core/types/delivery'
@@ -56,14 +58,16 @@ const discard = reactive(
     <section v-if="canRead || upload.canUpload" class="space-y-4">
         <h2 class="text-lg font-semibold">{{ t('deliveries.sakr') }}</h2>
 
-        <dl v-if="delivery.documents.length" class="panel grid gap-4 sm:grid-cols-2">
-            <div v-for="document in delivery.documents" :key="document.direction">
-                <dt class="font-semibold">
-                    {{ t('deliveries.directions.' + document.direction) }}
-                </dt>
-                <dd>{{ document.number }} · {{ document.documentDate }}</dd>
-            </div>
-        </dl>
+        <AppPanel v-if="delivery.documents.length" :title="t('deliveries.sakrMetadata')"
+            ><dl class="grid gap-5 break-words sm:grid-cols-2">
+                <div v-for="document in delivery.documents" :key="document.direction">
+                    <dt class="font-semibold">
+                        {{ t('deliveries.directions.' + document.direction) }}
+                    </dt>
+                    <dd>{{ document.number }} · {{ document.documentDate }}</dd>
+                </div>
+            </dl></AppPanel
+        >
         <DocumentPanel
             v-if="canRead || upload.canUpload"
             accept="application/pdf"

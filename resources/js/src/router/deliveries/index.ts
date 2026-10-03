@@ -1,6 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { accessRules } from '../access-rules'
 const meta = {
+    featureUnavailable: true,
     titleKey: 'deliveries.title',
     requiresAuth: true,
     ...accessRules['deliveries'],
@@ -10,7 +11,7 @@ export const deliveryRoutes: RouteRecordRaw[] = [
         path: '/deliveries',
         name: 'deliveries',
         component: () => import('@/views/deliveries/DeliveryListPage.vue'),
-        meta,
+        meta: { ...meta, featureUnavailable: false },
     },
     {
         path: '/deliveries/new',

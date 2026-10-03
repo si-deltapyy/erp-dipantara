@@ -1,0 +1,57 @@
+.woodflow-theme .wf-pagination {
+    justify-content: flex-end;
+}
+.woodflow-theme .wf-pagination-controls {
+    align-items: center;
+    gap: 6px;
+}
+.woodflow-theme .wf-pagination-controls .wf-button {
+    gap: 6px;
+    border: 0;
+    min-width: 44px;
+    background: var(--wf-card);
+    color: var(--wf-foreground);
+    box-shadow: none;
+}
+.woodflow-theme .wf-pagination-controls .wf-button:not(:disabled):hover {
+    background: var(--wf-muted);
+}
+.woodflow-theme .wf-pagination-previous {
+    transform: rotate(180deg);
+}
+.woodflow-theme .wf-pagination .wf-button[aria-current='page'] {
+    background: var(--wf-primary);
+    color: var(--wf-primary-foreground);
+    box-shadow: 0 4px 8px -4px var(--wf-primary);
+}
+.woodflow-theme .wf-panel-footer {
+    flex-wrap: wrap;
+}
+.woodflow-theme .wf-panel-footer .wf-pagination {
+    margin-left: auto;
+}
+@media (max-width: 639px) {
+    .woodflow-theme .wf-pagination {
+        justify-content: center;
+    }
+    .woodflow-theme .wf-panel-footer .wf-pagination {
+        margin-inline: auto;
+    }
+    .woodflow-theme .wf-pagination-desktop {
+        display: none;
+    }
+    .woodflow-theme .wf-pagination-label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+    .woodflow-theme .wf-pagination-controls {
+        gap: 2px;
+    }
+    .woodflow-theme .wf-priorities .wf-panel-footer {
+        flex-wrap: wrap;
+    }
+}

@@ -1,10 +1,11 @@
 import { parseTimestamp } from './contracts/timestamp-parser'
-import type { Mitra, MitraInput, MitraUpdate } from '@/core/types/mitra'
+import type { Mitra, MitraRecord, MitraInput, MitraUpdate } from '@/core/types/mitra'
 import { mitraFieldLimits } from '@/core/domain/mitra-validation'
 import { parseMetadata } from './contracts/response-parsers'
 import {
     invalidContract,
     parseId,
+    parseNumericId,
     parseInteger,
     parseObject,
     parseString,
@@ -28,6 +29,7 @@ function parseMitraFields(record: Record<string, unknown>): MitraInput {
         name: field('name'),
         phone: field('phone'),
         address: field('address'),
+        graderGroup: field('graderGroup'),
     }
 }
 export function parseMitra(value: unknown): Mitra {
@@ -58,3 +60,16 @@ export {
     parseMasterLookup as parseMitraLookup,
     parseMasterQuery as parseMitraQuery,
 } from './contracts/master-parsers'
+
+export function parseMitraRecord(value: unknown): MitraRecord {
+    const mitra = parseObject(value, 'mitra')
+    return {
+        id: parseNumericId(mitra.id),
+        name: parseString(mitra.name, 'name'),
+        phone: parseString(mitra.phone_number, 'phone_number'),
+        address: parseString(mitra.address, 'address'),
+        graderGroup: parseString(mitra.grader_group, 'grader_group'),
+        createdAt: parseTimestamp(mitra.created_at, 'created_at'),
+        updatedAt: parseTimestamp(mitra.updated_at, 'updated_at'),
+    }
+}

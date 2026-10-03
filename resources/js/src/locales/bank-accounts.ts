@@ -1,5 +1,8 @@
 export default {
     'bank-accounts': {
+        source: 'Daftar asal',
+        mitraReference: 'Referensi Mitra',
+        sources: { 'bank-account-numbers': 'Rekening bank', rekenings: 'Rekening terhubung Mitra' },
         title: 'Master Rekening',
         subtitle: 'Kelola rekening perusahaan, Buyer, dan Mitra untuk pembayaran.',
         section: 'Master data',

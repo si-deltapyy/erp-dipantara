@@ -1,10 +1,18 @@
 import { parseTimestamp } from './contracts/timestamp-parser'
-import type { Buyer, BuyerInput, BuyerLookup, BuyerQuery, BuyerUpdate } from '@/core/types/buyer'
+import type {
+    Buyer,
+    BuyerRecord,
+    BuyerInput,
+    BuyerLookup,
+    BuyerQuery,
+    BuyerUpdate,
+} from '@/core/types/buyer'
 import { buyerFieldLimits } from '@/core/domain/buyer-validation'
 import { parseMetadata } from './contracts/response-parsers'
 import {
     invalidContract,
     parseId,
+    parseNumericId,
     parseInteger,
     parseObject,
     parseString,
@@ -70,5 +78,18 @@ export function parseBuyerQuery(query: BuyerQuery): BuyerQuery {
         perPage: parseInteger(query.perPage, 'perPage', 1, 100),
         search,
         sort: query.sort,
+    }
+}
+
+export function parseBuyerRecord(value: unknown): BuyerRecord {
+    const buyer = parseObject(value, 'buyer')
+    return {
+        id: parseNumericId(buyer.id),
+        companyName: parseString(buyer.company_name, 'company_name'),
+        contactName: parseString(buyer.pic_name, 'pic_name'),
+        phone: parseString(buyer.phone_number, 'phone_number'),
+        address: parseString(buyer.address, 'address'),
+        createdAt: parseTimestamp(buyer.created_at, 'created_at'),
+        updatedAt: parseTimestamp(buyer.updated_at, 'updated_at'),
     }
 }

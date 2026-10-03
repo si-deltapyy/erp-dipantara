@@ -1,32 +1,30 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { TimberProduct } from '@/core/types/timber-product'
+import type { TimberProductRecord } from '@/core/types/timber-product'
 import type { TableColumn } from '@/core/types/table'
-import { timberDiameterCategory } from '@/core/domain/timber-measurements'
+import { formatMoney } from '@/core/formatting/money'
 import AppTable from '@/components/ui/AppTable.vue'
-import AppButton from '@/components/ui/AppButton.vue'
 const props = defineProps<{
-    timberProducts: readonly TimberProduct[]
+    timberProducts: readonly TimberProductRecord[]
     state: 'ready' | 'loading' | 'error'
-    canUpdate: boolean
     canReadPrices: boolean
 }>()
-defineEmits<{ edit: [product: TimberProduct]; retry: [] }>()
+defineEmits<{ retry: [] }>()
 const { t } = useI18n()
-const columns = computed<readonly TableColumn<TimberProduct>[]>(() => {
-    const fields: (keyof TimberProduct)[] = [
+const columns = computed<readonly TableColumn<TimberProductRecord>[]>(() => {
+    const fields: (keyof TimberProductRecord)[] = [
         'name',
-        'gradeCode',
-        'diameterCm',
-        'lengthM',
-        'volumeM3',
+        'type',
+        'grade',
+        'dimensionLength',
+        'dimensionWidth',
+        'dimensionHeight',
+        'dimensionDiameter',
+        'volume',
     ]
-    if (props.canReadPrices) fields.push('purchasePrice', 'salePrice')
-    return [
-        ...fields.map((key) => ({ key, label: t(`timber-products.${key}`) })),
-        { key: 'allowedActions', label: t('timber-products.actions') },
-    ]
+    if (props.canReadPrices) fields.push('price')
+    return fields.map((key) => ({ key, label: t(`timber-products.${key}`) }))
 })
 </script>
 <template>
@@ -43,23 +41,6 @@ const columns = computed<readonly TableColumn<TimberProduct>[]>(() => {
                 row.name
             }}</span></template
         >
-        <template #cell-gradeCode="{ row }"
-            ><span class="block max-w-48 whitespace-normal break-words">{{
-                row.gradeCode
-            }}</span></template
-        >
-        <template #cell-diameterCm="{ row }"
-            >{{ row.diameterCm }} · {{ timberDiameterCategory(row.diameterCm) }}</template
-        >
-        <template #cell-allowedActions="{ row }">
-            <AppButton
-                v-if="canUpdate && row.allowedActions.includes('update')"
-                variant="secondary"
-                :aria-label="t('timber-products.edit') + ': ' + row.name"
-                @click="$emit('edit', row)"
-                >{{ t('timber-products.edit') }}</AppButton
-            >
-            <span v-else>—</span>
-        </template>
+        <template #cell-price="{ row }">{{ formatMoney(row.price) }}</template>
     </AppTable>
 </template>

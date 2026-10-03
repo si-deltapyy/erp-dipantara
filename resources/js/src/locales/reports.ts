@@ -6,6 +6,15 @@ export default {
         exportNotice:
             'CSV memuat seluruh hasil sesuai filter dan akses. Hasil kosong tetap memiliki header. Jika gagal, klik kembali untuk mengulang permintaan yang sama.',
         prices: 'Laporan harga beli',
+        filters: 'Periode dan cakupan laporan',
+        scopeHint: 'Hasil mengikuti periode, filter yang diterapkan, dan hak akses Anda.',
+        appliedFiltersHint:
+            'Ekspor memakai filter yang sudah diterapkan. Perubahan input belum tersimpan tidak mengubah hasil ekspor.',
+        priceResults: 'Rincian harga beli historis',
+        resultCount: '{count} baris hasil',
+        timber: 'Jenis kayu',
+        loading: 'Memuat laporan...',
+        refresh: 'Muat ulang',
         quantity: 'Batang',
         volume: 'Volume (m3)',
         unitPrice: 'Harga satuan',

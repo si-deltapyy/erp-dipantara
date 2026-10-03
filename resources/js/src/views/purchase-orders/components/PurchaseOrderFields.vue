@@ -79,19 +79,19 @@ function message(path: string): string | undefined {
                 @update:model-value="field('orderDate', $event)"
             />
         </div>
-        <div class="space-y-4">
-            <h2 class="font-semibold">{{ t('purchase-orders.lines') }}</h2>
+        <div class="space-y-5 border-t border-line pt-6">
+            <h2 class="text-lg font-semibold">{{ t('purchase-orders.lines') }}</h2>
             <p class="text-sm text-muted">{{ t('purchase-orders.priceHint') }}</p>
-            <p v-if="message('lines')" role="alert" class="text-sm text-red-700">
+            <p v-if="message('lines')" role="alert" class="text-sm text-danger">
                 {{ message('lines') }}
             </p>
             <fieldset
                 v-for="(row, index) in modelValue.lines"
                 :key="rowKeys[index]"
-                class="min-w-0 space-y-4 rounded-md border border-line p-4"
+                class="min-w-0 space-y-4 border-b border-line pb-6"
                 :disabled="disabled"
             >
-                <legend class="px-2 text-sm font-semibold">
+                <legend class="mb-4 text-sm font-semibold">
                     {{ t('purchase-orders.line', { number: index + 1 }) }}
                 </legend>
                 <PurchaseOrderLookup

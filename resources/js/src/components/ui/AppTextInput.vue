@@ -31,7 +31,7 @@ function update(event: Event): void {
                 [hint ? id + '-hint' : '', error ? id + '-error' : ''].filter(Boolean).join(' ') ||
                 undefined
             "
-            class="min-h-11 w-full rounded-md border border-line bg-white px-3 py-2 text-ink focus:border-primary focus:ring-primary disabled:bg-canvas"
+            class="wf-form-input min-h-11 w-full rounded-md border border-line bg-white px-3 py-2 text-ink focus:border-primary focus:ring-primary disabled:bg-canvas"
             @input="update"
         />
     </AppFormField>

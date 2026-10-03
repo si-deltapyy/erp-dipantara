@@ -51,7 +51,7 @@ async function apply(): Promise<void> {
 </script>
 <template>
     <form class="space-y-4" @submit.prevent="apply">
-        <div class="grid gap-4 md:grid-cols-2">
+        <div class="grid min-w-0 gap-5 md:grid-cols-2 xl:grid-cols-3">
             <AppTextInput
                 id="report-period"
                 v-model="period"
@@ -67,6 +67,7 @@ async function apply(): Promise<void> {
             <AppSelect
                 id="report-category"
                 v-model="category"
+                renderer="nice"
                 :label="t('reports.category')"
                 :options="[
                     { value: '', label: t('reports.all') },

@@ -1,61 +1,59 @@
 <script setup lang="ts">
-import { computed, ref, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { Mitra } from '@/core/types/mitra'
+import { ref, watch } from 'vue'
 import { useSessionStore } from '@/stores/session'
-import { useMitraRecoveryStore } from '@/stores/mitra-recovery'
 import { useMitraList } from './composables/useMitraList'
-import MitraEditor from './components/MitraEditor.vue'
 import MitraTable from './components/MitraTable.vue'
+import MitraEditor from './components/MitraEditor.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
 import AppPagination from '@/components/ui/AppPagination.vue'
+import AppPageHeader from '@/components/ui/AppPageHeader.vue'
+import AppPanel from '@/components/ui/AppPanel.vue'
 const { t } = useI18n()
-const session = useSessionStore()
-const recovery = useMitraRecoveryStore()
 const { response, query, search, loading, error, canCreate, refresh, searchMitras, changePage } =
     useMitraList()
-const canUpdate = computed(() => !!session.user?.permissions.includes('mitras.update.all'))
-const recovered = recovery.snapshot?.actorId === session.user?.id ? recovery.snapshot : null
-const editing = ref(!!recovered)
-const selected = shallowRef<Mitra | undefined>(recovered?.mitra)
+const session = useSessionStore()
+const editing = ref(false)
 const success = ref(false)
-function open(mitra?: Mitra): void {
-    selected.value = mitra
+function open(): void {
     success.value = false
     editing.value = true
 }
 function saved(): void {
     editing.value = false
-    selected.value = undefined
     success.value = true
     void refresh()
 }
-function close(): void {
-    editing.value = false
-    selected.value = undefined
-    recovery.$reset()
-}
+watch(
+    () => session.user?.id,
+    () => {
+        editing.value = false
+        success.value = false
+    },
+)
 </script>
 <template>
     <section class="space-y-6">
-        <header class="flex flex-wrap items-start justify-between gap-4">
-            <div>
-                <p class="mb-1 text-sm font-semibold text-primary">{{ t('mitras.section') }}</p>
-                <h1 class="text-2xl font-bold tracking-tight">{{ t('mitras.title') }}</h1>
-                <p class="mt-2 text-sm text-muted">{{ t('mitras.subtitle') }}</p>
-            </div>
-            <AppButton v-if="canCreate" @click="open()">{{ t('mitras.add') }}</AppButton>
-        </header>
-        <p
-            v-if="success"
-            role="status"
-            class="rounded-md border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary"
-        >
-            {{ t('mitras.saved') }}
-        </p>
-        <div class="panel space-y-5">
-            <form class="flex flex-wrap items-end gap-3" @submit.prevent="searchMitras">
+        <AppPageHeader :title="t('mitras.title')" :description="t('mitras.subtitle')">
+            <template #actions
+                ><AppButton v-if="canCreate" @click="open">{{
+                    t('mitras.add')
+                }}</AppButton></template
+            >
+        </AppPageHeader>
+        <p role="status" class="text-sm text-muted">{{ t('mitras.updateUnavailable') }}</p>
+        <p v-if="success" role="status" class="text-sm text-primary">{{ t('mitras.saved') }}</p>
+        <AppPanel :title="t('mitras.list')" class="space-y-5">
+            <template #actions
+                ><span v-if="response" class="text-sm text-muted">{{
+                    t('mitras.total', { count: response.meta.total })
+                }}</span></template
+            >
+            <form
+                class="flex flex-wrap items-end gap-3 border-b border-line pb-5"
+                @submit.prevent="searchMitras"
+            >
                 <div class="min-w-0 flex-1 basis-64">
                     <AppTextInput
                         id="mitra-search"
@@ -72,34 +70,24 @@ function close(): void {
                     t('mitras.refresh')
                 }}</AppButton>
             </form>
-            <div class="flex flex-wrap items-center justify-between gap-2">
-                <h2 class="font-semibold">{{ t('mitras.list') }}</h2>
-                <p v-if="response" class="text-sm text-muted">
-                    {{ t('mitras.total', { count: response.meta.total }) }}
-                </p>
-            </div>
-            <p v-if="error" role="alert" class="text-sm text-red-700">{{ t(error) }}</p>
+
+            <p v-if="error" role="alert" class="text-sm text-danger">{{ t(error) }}</p>
             <MitraTable
                 :mitras="response?.data ?? []"
                 :state="loading ? 'loading' : error ? 'error' : 'ready'"
-                :can-update="canUpdate"
-                @edit="open"
                 @retry="refresh"
             />
-            <AppPagination
-                v-if="response && !error"
-                :page="query.page"
-                :page-size="response.meta.perPage"
-                :total="response.meta.total"
-                :disabled="loading"
-                @update:page="changePage"
-            />
-        </div>
-        <MitraEditor
-            v-if="editing && (selected ? canUpdate : canCreate)"
-            :mitra="selected"
-            @close="close"
-            @saved="saved"
-        />
+            <template #footer
+                ><AppPagination
+                    v-if="response && !error"
+                    numbered
+                    :page="query.page"
+                    :page-size="response.meta.perPage"
+                    :total="response.meta.total"
+                    :disabled="loading"
+                    @update:page="changePage"
+            /></template>
+        </AppPanel>
+        <MitraEditor v-if="editing && canCreate" @close="editing = false" @saved="saved" />
     </section>
 </template>

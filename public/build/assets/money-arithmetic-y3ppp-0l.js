@@ -1,0 +1,1 @@
+function e(n){if(!/^-?\d+\.\d{2}$/.test(n))throw new Error("Invalid monetary amount");return BigInt(n.replace(".",""))}function o(n){const r=n<0n?-n:n;return`${n<0n?"-":""}${r/100n}.${String(r%100n).padStart(2,"0")}`}function a(n){return o(n.reduce((r,t)=>r+e(t),0n))}export{e as m,a as s};

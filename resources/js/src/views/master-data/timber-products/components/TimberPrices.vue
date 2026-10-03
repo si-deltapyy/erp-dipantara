@@ -12,7 +12,7 @@ defineEmits<{ update: [field: 'purchasePrice' | 'salePrice', value: string] }>()
 const { t } = useI18n()
 </script>
 <template>
-    <fieldset class="space-y-3">
+    <fieldset class="space-y-4 border-t border-line pt-5">
         <legend class="font-semibold">{{ t('timber-products.prices') }}</legend>
         <div class="grid gap-4 sm:grid-cols-2">
             <AppTextInput

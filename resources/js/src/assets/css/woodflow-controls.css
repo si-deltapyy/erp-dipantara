@@ -1,0 +1,74 @@
+.woodflow-theme .wf-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 8px 20px;
+    border: 1px solid transparent;
+    border-radius: var(--wf-radius);
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 10px 20px -10px var(--wf-primary);
+}
+.woodflow-theme .wf-button[data-variant='primary'] {
+    background: var(--wf-primary);
+    border-color: var(--wf-primary);
+    color: var(--wf-primary-foreground);
+}
+.woodflow-theme .wf-button[data-variant='secondary'] {
+    background: var(--wf-secondary);
+    border-color: var(--wf-border);
+    color: var(--wf-secondary-foreground);
+}
+.woodflow-theme .wf-button[data-variant='danger'] {
+    background: var(--wf-danger);
+    border-color: var(--wf-destructive);
+    color: var(--wf-destructive-foreground);
+}
+.woodflow-theme .wf-button:not(:disabled):hover {
+    filter: brightness(0.96);
+    box-shadow: none;
+}
+.woodflow-theme .wf-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+}
+.woodflow-theme :is(.wf-form-input, .wf-form-select) {
+    width: 100%;
+    min-height: 44px;
+    padding: 8px 16px;
+    border: 1px solid var(--wf-input);
+    border-radius: var(--wf-radius);
+    background: var(--wf-background);
+    color: var(--wf-foreground);
+    font-size: 14px;
+    font-weight: 500;
+}
+.woodflow-theme :is(.wf-form-input, .wf-form-select):focus {
+    border-color: var(--wf-ring);
+}
+.woodflow-theme :is(.wf-form-input, .wf-form-select)[aria-invalid='true'] {
+    border-color: var(--wf-destructive);
+}
+.woodflow-theme :is(.wf-form-input, .wf-form-select):disabled {
+    background: var(--wf-muted);
+    color: var(--wf-muted-foreground);
+    cursor: not-allowed;
+}
+.woodflow-theme .wf-balance-due {
+    color: var(--wf-muted-foreground);
+    border-color: color-mix(in srgb, var(--wf-secondary-foreground) 20%, transparent);
+}
+.woodflow-theme .wf-balance + .wf-balance :is(p, .wf-balance-due) {
+    color: var(--wf-muted-foreground);
+}
+.woodflow-theme .wf-priorities .wf-panel-footer .wf-button {
+    background: var(--wf-card);
+    color: var(--wf-foreground);
+    box-shadow: none;
+}
+.woodflow-theme .wf-priorities .wf-panel-footer .wf-button:not(:disabled):hover {
+    background: var(--wf-accent);
+}

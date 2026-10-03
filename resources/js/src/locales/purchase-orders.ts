@@ -1,5 +1,8 @@
 export default {
     'purchase-orders': {
+        material: 'Material kayu',
+        quantityHeading: 'Jumlah batang',
+        priceHeading: 'Harga satuan',
         history: 'Riwayat Buyer',
         title: 'Purchase Order',
         section: 'Pesanan',

@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router'
 import AppButton from '@/components/ui/AppButton.vue'
 import { useSession } from '@/composables/useSession'
 import { useSessionStore } from '@/stores/session'
+withDefaults(defineProps<{ showName?: boolean }>(), { showName: true })
 const { t } = useI18n()
 const router = useRouter()
 const session = useSession()
@@ -22,13 +23,13 @@ async function logout(): Promise<void> {
 </script>
 <template>
     <div class="flex flex-wrap items-center justify-end gap-2">
-        <span v-if="store.user" class="max-w-32 truncate text-xs text-muted">{{
+        <span v-if="store.user && showName" class="max-w-32 truncate text-xs text-muted">{{
             store.user.displayName
         }}</span>
         <AppButton v-if="store.user" variant="secondary" :pending="store.pending" @click="logout">{{
             t('auth.logout')
         }}</AppButton>
-        <p v-if="failure" role="alert" class="w-full text-xs text-red-700">
+        <p v-if="failure" role="alert" class="w-full text-xs text-danger">
             {{ t(failure) }}
         </p>
     </div>

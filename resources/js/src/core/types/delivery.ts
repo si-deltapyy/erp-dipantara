@@ -65,7 +65,7 @@ export interface AvailableTimber {
 export interface DeliveriesApi {
     dispatch(id: string, input: WorkflowVersion, options: WorkflowWriteOptions): Promise<Delivery>
     receive(id: string, input: WorkflowVersion, options: WorkflowWriteOptions): Promise<Delivery>
-    list(query: DeliveryQuery, signal: AbortSignal): Promise<PageResponse<Delivery>>
+    list(query: DeliveryQuery, signal: AbortSignal): Promise<readonly Delivery[]>
     get(id: string, signal: AbortSignal): Promise<Delivery>
     availability(
         query: AvailabilityQuery,

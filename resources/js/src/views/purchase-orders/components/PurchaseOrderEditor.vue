@@ -49,7 +49,7 @@ async function submit(): Promise<void> {
         <div
             v-if="error"
             role="alert"
-            class="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+            class="rounded-md border border-danger/20 bg-danger-light p-4 text-sm text-danger"
         >
             <p>{{ t(error) }}</p>
             <p v-if="error === 'purchase-orders.errors.conflict'">
@@ -57,7 +57,7 @@ async function submit(): Promise<void> {
             </p>
             <p v-if="uncertain">{{ t('purchase-orders.uncertain') }}</p>
         </div>
-        <div class="flex flex-wrap justify-end gap-3">
+        <div class="wf-form-actions">
             <RouterLink
                 :to="{
                     name: order ? 'purchase-order-detail' : 'purchase-orders',

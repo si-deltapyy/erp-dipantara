@@ -1,6 +1,6 @@
 import type { MitraInput } from '@/core/types/mitra'
 
-export const mitraFieldLimits = { name: 255, phone: 40, address: 1000 }
+export const mitraFieldLimits = { name: 255, phone: 40, address: 1000, graderGroup: 255 }
 export type MitraField = keyof MitraInput
 export type MitraErrors = Partial<Record<MitraField, string>>
 export function validateMitra(input: MitraInput): MitraErrors {
@@ -13,12 +13,13 @@ export function validateMitra(input: MitraInput): MitraErrors {
     return errors
 }
 export function emptyMitra(): MitraInput {
-    return { name: '', phone: '', address: '' }
+    return { name: '', phone: '', address: '', graderGroup: '' }
 }
 export function mitraDraft(input: MitraInput): MitraInput {
     return {
         name: input.name,
         phone: input.phone,
         address: input.address,
+        graderGroup: input.graderGroup,
     }
 }

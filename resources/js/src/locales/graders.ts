@@ -1,5 +1,6 @@
 export default {
     graders: {
+        graderGroup: 'Grup Grader',
         title: 'Master Grader',
         subtitle: 'Kelola profil Grader dan pengajuan aktivasi akunnya.',
         section: 'Master data',

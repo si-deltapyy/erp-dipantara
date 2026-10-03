@@ -1,6 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { accessRules } from '../access-rules'
 const meta = {
+    featureUnavailable: true,
     titleKey: 'gradings.title',
     requiresAuth: true,
     ...accessRules['gradings'],
@@ -16,7 +17,7 @@ export const gradingRoutes: RouteRecordRaw[] = [
         path: '/gradings',
         name: 'gradings',
         component: () => import('@/views/gradings/GradingListPage.vue'),
-        meta,
+        meta: { ...meta, featureUnavailable: false },
     },
     {
         path: '/gradings/new',

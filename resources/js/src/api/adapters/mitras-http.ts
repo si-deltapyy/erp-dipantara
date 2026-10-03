@@ -1,54 +1,56 @@
 import type { AxiosInstance } from 'axios'
-import type { MitrasApi, MitraWriteOptions } from '@/core/types/mitra'
+import type { MitrasApi } from '@/core/types/mitra'
+import { ApiError } from '@/core/types/api-error'
+import { normalizeApiError } from '@/services/api-error'
 import { createHttpClient } from '@/services/http-client'
-import { parseDetail, parsePage } from '@/api/contracts/response-parsers'
-import { parseMitra, parseMitraInput, parseMitraLookup, parseMitraQuery } from '@/api/mitra-mapper'
-import { parseId } from '@/api/contracts/value-parsers'
+import { parseCollection, parseDetail } from '@/api/contracts/response-parsers'
+import { parseMitraRecord, parseMitraInput } from '@/api/mitra-mapper'
 
-const endpoint = '/api/v1/mitras'
 export function createHttpMitras(client: AxiosInstance = createHttpClient()): MitrasApi {
-    const writeConfig = (options: MitraWriteOptions) => ({
-        signal: options.signal,
-        headers: { 'Idempotency-Key': options.idempotencyKey },
-    })
+    const unavailable = async (): Promise<never> => {
+        throw new ApiError('unexpected', {}, 'feature.unavailable')
+    }
     return {
-        async list(query, signal) {
-            const response = await client.get<unknown>(endpoint, {
-                params: parseMitraQuery(query),
-                signal,
-            })
-            return parsePage(response.data, parseMitra)
+        async list(_query, signal) {
+            const response = await client.get<unknown>('/api/v1/mitras', { signal })
+            return parseCollection(response.data, parseMitraRecord)
         },
-        async lookup(query, signal) {
-            const response = await client.get<unknown>(`${endpoint}/lookup`, {
-                params: parseMitraQuery(query),
-                signal,
-            })
-            return parsePage(response.data, parseMitraLookup)
-        },
-        async get(id, signal) {
-            const response = await client.get<unknown>(
-                `${endpoint}/${encodeURIComponent(parseId(id))}`,
-                { signal },
-            )
-            return parseDetail(response.data, parseMitra).data
-        },
+        lookup: unavailable,
+        get: unavailable,
         async create(input, options) {
-            const response = await client.post<unknown>(
-                endpoint,
-                parseMitraInput(input),
-                writeConfig(options),
-            )
-            return parseDetail(response.data, parseMitra).data
+            const mitra = parseMitraInput(input)
+            try {
+                const response = await client.post<unknown>(
+                    '/api/v1/mitras',
+                    {
+                        name: mitra.name,
+                        phone_number: mitra.phone,
+                        address: mitra.address,
+                        grader_group: mitra.graderGroup,
+                    },
+                    { signal: options.signal },
+                )
+                return parseDetail(response.data, parseMitraRecord).data
+            } catch (cause) {
+                const failure = normalizeApiError(cause)
+                const fields: Readonly<Record<string, string>> = {
+                    phone_number: 'phone',
+                    grader_group: 'graderGroup',
+                }
+                throw new ApiError(
+                    failure.kind,
+                    Object.fromEntries(
+                        Object.entries(failure.fieldErrors).map(([field, messages]) => [
+                            fields[field] ?? field,
+                            messages,
+                        ]),
+                    ),
+                    failure.code,
+                    failure.requestId,
+                )
+            }
         },
-        async update(id, input, options) {
-            const response = await client.put<unknown>(
-                `${endpoint}/${encodeURIComponent(parseId(id))}`,
-                parseMitraInput(input, true),
-                writeConfig(options),
-            )
-            return parseDetail(response.data, parseMitra).data
-        },
+        update: unavailable,
         subscribe: () => () => undefined,
     }
 }

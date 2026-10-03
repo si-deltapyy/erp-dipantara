@@ -12,6 +12,7 @@ import GradingRowsEditor from './GradingRowsEditor.vue'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppConfirmDialog from '@/components/ui/AppConfirmDialog.vue'
+import AppPanel from '@/components/ui/AppPanel.vue'
 const props = defineProps<{ grading?: Grading; assignment: Assignment }>()
 const { t } = useI18n()
 const router = useRouter()
@@ -39,34 +40,40 @@ async function submit(): Promise<void> {
 }
 </script>
 <template>
-    <form ref="element" class="panel space-y-6" novalidate @submit.prevent="submit">
-        <p class="font-semibold">
-            {{ assignment.purchaseOrderNumber }} / {{ assignment.mitraName }}
-        </p>
-        <AppTextInput
-            id="grading-date"
-            type="date"
-            :model-value="draft.gradingDate"
-            :label="t('gradings.gradingDate')"
-            :error="errors.gradingDate ? t(errors.gradingDate) : ''"
-            :disabled="pending || uncertain || !permitted"
-            @update:model-value="draft = { ...draft, gradingDate: $event }"
-        />
-        <GradingRowsEditor
-            :rows="draft.rows"
-            :assignment="assignment"
-            :errors="errors"
-            :disabled="pending || uncertain || !permitted"
-            :preview="preview"
-            @update:rows="draft = { ...draft, rows: $event }"
-        />
-        <p v-if="preview" class="text-sm text-muted">{{ t('gradings.previewHint') }}</p>
-        <div v-if="error" role="alert" class="space-y-2 text-red-700">
+    <form ref="element" class="min-w-0 space-y-6" novalidate @submit.prevent="submit">
+        <AppPanel :title="t('gradings.context')" :description="t('gradings.parentLocked')">
+            <div class="grid gap-5 md:grid-cols-2">
+                <p class="break-words font-semibold">
+                    {{ assignment.purchaseOrderNumber }} / {{ assignment.mitraName }}
+                </p>
+                <AppTextInput
+                    id="grading-date"
+                    type="date"
+                    :model-value="draft.gradingDate"
+                    :label="t('gradings.gradingDate')"
+                    :error="errors.gradingDate ? t(errors.gradingDate) : ''"
+                    :disabled="pending || uncertain || !permitted"
+                    @update:model-value="draft = { ...draft, gradingDate: $event }"
+                />
+            </div>
+        </AppPanel>
+        <AppPanel :title="t('gradings.measurements')">
+            <GradingRowsEditor
+                :rows="draft.rows"
+                :assignment="assignment"
+                :errors="errors"
+                :disabled="pending || uncertain || !permitted"
+                :preview="preview"
+                @update:rows="draft = { ...draft, rows: $event }"
+            />
+            <p v-if="preview" class="text-sm text-muted">{{ t('gradings.previewHint') }}</p>
+        </AppPanel>
+        <div v-if="error" role="alert" class="space-y-2 break-words text-danger">
             <p>{{ t(error) }}</p>
             <p v-if="uncertain">{{ t('gradings.uncertain') }}</p>
             <p v-if="error === 'gradings.errors.conflict'">{{ t('gradings.conflictHint') }}</p>
         </div>
-        <div class="flex flex-wrap justify-end gap-3">
+        <div class="wf-form-actions">
             <RouterLink
                 :to="
                     grading

@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import type { PurchaseOrder } from '@/core/types/purchase-order'
 import type { TableColumn } from '@/core/types/table'
 import AppTable from '@/components/ui/AppTable.vue'
+import PurchaseOrderStatus from './PurchaseOrderStatus.vue'
 import { formatPurchaseOrderMoney } from '../purchase-order-format'
 defineProps<{ orders: readonly PurchaseOrder[] }>()
 const { t } = useI18n()
@@ -33,9 +34,7 @@ const columns = computed<readonly TableColumn<PurchaseOrder>[]>(() => [
                 row.number
             }}</span></template
         >
-        <template #cell-status="{ row }">{{
-            t('purchase-orders.statuses.' + row.status)
-        }}</template>
+        <template #cell-status="{ row }"><PurchaseOrderStatus :status="row.status" /></template>
         <template #cell-totalAmount="{ row }">{{
             formatPurchaseOrderMoney(row.totalAmount)
         }}</template>

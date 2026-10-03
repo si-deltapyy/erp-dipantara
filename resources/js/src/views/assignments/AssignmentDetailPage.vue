@@ -5,6 +5,8 @@ import { useI18n } from 'vue-i18n'
 import { useRecordDetail } from '@/composables/useRecordDetail'
 import { useAssignmentApi } from '@/views/orders/composables/useAssignmentApi'
 import AppButton from '@/components/ui/AppButton.vue'
+import AppPageHeader from '@/components/ui/AppPageHeader.vue'
+import OrderStatus from '@/views/orders/components/OrderStatus.vue'
 const { t } = useI18n()
 const session = useSessionStore()
 const {
@@ -16,20 +18,28 @@ const {
 </script>
 <template>
     <section class="space-y-6">
-        <header class="flex flex-wrap items-center justify-between gap-4">
-            <h1 class="text-2xl font-bold">{{ t('assignments.detailTitle') }}</h1>
-            <RouterLink :to="{ name: 'assignments' }" class="secondary-button">{{
-                t('assignments.back')
-            }}</RouterLink>
-        </header>
+        <AppPageHeader :title="t('assignments.detailTitle')">
+            <template #actions>
+                <RouterLink :to="{ name: 'assignments' }" class="secondary-button">{{
+                    t('assignments.back')
+                }}</RouterLink>
+            </template>
+        </AppPageHeader>
         <p v-if="loading" role="status">{{ t('assignments.loading') }}</p>
         <div v-else-if="error" role="alert" class="panel space-y-4">
-            <p class="text-red-700">{{ t(error) }}</p>
+            <p class="text-danger">{{ t(error) }}</p>
             <AppButton @click="refresh">{{ t('orders.refresh') }}</AppButton>
         </div>
         <article v-else-if="assignment" class="panel space-y-5">
-            <h2 class="text-xl font-bold">{{ assignment.purchaseOrderNumber }}</h2>
-            <dl class="grid gap-5 sm:grid-cols-2">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <h2 class="break-words text-xl font-semibold">
+                    {{ assignment.purchaseOrderNumber }}
+                </h2>
+                <OrderStatus :status="assignment.orderStatus" />
+            </div>
+            <dl
+                class="grid gap-6 border-y border-line py-6 sm:grid-cols-2 xl:grid-cols-3 [&_dd]:mt-1 [&_dd]:break-words [&_dd]:font-semibold"
+            >
                 <div>
                     <dt class="text-muted">{{ t('assignments.mitra') }}</dt>
                     <dd>{{ assignment.mitraName }}</dd>
@@ -44,7 +54,7 @@ const {
                 </div>
                 <div>
                     <dt class="text-muted">{{ t('assignments.quantity') }}</dt>
-                    <dd>{{ assignment.quantity }}</dd>
+                    <dd class="text-2xl">{{ assignment.quantity.toLocaleString('id-ID') }}</dd>
                 </div>
                 <div>
                     <dt class="text-muted">{{ t('assignments.orderStatus') }}</dt>

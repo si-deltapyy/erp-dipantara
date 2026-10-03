@@ -32,7 +32,9 @@ export function useRecordDetail<T>(
         active?.abort()
         const id = identity ? identity() : route.params.id
         record.value = undefined
-        if (typeof id !== 'string') return
+        loading.value = false
+        error.value = ''
+        if (!store.user || typeof id !== 'string') return
         const request = new AbortController()
         active = request
         loading.value = true
@@ -42,7 +44,13 @@ export function useRecordDetail<T>(
             if (!request.signal.aborted) record.value = result
         } catch (cause) {
             if (request.signal.aborted || isRequestCancelled(cause)) return
-            error.value = `${resource}.errors.${normalizeApiError(cause).kind}`
+            const failure = normalizeApiError(cause)
+            error.value =
+                failure.code === 'record.unconfirmed'
+                    ? 'ui.recordUnavailable'
+                    : failure.code === 'feature.unavailable'
+                      ? 'ui.featureUnavailable'
+                      : `${resource}.errors.${failure.kind}`
             await session.handleRequestFailure(cause)
         } finally {
             if (active === request) loading.value = false

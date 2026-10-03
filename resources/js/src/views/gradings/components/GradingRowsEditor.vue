@@ -35,13 +35,13 @@ function fieldError(index: number, field: string): string {
             v-for="(row, index) in rows"
             :key="row.rowId"
             :disabled="disabled"
-            class="space-y-4 rounded-md border border-slate-200 p-4"
+            class="min-w-0 space-y-4 border-t border-line py-5"
         >
             <legend class="px-2 font-semibold">
                 {{ t('gradings.line', { number: index + 1 }) }}
             </legend>
-            <p>{{ assignment.timberProductName }}</p>
-            <div class="grid gap-4 sm:grid-cols-2">
+            <p class="break-words text-sm text-muted">{{ assignment.timberProductName }}</p>
+            <div class="grid min-w-0 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <AppTextInput
                     :id="row.rowId + '-quantity'"
                     :model-value="String(row.quantity)"
@@ -72,6 +72,8 @@ function fieldError(index: number, field: string): string {
                 />
                 <AppSelect
                     :id="row.rowId + '-grade'"
+                    renderer="nice"
+                    :disabled="disabled"
                     :model-value="row.gradeCode"
                     :label="t('gradings.grade')"
                     :options="

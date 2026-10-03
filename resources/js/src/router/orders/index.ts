@@ -1,6 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { accessRules } from '../access-rules'
 const meta = {
+    featureUnavailable: true,
     titleKey: 'orders.title',
     requiresAuth: true,
     ...accessRules['orders'],
@@ -10,7 +11,7 @@ export const orderRoutes: RouteRecordRaw[] = [
         path: '/orders',
         name: 'orders',
         component: () => import('@/views/orders/OrderListPage.vue'),
-        meta,
+        meta: { ...meta, featureUnavailable: false },
     },
     {
         path: '/orders/new',

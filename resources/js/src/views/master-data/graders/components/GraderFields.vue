@@ -27,10 +27,11 @@ function fieldError(field: GraderField): string | undefined {
 }
 </script>
 <template>
-    <div class="space-y-4">
-        <p class="text-sm text-muted">{{ t('graders.requiredHint') }}</p>
+    <div class="grid gap-5 sm:grid-cols-2">
+        <p class="text-sm text-muted sm:col-span-2">{{ t('graders.requiredHint') }}</p>
         <AppTextInput
             id="grader-name"
+            class="sm:col-span-2"
             :model-value="modelValue.name"
             :label="t('graders.name')"
             :error="fieldError('name')"
@@ -67,6 +68,7 @@ function fieldError(field: GraderField): string | undefined {
         />
         <AppTextarea
             id="grader-address"
+            class="sm:col-span-2"
             :model-value="modelValue.address"
             :label="t('graders.address')"
             :hint="t('graders.optional')"

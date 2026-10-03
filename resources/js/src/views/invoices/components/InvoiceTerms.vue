@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import AppPanel from '@/components/ui/AppPanel.vue'
+
 import { useI18n } from 'vue-i18n'
 import type { InvoiceTerm } from '@/core/types/invoice'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
@@ -22,13 +24,12 @@ function update(index: number, field: keyof InvoiceTerm, value: string): void {
 }
 </script>
 <template>
-    <section class="space-y-4">
-        <h2 class="text-lg font-semibold">{{ t('invoices.terms') }}</h2>
+    <AppPanel :title="t('invoices.terms')" class="space-y-5">
         <fieldset
             v-for="(term, index) in terms"
             :key="index"
             :disabled="disabled"
-            class="grid gap-3 rounded-lg border border-line p-4 sm:grid-cols-3"
+            class="grid min-w-0 gap-4 border-t border-line py-4 lg:grid-cols-3"
         >
             <legend class="px-2 font-semibold">{{ t('invoices.terms') }} {{ index + 1 }}</legend>
             <AppTextInput
@@ -83,5 +84,5 @@ function update(index: number, field: keyof InvoiceTerm, value: string): void {
             @click="emit('change', [...terms, { label: '', amount: '', dueDate: null }])"
             >{{ t('invoices.addTerm') }}</AppButton
         >
-    </section>
+    </AppPanel>
 </template>

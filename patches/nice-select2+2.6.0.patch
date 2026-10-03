@@ -1,0 +1,43 @@
+diff --git a/node_modules/nice-select2/package.json b/node_modules/nice-select2/package.json
+index eb0da70..e5ea7cf 100644
+--- a/node_modules/nice-select2/package.json
++++ b/node_modules/nice-select2/package.json
+@@ -42,8 +42,9 @@
+   "homepage": "https://github.com/bluzky/nice-select2#readme",
+   "exports": {
+     ".": {
+-      "import": "./dist/js/nice-select2.esm.js",
++      "import": "./src/js/nice-select2.js",
+       "require": "./dist/js/nice-select2.js"
+-    }
++    },
++    "./src/scss/nice-select2.scss": "./src/scss/nice-select2.scss"
+   }
+ }
+diff --git a/node_modules/nice-select2/src/js/nice-select2.js b/node_modules/nice-select2/src/js/nice-select2.js
+index 128d8af..e46bf0a 100644
+--- a/node_modules/nice-select2/src/js/nice-select2.js
++++ b/node_modules/nice-select2/src/js/nice-select2.js
+@@ -104,6 +104,9 @@ class NiceSelect {
+   }
+ 
+   destroy() {
++    this.eventController.abort();
++    this.el.removeEventListener("change", this.update);
++    delete this.el._niceSelect;
+     if(this.selectionList){
+       this.#removeSelectionList();
+     }
+@@ -346,8 +349,10 @@ class NiceSelect {
+   }
+ 
+   #bindElementEvents(){
+-    this.el.addEventListener("invalid", () => this.#triggerValidationMessage("invalid"));
+-    window.addEventListener("click", e => this.#onClickedOutside(e));
++    this.eventController = new AbortController();
++    const options = { signal: this.eventController.signal };
++    this.el.addEventListener("invalid", () => this.#triggerValidationMessage("invalid"), options);
++    window.addEventListener("click", e => this.#onClickedOutside(e), options);
+     this.el.addEventListener("change", this.update);
+   }
+ 

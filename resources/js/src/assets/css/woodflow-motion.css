@@ -1,0 +1,52 @@
+.woodflow-theme .wf-drawer {
+    --drawer-offset: 100%;
+    opacity: 0;
+    transform: translateX(var(--drawer-offset));
+    transition:
+        transform 200ms ease-in,
+        opacity 200ms ease-in,
+        display 200ms allow-discrete,
+        overlay 200ms allow-discrete;
+}
+.woodflow-theme .wf-drawer--left {
+    --drawer-offset: -100%;
+}
+.woodflow-theme .wf-drawer[open] {
+    opacity: 1;
+    transform: translateX(0);
+    transition-duration: 300ms;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+.woodflow-theme .wf-drawer::backdrop {
+    opacity: 0;
+    transition:
+        opacity 200ms ease-in,
+        display 200ms allow-discrete,
+        overlay 200ms allow-discrete;
+}
+.woodflow-theme .wf-drawer[open]::backdrop {
+    opacity: 1;
+    transition-duration: 300ms;
+    transition-timing-function: ease-out;
+}
+@starting-style {
+    .woodflow-theme .wf-drawer[open] {
+        opacity: 0;
+        transform: translateX(var(--drawer-offset));
+    }
+    .woodflow-theme .wf-drawer[open]::backdrop {
+        opacity: 0;
+    }
+}
+.woodflow-theme .table-hover tbody tr {
+    transition: background-color 150ms ease-out;
+}
+.woodflow-theme .wf-distribution-bar span {
+    transition: flex-grow 300ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+    .woodflow-theme .wf-drawer,
+    .woodflow-theme .wf-drawer::backdrop {
+        transition: none;
+    }
+}

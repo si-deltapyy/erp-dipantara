@@ -19,13 +19,18 @@ interface MasterListState<T> {
     changePage(page: number): Promise<void>
 }
 interface MasterListSource<T> {
-    list(query: MasterListQuery, signal: AbortSignal): Promise<PageResponse<T>>
+    list(query: MasterListQuery, signal: AbortSignal): Promise<PageResponse<T> | readonly T[]>
     subscribe(listener: () => void): () => void
+}
+interface CollectionDisplay<T> {
+    searchText(record: T): string
+    compare(left: T, right: T): number
 }
 export function useMasterList<T>(
     api: MasterListSource<T>,
     resource: string,
     filters: () => Record<string, string | undefined> = () => ({}),
+    collection?: CollectionDisplay<T>,
 ): MasterListState<T> {
     const session = useSession()
     const store = useSessionStore()
@@ -46,13 +51,19 @@ export function useMasterList<T>(
     let current: AbortController | undefined
     async function refresh(): Promise<void> {
         current?.abort()
+        response.value = undefined
+        error.value = ''
+        loading.value = false
+        if (!store.user) return
         const request = new AbortController()
         current = request
         loading.value = true
         error.value = ''
         try {
-            const result = await api.list(query.value, request.signal)
+            const records = await api.list(query.value, request.signal)
             if (request.signal.aborted) return
+            const result =
+                'meta' in records ? records : paginateCollection(records, query.value, collection)
             const lastPage = Math.max(1, Math.ceil(result.meta.total / result.meta.perPage))
             if (query.value.page > lastPage) {
                 await changePage(lastPage)
@@ -62,7 +73,13 @@ export function useMasterList<T>(
         } catch (cause) {
             if (request.signal.aborted || isRequestCancelled(cause)) return
             response.value = undefined
-            error.value = `${resource}.errors.${normalizeApiError(cause).kind}`
+            const failure = normalizeApiError(cause)
+            error.value =
+                failure.code === 'record.unconfirmed'
+                    ? 'ui.recordUnavailable'
+                    : failure.code === 'feature.unavailable'
+                      ? 'ui.featureUnavailable'
+                      : `${resource}.errors.${failure.kind}`
             await session.handleRequestFailure(cause)
         } finally {
             if (current === request) loading.value = false
@@ -99,6 +116,25 @@ export function useMasterList<T>(
         refresh,
         searchRecords,
         changePage,
+    }
+}
+function paginateCollection<T>(
+    records: readonly T[],
+    query: MasterListQuery,
+    display: CollectionDisplay<T> | undefined,
+): PageResponse<T> {
+    if (!display) throw new Error('Collection display is not configured')
+    const search = query.search.trim().toLocaleLowerCase('id-ID')
+    const filtered = records.filter((record) =>
+        display.searchText(record).toLocaleLowerCase('id-ID').includes(search),
+    )
+    filtered.sort((left, right) =>
+        query.sort === '-createdAt' ? display.compare(right, left) : display.compare(left, right),
+    )
+    const offset = (query.page - 1) * query.perPage
+    return {
+        data: filtered.slice(offset, offset + query.perPage),
+        meta: { page: query.page, perPage: query.perPage, total: filtered.length },
     }
 }
 function validPage(value: unknown): number {

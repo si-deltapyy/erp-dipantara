@@ -7,7 +7,7 @@ import { useSessionStore } from '@/stores/session'
 import { useOrderForm } from '../composables/useOrderForm'
 import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
 import ApprovedPurchaseOrderLookup from './ApprovedPurchaseOrderLookup.vue'
-import AppTextInput from '@/components/ui/AppTextInput.vue'
+import AppTextarea from '@/components/ui/AppTextarea.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppConfirmDialog from '@/components/ui/AppConfirmDialog.vue'
 const props = defineProps<{ order?: Order }>()
@@ -50,7 +50,7 @@ async function submit(): Promise<void> {
             @update:model-value="draft = { ...draft, purchaseOrderId: $event }"
         />
         <p v-else>{{ t('orders.number') }}: {{ order.purchaseOrderNumber }}</p>
-        <AppTextInput
+        <AppTextarea
             id="order-notes"
             :model-value="draft.notes ?? ''"
             :label="t('orders.notes')"
@@ -62,7 +62,7 @@ async function submit(): Promise<void> {
         <div
             v-if="error"
             role="alert"
-            class="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+            class="rounded-md border border-danger/20 bg-danger-light p-4 text-sm text-danger"
         >
             <p>{{ t(error) }}</p>
             <p v-if="error === 'orders.errors.conflict'">
@@ -70,7 +70,7 @@ async function submit(): Promise<void> {
             </p>
             <p v-if="uncertain">{{ t('orders.uncertain') }}</p>
         </div>
-        <div class="flex flex-wrap justify-end gap-3">
+        <div class="wf-form-actions">
             <RouterLink
                 :to="{
                     name: order ? 'order-detail' : 'orders',

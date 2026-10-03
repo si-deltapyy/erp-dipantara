@@ -1,30 +1,28 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { BankAccount } from '@/core/types/bank-account'
+import type { BankAccountRecord } from '@/core/types/bank-account'
 import type { TableColumn } from '@/core/types/table'
 import AppTable from '@/components/ui/AppTable.vue'
-import AppButton from '@/components/ui/AppButton.vue'
 defineProps<{
-    bankAccounts: readonly BankAccount[]
+    bankAccounts: readonly BankAccountRecord[]
     state: 'ready' | 'loading' | 'error'
-    canUpdate: boolean
 }>()
-defineEmits<{ edit: [bankAccount: BankAccount]; retry: [] }>()
+defineEmits<{ retry: [] }>()
 const { t } = useI18n()
-const columns = computed<readonly TableColumn<BankAccount>[]>(() => [
+const columns = computed<readonly TableColumn<BankAccountRecord>[]>(() => [
     { key: 'bankName', label: t('bank-accounts.bankName') },
     { key: 'accountNumber', label: t('bank-accounts.accountNumber') },
     { key: 'accountHolder', label: t('bank-accounts.accountHolder') },
-    { key: 'ownerType', label: t('bank-accounts.ownerType') },
-    { key: 'allowedActions', label: t('bank-accounts.actions') },
+    { key: 'source', label: t('bank-accounts.source') },
+    { key: 'mitraId', label: t('bank-accounts.mitraReference') },
 ])
 </script>
 <template>
     <AppTable
         :rows="bankAccounts"
         :columns="columns"
-        :row-key="(account) => account.id"
+        :row-key="(account) => `${account.source}:${account.id}`"
         :caption="t('bank-accounts.list')"
         :state="state"
         @retry="$emit('retry')"
@@ -44,15 +42,7 @@ const columns = computed<readonly TableColumn<BankAccount>[]>(() => [
                 row.accountHolder
             }}</span></template
         >
-        <template #cell-ownerType="{ row }">{{ t('bank-accounts.' + row.ownerType) }}</template>
-        <template #cell-allowedActions="{ row }"
-            ><AppButton
-                v-if="canUpdate && row.allowedActions.includes('update')"
-                variant="secondary"
-                :aria-label="t('bank-accounts.edit') + ': ' + row.bankName"
-                @click="$emit('edit', row)"
-                >{{ t('bank-accounts.edit') }}</AppButton
-            ><span v-else>—</span></template
-        >
+        <template #cell-source="{ row }">{{ t('bank-accounts.sources.' + row.source) }}</template>
+        <template #cell-mitraId="{ row }">{{ row.mitraId ?? '—' }}</template>
     </AppTable>
 </template>

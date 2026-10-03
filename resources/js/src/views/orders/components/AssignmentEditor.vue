@@ -35,7 +35,7 @@ function requestCancel(): void {
 }
 </script>
 <template>
-    <form class="space-y-4 rounded-lg border border-line p-4" @submit.prevent="save">
+    <form class="space-y-5 border-y border-line py-5" @submit.prevent="save">
         <h3 class="text-lg font-semibold">
             {{ t(assignment ? 'assignments.edit' : 'assignments.add') }}
         </h3>
@@ -83,9 +83,9 @@ function requestCancel(): void {
             />
         </div>
         <p class="text-sm text-muted">{{ t('assignments.activeHint') }}</p>
-        <p v-if="error" role="alert" class="text-red-700">{{ t(error) }}</p>
+        <p v-if="error" role="alert" class="text-danger">{{ t(error) }}</p>
         <p v-if="uncertain" role="status">{{ t('orders.uncertain') }}</p>
-        <div class="flex flex-wrap gap-3">
+        <div class="wf-form-actions">
             <AppButton type="submit" :pending="pending" :disabled="!permitted">{{
                 t(uncertain ? 'orders.retryWrite' : 'assignments.save')
             }}</AppButton

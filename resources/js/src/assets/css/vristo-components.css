@@ -1,0 +1,45 @@
+.woodflow-theme .panel {
+    position: relative;
+    min-width: 0;
+    padding: 20px;
+    border: 0;
+    border-radius: var(--wf-radius);
+    background: var(--wf-card);
+    box-shadow: var(--wf-panel-shadow);
+}
+.woodflow-theme .table-responsive {
+    max-width: 100%;
+    overflow: auto;
+    border: 0;
+    border-radius: 0;
+}
+.woodflow-theme .table-responsive table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.woodflow-theme .table-responsive :is(thead, tfoot) tr {
+    border-bottom: 0;
+    background: var(--wf-muted);
+}
+.woodflow-theme .table-responsive :is(th, td) {
+    padding: 12px 16px;
+    text-align: left;
+}
+.woodflow-theme .table-responsive th {
+    font-weight: 600;
+}
+.woodflow-theme .table-responsive tbody tr {
+    border-top: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--wf-border) 40%, transparent);
+}
+.woodflow-theme .table-hover tbody tr:hover {
+    background: color-mix(in srgb, var(--wf-accent) 35%, transparent);
+}
+.woodflow-theme .wf-topbar {
+    box-shadow: 0 1px 2px rgb(0 0 0 / 5%);
+}
+@media (max-width: 639px) {
+    .woodflow-theme .panel {
+        padding: 16px;
+    }
+}

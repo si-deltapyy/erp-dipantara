@@ -1,20 +1,31 @@
 import defaultTheme from 'tailwindcss/defaultTheme'
 
+const token =
+    (name) =>
+    ({ opacityValue } = {}) =>
+        opacityValue === undefined
+            ? `var(--wf-${name})`
+            : `color-mix(in srgb, var(--wf-${name}) calc(${opacityValue} * 100%), transparent)`
+
 export default {
     content: ['./resources/js/src/**/*.{vue,ts}'],
     theme: {
         extend: {
             colors: {
-                primary: { DEFAULT: '#4361ee', light: '#eaf1ff', strong: '#304aca' },
-                canvas: '#fafafa',
-                ink: '#0e1726',
-                muted: '#536079',
-                line: '#e0e6ed',
-                success: { DEFAULT: '#147d52', light: '#ddf5f0' },
-                danger: { DEFAULT: '#b42332', light: '#fff5f5' },
+                primary: {
+                    DEFAULT: token('primary'),
+                    light: token('muted'),
+                    strong: token('primary-strong'),
+                },
+                canvas: token('canvas'),
+                ink: token('ink'),
+                muted: token('muted-foreground'),
+                line: token('line'),
+                success: { DEFAULT: token('success'), light: token('success-light') },
+                danger: { DEFAULT: token('danger'), light: token('danger-light') },
             },
-            fontFamily: { sans: ['Nunito Sans', ...defaultTheme.fontFamily.sans] },
-            boxShadow: { panel: '0 2px 8px rgb(14 23 38 / 5%)' },
+            fontFamily: { sans: ['Plus Jakarta Sans', ...defaultTheme.fontFamily.sans] },
+            boxShadow: { panel: 'var(--wf-panel-shadow)' },
         },
     },
     plugins: [],

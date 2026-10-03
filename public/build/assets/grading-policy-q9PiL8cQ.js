@@ -1,1 +1,0 @@
-import{h as r}from"./main-Bk-MKqvV.js";function d(t,e,s){return!t||!r(t,`gradings.${s}`)||!e.allowedActions.includes(s)?!1:s==="approve"||s==="reject"?e.status==="submitted"&&t.id!==e.createdByUserId&&t.id!==e.submittedByUserId:s==="revise"?e.status==="approved":["draft","rejected"].includes(e.status)}export{d as c};

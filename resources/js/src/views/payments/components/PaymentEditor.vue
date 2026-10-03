@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import AppPanel from '@/components/ui/AppPanel.vue'
+import AppStatusBadge from '@/components/ui/AppStatusBadge.vue'
+
 import { computed, nextTick, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -58,11 +61,13 @@ async function submit(): Promise<void> {
 }
 </script>
 <template>
-    <form ref="formElement" class="panel space-y-6" novalidate @submit.prevent="submit">
-        <p class="break-words font-semibold">
-            {{ invoice.number ?? invoice.purchaseOrderNumber }} / {{ invoice.counterpartyName }}
-        </p>
-        <p>{{ t('payments.subtitle') }}</p>
+    <form ref="formElement" class="min-w-0 space-y-6" novalidate @submit.prevent="submit">
+        <AppPanel :title="t('payments.invoiceContext')" class="space-y-4">
+            <p class="break-words font-semibold">
+                {{ invoice.number ?? invoice.purchaseOrderNumber }} / {{ invoice.counterpartyName }}
+            </p>
+            <AppStatusBadge>{{ t('payments.' + invoice.direction) }}</AppStatusBadge>
+        </AppPanel>
         <PaymentFields
             :draft="draft"
             :invoice="invoice"
@@ -102,7 +107,7 @@ async function submit(): Promise<void> {
         <p v-if="errors.proofDocumentId" role="alert">{{ t(errors.proofDocumentId) }}</p>
         <p v-if="error" role="alert">{{ t(error) }}</p>
         <p v-if="uncertain" role="status">{{ t('payments.uncertain') }}</p>
-        <div class="flex flex-wrap justify-end gap-3">
+        <div class="wf-form-actions">
             <RouterLink
                 :to="{
                     name: payment ? 'payment-detail' : 'invoice-detail',
