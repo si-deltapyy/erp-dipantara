@@ -1,46 +1,36 @@
-import { inject, watch } from 'vue'
+import { inject } from 'vue'
 import { gradersApiKey } from '@/api/graders-api'
-import type { Grader, GraderInput } from '@/core/types/grader'
-import { graderDraft, emptyGrader, validateGrader } from '@/core/domain/grader-validation'
+import type { GraderRecord, GraderContactInput } from '@/core/types/grader'
+import { validateGraderContact } from '@/core/domain/grader-validation'
 import { useSessionStore } from '@/stores/session'
 import { useGraderRecoveryStore } from '@/stores/grader-recovery'
 import { useMasterForm } from '@/composables/useMasterForm'
 
 export function useGraderForm(
-    grader: Grader | undefined,
+    grader: GraderRecord,
     saved: () => void,
-): ReturnType<typeof useMasterForm<GraderInput>> {
+): ReturnType<typeof useMasterForm<GraderContactInput>> {
     const api = inject(gradersApiKey)
     if (!api) throw new Error('Graders API is not configured')
     const store = useSessionStore()
     const recovery = useGraderRecoveryStore()
-    const snapshot = recovery.snapshot?.actorId === store.user?.id ? recovery.snapshot : null
+    const snapshot =
+        recovery.snapshot?.actorId === store.user?.id && recovery.snapshot?.grader?.id === grader.id
+            ? recovery.snapshot
+            : null
     recovery.snapshot = null
-    const form = useMasterForm<GraderInput>({
+    return useMasterForm<GraderContactInput>({
         resource: 'graders',
-        initial: grader ? graderDraft(grader) : emptyGrader(),
+        retrySafe: false,
+        requiredPermission: 'graders.update.all',
+        initial: { phone: grader.phone, graderGroup: grader.graderGroup },
         snapshot,
-        validate: validateGrader,
-        write: (draft, signal, idempotencyKey) => {
-            const options = {
-                signal,
-                idempotencyKey,
-                snapshotGeneration: grader?.snapshotGeneration,
-            }
-            return grader
-                ? api.update(grader.id, { ...draft, version: grader.version }, options)
-                : api.create(draft, options)
-        },
+        validate: validateGraderContact,
+        write: (draft, signal, idempotencyKey) =>
+            api.update(grader.id, draft, { signal, idempotencyKey }),
         recover: (draft, idempotencyKey, actorId) => {
             recovery.snapshot = { actorId, grader, draft, idempotencyKey }
         },
         saved,
     })
-    watch(form.draft, (current, previous) => {
-        const remaining = { ...form.errors.value }
-        for (const field of Object.keys(current) as (keyof GraderInput)[])
-            if (current[field] !== previous[field]) delete remaining[field]
-        form.errors.value = remaining
-    })
-    return form
 }

@@ -45,3 +45,21 @@ function parseFieldErrors(response: unknown): Readonly<Record<string, readonly s
         ),
     )
 }
+
+export function mapApiFieldErrors(
+    cause: unknown,
+    fields: Readonly<Record<string, string>>,
+): ApiError {
+    const failure = normalizeApiError(cause)
+    return new ApiError(
+        failure.kind,
+        Object.fromEntries(
+            Object.entries(failure.fieldErrors).map(([field, messages]) => [
+                fields[field] ?? field,
+                messages,
+            ]),
+        ),
+        failure.code,
+        failure.requestId,
+    )
+}

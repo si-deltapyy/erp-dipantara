@@ -2,6 +2,7 @@ import type { AxiosInstance } from 'axios'
 import type { InvoicesApi } from '@/core/types/invoice'
 import { ApiError } from '@/core/types/api-error'
 import { createHttpClient } from '@/services/http-client'
+import { parseInvoiceRecord } from '@/api/invoice-mapper'
 import { parseCollection } from '@/api/contracts/response-parsers'
 
 export function createHttpInvoices(client: AxiosInstance = createHttpClient()): InvoicesApi {
@@ -11,9 +12,7 @@ export function createHttpInvoices(client: AxiosInstance = createHttpClient()): 
     return {
         async list(_query, signal) {
             const response = await client.get<unknown>('/api/v1/invoices', { signal })
-            return parseCollection(response.data, () => {
-                throw new ApiError('unexpected', {}, 'record.unconfirmed')
-            })
+            return parseCollection(response.data, parseInvoiceRecord)
         },
         get: unavailable,
         create: unavailable,

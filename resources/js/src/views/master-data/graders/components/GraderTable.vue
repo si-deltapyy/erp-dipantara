@@ -8,7 +8,7 @@ defineProps<{
     graders: readonly GraderRecord[]
     state: 'ready' | 'loading' | 'error'
 }>()
-defineEmits<{ retry: [] }>()
+defineEmits<{ retry: []; select: [id: string] }>()
 const { t } = useI18n()
 const columns = computed<readonly TableColumn<GraderRecord>[]>(() => [
     { key: 'name', label: t('graders.name') },
@@ -26,9 +26,13 @@ const columns = computed<readonly TableColumn<GraderRecord>[]>(() => [
         @retry="$emit('retry')"
     >
         <template #cell-name="{ row }"
-            ><span class="block min-w-40 max-w-64 whitespace-normal break-words font-semibold">{{
-                row.name
-            }}</span></template
+            ><button
+                type="button"
+                class="block min-w-40 max-w-64 whitespace-normal break-words font-semibold text-primary hover:underline"
+                @click="$emit('select', row.id)"
+            >
+                {{ row.name }}
+            </button></template
         >
         <template #cell-phone="{ row }">{{ row.phone || '—' }}</template>
     </AppTable>

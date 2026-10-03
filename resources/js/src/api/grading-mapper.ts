@@ -1,12 +1,13 @@
-import type { Grading, GradingQuery } from '@/core/types/grading'
+import type { Grading, GradingRecord, GradingQuery } from '@/core/types/grading'
 import { gradingStatuses } from '@/core/types/grading'
 import { parseMetadata } from './contracts/response-parsers'
 import { parseTimestamp } from './contracts/timestamp-parser'
 import { parseBuyerQuery } from './buyer-mapper'
-import { parseGradingInput } from './contracts/grading-input'
+import { parseGradingDate, parseGradingInput } from './contracts/grading-input'
 import {
     invalidContract,
     parseId,
+    parseNumericId,
     parseDecimal,
     parseObject,
     parseString,
@@ -93,5 +94,26 @@ export function parseGradingQuery(query: GradingQuery): GradingQuery {
         ...parseBuyerQuery(query),
         ...(query.status ? { status: query.status } : {}),
         ...(query.assignmentId ? { assignmentId: parseId(query.assignmentId) } : {}),
+    }
+}
+
+export function parseGradingRecord(value: unknown): GradingRecord {
+    const grading = parseObject(value, 'grading')
+    const preOrder = grading.pre_order === null ? null : parseObject(grading.pre_order, 'pre_order')
+    const mitra = grading.mitra === null ? null : parseObject(grading.mitra, 'mitra')
+    const grader = grading.grader === null ? null : parseObject(grading.grader, 'grader')
+    const product = grading.product === null ? null : parseObject(grading.product, 'product')
+    return {
+        id: parseNumericId(grading.id),
+        purchaseOrderNumber:
+            preOrder === null
+                ? null
+                : parseString(preOrder.pre_order_number, 'pre_order.pre_order_number'),
+        mitraName: mitra === null ? null : parseString(mitra.name, 'mitra.name'),
+        graderGroup:
+            grader === null ? null : parseString(grader.grader_group, 'grader.grader_group'),
+        productName: product === null ? null : parseString(product.name, 'product.name'),
+        gradingDate: parseGradingDate(grading.grading_date),
+        notes: nullable(grading.note, 'note'),
     }
 }

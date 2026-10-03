@@ -22,7 +22,7 @@ function parseMitraFields(record: Record<string, unknown>): MitraInput {
     const field = (name: keyof MitraInput): string => {
         const value = parseString(record[name], name)
         if ([...value].length > mitraFieldLimits[name]) return invalidContract(name)
-        if (name === 'name' && !value.trim()) return invalidContract(name)
+        if (!value.trim()) return invalidContract(name)
         return name === 'name' ? value.trim() : value
     }
     return {

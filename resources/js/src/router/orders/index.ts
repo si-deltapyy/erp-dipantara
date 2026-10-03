@@ -1,3 +1,4 @@
+import { integrationPermissions } from '@/core/constants/business-permissions'
 import type { RouteRecordRaw } from 'vue-router'
 import { accessRules } from '../access-rules'
 const meta = {
@@ -19,14 +20,21 @@ export const orderRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/orders/OrderFormPage.vue'),
         meta: {
             ...meta,
-            anyPermissions: ['orders.create.all'],
+            featureUnavailable: false,
+            requiredPermissions: [...integrationPermissions['orders.create']],
+            anyPermissions: [],
         },
     },
     {
         path: '/orders/:id',
         name: 'order-detail',
         component: () => import('@/views/orders/OrderDetailPage.vue'),
-        meta,
+        meta: {
+            ...meta,
+            featureUnavailable: false,
+            requiredPermissions: [...integrationPermissions['orders.read']],
+            anyPermissions: [],
+        },
     },
     {
         path: '/orders/:id/edit',

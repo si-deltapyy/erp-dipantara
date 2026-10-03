@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { nextTick, ref } from 'vue'
-import type { Mitra } from '@/core/types/mitra'
+import type { MitraRecord } from '@/core/types/mitra'
 import { useMitraForm } from '../composables/useMitraForm'
 import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
 import MitraFields from './MitraFields.vue'
@@ -9,7 +9,7 @@ import AppModal from '@/components/ui/AppModal.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppConfirmDialog from '@/components/ui/AppConfirmDialog.vue'
 import { useSessionStore } from '@/stores/session'
-const props = defineProps<{ mitra?: Mitra }>()
+const props = defineProps<{ mitra?: MitraRecord }>()
 const emit = defineEmits<{ saved: []; close: [] }>()
 const { t } = useI18n()
 const session = useSessionStore()

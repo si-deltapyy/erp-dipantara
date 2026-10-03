@@ -107,3 +107,47 @@ type OperationOf<T> = T extends `${infer Resource}.${infer Action}.${string}`
     ? `${Resource}.${Action}`
     : never
 export type BusinessOperation = OperationOf<BusinessPermission>
+
+export const integrationPermissions = {
+    'purchase-orders.read': ['purchase-orders.read.all', 'timber-prices.read.all'],
+    'purchase-orders.create': [
+        'purchase-orders.read.all',
+        'purchase-orders.create.all',
+        'buyers.read.all',
+        'timber-products.read.all',
+        'timber-prices.read.all',
+    ],
+    'purchase-orders.update': [
+        'purchase-orders.read.all',
+        'purchase-orders.update.all',
+        'buyers.read.all',
+        'timber-products.read.all',
+        'timber-prices.read.all',
+    ],
+    'orders.read': ['orders.read.all', 'timber-prices.read.all'],
+    'orders.create': [
+        'orders.read.all',
+        'orders.create.all',
+        'purchase-orders.read.all',
+        'mitras.read.all',
+        'graders.read.all',
+        'timber-prices.read.all',
+    ],
+    'gradings.create': [
+        'gradings.read.all',
+        'gradings.create.all',
+        'purchase-orders.read.all',
+        'mitras.read.all',
+        'graders.read.all',
+        'timber-products.read.all',
+        'timber-prices.read.all',
+    ],
+    'deliveries.create': [
+        'deliveries.read.all',
+        'deliveries.create.all',
+        'purchase-orders.read.all',
+        'mitras.read.all',
+        'graders.read.all',
+        'timber-prices.read.all',
+    ],
+} as const satisfies Partial<Record<BusinessOperation, readonly BusinessPermission[]>>

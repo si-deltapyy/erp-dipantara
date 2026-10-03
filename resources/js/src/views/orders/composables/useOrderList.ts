@@ -1,7 +1,7 @@
 import type { Ref, ShallowRef, ComputedRef } from 'vue'
 import { computed, onScopeDispose, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import type { Order, OrderQuery } from '@/core/types/order'
+import type { OrderRecord, OrderQuery } from '@/core/types/order'
 import { orderStatuses } from '@/core/types/order'
 import type { PageResponse } from '@/core/types/contracts'
 import { useSession } from '@/composables/useSession'
@@ -12,7 +12,7 @@ import { canCreateOrder } from '@/core/domain/order-policy'
 import { useOrderApi } from './useOrderApi'
 
 interface OrderListState {
-    response: ShallowRef<PageResponse<Order> | undefined>
+    response: ShallowRef<PageResponse<OrderRecord> | undefined>
     query: ComputedRef<OrderQuery>
     search: Ref<string>
     status: Ref<string>
@@ -49,7 +49,7 @@ export function useOrderList(): OrderListState {
     const status = ref(query.value.status ?? '')
     const purchaseOrderId = ref(query.value.purchaseOrderId ?? '')
     const sort = ref(query.value.sort)
-    const response = shallowRef<PageResponse<Order>>()
+    const response = shallowRef<PageResponse<OrderRecord>>()
     const loading = ref(false)
     const error = ref('')
     let active: AbortController | undefined

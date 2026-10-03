@@ -51,15 +51,50 @@ export interface PurchaseOrderWriteOptions {
     readonly idempotencyKey: string
     readonly snapshotGeneration?: string
 }
+export interface PurchaseOrderRecord {
+    readonly id: string
+    readonly number: string
+    readonly buyerName: string | null
+    readonly productName: string | null
+    readonly orderDate: string
+    readonly closingDate: string
+    readonly quantity: number
+    readonly totalAmount: string | null
+    readonly status: 'pending' | 'on_process' | 'delivered' | 'completed'
+}
+export interface PurchaseOrderWriteInput {
+    readonly buyerId: string
+    readonly productId: string
+    readonly number: string
+    readonly orderDate: string
+    readonly closingDate: string
+    readonly quantity: string
+    readonly totalAmount: string
+    readonly notes: string
+}
+export interface PurchaseOrderDetail extends PurchaseOrderRecord {
+    readonly buyerId: string
+    readonly productId: string
+    readonly notes: string | null
+    readonly orders: readonly {
+        readonly id: string
+        readonly number: string
+        readonly mitraName: string | null
+        readonly graderGroup: string | null
+    }[]
+}
 export interface PurchaseOrdersApi {
-    list(query: PurchaseOrderQuery, signal: AbortSignal): Promise<PageResponse<PurchaseOrder>>
-    get(id: string, signal: AbortSignal): Promise<PurchaseOrder>
-    create(input: PurchaseOrderInput, options: PurchaseOrderWriteOptions): Promise<PurchaseOrder>
+    list(query: PurchaseOrderQuery, signal: AbortSignal): Promise<PageResponse<PurchaseOrderRecord>>
+    get(id: string, signal: AbortSignal): Promise<PurchaseOrderDetail>
+    create(
+        input: PurchaseOrderWriteInput,
+        options: PurchaseOrderWriteOptions,
+    ): Promise<{ readonly id: string }>
     update(
         id: string,
-        input: PurchaseOrderUpdate,
+        input: PurchaseOrderWriteInput,
         options: PurchaseOrderWriteOptions,
-    ): Promise<PurchaseOrder>
+    ): Promise<{ readonly id: string }>
     submit(
         id: string,
         input: { readonly version: number },

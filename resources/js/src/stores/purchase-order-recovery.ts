@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import type {
     PurchaseOrder,
+    PurchaseOrderDetail,
+    PurchaseOrderWriteInput,
     PurchaseOrderInput,
     PurchaseOrderReviewAction,
 } from '@/core/types/purchase-order'
@@ -20,7 +22,13 @@ export interface PurchaseOrderReviewRecovery {
 }
 export const usePurchaseOrderRecoveryStore = defineStore('purchase-order-recovery', {
     state: (): {
+        form: {
+            readonly actorId: string
+            readonly order?: PurchaseOrderDetail
+            readonly draft: PurchaseOrderWriteInput
+            readonly idempotencyKey: string
+        } | null
         snapshot: PurchaseOrderRecovery | null
         review: PurchaseOrderReviewRecovery | null
-    } => ({ snapshot: null, review: null }),
+    } => ({ form: null, snapshot: null, review: null }),
 })

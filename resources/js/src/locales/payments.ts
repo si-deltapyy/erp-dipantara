@@ -1,5 +1,11 @@
 export default {
     payments: {
+        buyer: 'Buyer',
+        dueDate: 'Tanggal jatuh tempo',
+        amount: 'Nominal pembayaran',
+        buyerTerm: 'Termin Buyer',
+        mitraTerm: 'Termin Mitra',
+        recordSearch: 'Cari PO, Buyer, atau termin',
         purchaseOrderNumber: 'Nomor PO',
         counterpartyName: 'Buyer / Mitra',
         sourceAccountLabel: 'Rekening sumber',
@@ -41,6 +47,9 @@ export default {
         notes: 'Catatan',
         status: 'Status',
         statuses: {
+            pending: 'Menunggu',
+            completed: 'Selesai',
+            cancelled: 'Dibatalkan',
             draft: 'Draft',
             submitted: 'Diajukan',
             approved: 'Disetujui',

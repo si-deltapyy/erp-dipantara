@@ -2,7 +2,9 @@ export default {
     graders: {
         graderGroup: 'Grup Grader',
         title: 'Master Grader',
-        subtitle: 'Kelola profil Grader dan pengajuan aktivasi akunnya.',
+        detail: 'Detail Grader',
+        createUnavailable: 'Penambahan Grader menunggu pilihan akun yang tersedia.',
+        subtitle: 'Kelola kontak dan kelompok Grader yang terhubung dengan akun.',
         section: 'Master data',
         list: 'Daftar Grader',
         add: 'Tambah Grader',
@@ -30,7 +32,7 @@ export default {
         address: 'Alamat',
         optional: 'Opsional',
         search: 'Cari Grader',
-        searchHint: 'Nama, email, telepon, atau alamat',
+        searchHint: 'Nama, telepon, atau kelompok',
         searchAction: 'Cari',
         clear: 'Hapus pencarian',
         total: '{count} Grader',
@@ -42,12 +44,12 @@ export default {
         required: 'Field ini wajib diisi.',
         tooLong: 'Isi melebihi batas karakter.',
         invalid: 'Periksa kembali nilai field ini.',
-        requiredHint: 'Nama dan email login wajib diisi.',
+        requiredHint: 'Telepon dan kelompok wajib diisi.',
         discardTitle: 'Buang perubahan?',
         discardDescription: 'Perubahan yang belum disimpan akan hilang.',
         retry: 'Ulangi penyimpanan',
         uncertain:
-            'Hasil penyimpanan belum diketahui. Ulangi permintaan yang sama untuk memastikan hasilnya tanpa membuat data ganda.',
+            'Hasil penyimpanan belum diketahui. Tutup form dan muat ulang detail sebelum mencoba kembali.',
         conflictHint:
             'Data telah berubah. Tutup form lalu buka kembali untuk memuat versi terbaru. Draft Anda belum disimpan.',
         errors: {

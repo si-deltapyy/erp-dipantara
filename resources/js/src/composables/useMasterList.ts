@@ -31,6 +31,7 @@ export function useMasterList<T>(
     resource: string,
     filters: () => Record<string, string | undefined> = () => ({}),
     collection?: CollectionDisplay<T>,
+    requiredPermission: string | readonly string[] = `${resource}.read.all`,
 ): MasterListState<T> {
     const session = useSession()
     const store = useSessionStore()
@@ -55,6 +56,12 @@ export function useMasterList<T>(
         error.value = ''
         loading.value = false
         if (!store.user) return
+        const permissions =
+            typeof requiredPermission === 'string' ? [requiredPermission] : requiredPermission
+        if (!permissions.every((permission) => store.user?.permissions.includes(permission))) {
+            error.value = 'ui.scopeUnavailable'
+            return
+        }
         const request = new AbortController()
         current = request
         loading.value = true

@@ -55,7 +55,7 @@
             <!-- Auth Buttons (Desktop) -->
             <div class="hidden items-center gap-3 md:flex">
                 @auth
-                    <a href="/app" class="rounded-xl bg-[#1e5b3d] px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-[#1e5b3d]/20 transition hover:bg-[#16472f]">
+                    <a href="{{ route('app') }}" class="rounded-xl bg-[#1e5b3d] px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-[#1e5b3d]/20 transition hover:bg-[#16472f]">
                         Dashboard
                     </a>
                     <form method="POST" action="{{ route('logout') }}">
@@ -65,7 +65,7 @@
                         </button>
                     </form>
                 @else
-                    <a href="/auth/login" class="rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:text-[#1e5b3d]">
+                    <a href="{{ route('app') }}" class="rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:text-[#1e5b3d]">
                         Masuk
                     </a>
                     {{-- <a href="{{ route('register') }}" class="rounded-xl bg-[#1e5b3d] px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-[#1e5b3d]/20 transition hover:bg-[#16472f]">
@@ -94,9 +94,9 @@
                 <hr class="border-slate-100">
 
                 @auth
-                    <a href="{{ route('dashboard') }}" class="w-full rounded-xl bg-[#1e5b3d] px-4 py-3 text-center text-sm font-bold text-white">Dashboard</a>
+                    <a href="{{ route('app') }}" class="w-full rounded-xl bg-[#1e5b3d] px-4 py-3 text-center text-sm font-bold text-white">Dashboard</a>
                 @else
-                    <a href="{{ route('login') }}" class="w-full rounded-xl border border-slate-200 px-4 py-3 text-center text-sm font-bold text-slate-700">Masuk</a>
+                    <a href="{{ route('app') }}" class="w-full rounded-xl border border-slate-200 px-4 py-3 text-center text-sm font-bold text-slate-700">Masuk</a>
                     <a href="{{ route('register') }}" class="w-full rounded-xl bg-[#1e5b3d] px-4 py-3 text-center text-sm font-bold text-white">Coba Gratis</a>
                 @endauth
             </div>

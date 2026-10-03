@@ -1,18 +1,25 @@
 <script setup lang="ts">
+import { integrationPermissions } from '@/core/constants/business-permissions'
+import { canAccess } from '@/core/domain/access-policy'
+import { useSessionStore } from '@/stores/session'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { Order } from '@/core/types/order'
+import type { OrderRecord } from '@/core/types/order'
 import type { TableColumn } from '@/core/types/table'
 import AppTable from '@/components/ui/AppTable.vue'
-import OrderStatus from './OrderStatus.vue'
-defineProps<{ orders: readonly Order[] }>()
+defineProps<{ orders: readonly OrderRecord[] }>()
 const { t } = useI18n()
-const columns = computed<readonly TableColumn<Order>[]>(() => [
+const session = useSessionStore()
+const canOpen = computed(() => canAccess(session.user, integrationPermissions['orders.read']))
+const columns = computed<readonly TableColumn<OrderRecord>[]>(() => [
     { key: 'buyerName', label: t('orders.buyer') },
+    { key: 'number', label: t('orders.orderNumber') },
     { key: 'purchaseOrderNumber', label: t('orders.number') },
-    { key: 'status', label: t('orders.status') },
-    { key: 'notes', label: t('orders.dp') },
-    { key: 'allowedActions', label: t('orders.actions') },
+    { key: 'orderDate', label: t('orders.orderDate') },
+    { key: 'mitraName', label: t('orders.mitra') },
+    { key: 'graderName', label: t('orders.grader') },
+    { key: 'buyerGraderName', label: t('orders.buyerGrader') },
+    { key: 'notes', label: t('orders.notes') },
 ])
 </script>
 <template>
@@ -22,25 +29,29 @@ const columns = computed<readonly TableColumn<Order>[]>(() => [
         :row-key="(order) => order.id"
         :caption="t('orders.title')"
     >
-        <template #cell-buyerName="{ row }"
-            ><span class="block min-w-40 max-w-64 whitespace-normal break-words font-semibold">{{
-                row.buyerName
-            }}</span></template
+        <template
+            v-for="field in [
+                'buyerName',
+                'purchaseOrderNumber',
+                'mitraName',
+                'graderName',
+                'notes',
+            ] as const"
+            :key="field"
+            #[`cell-${field}`]="{ row }"
         >
-        <template #cell-purchaseOrderNumber="{ row }"
-            ><span class="block max-w-48 whitespace-normal break-words">{{
-                row.purchaseOrderNumber
-            }}</span></template
-        >
-        <template #cell-status="{ row }"><OrderStatus :status="row.status" /></template>
-        <template #cell-notes>{{ t('orders.dpUnavailable') }}</template>
-        <template #cell-allowedActions="{ row }"
-            ><RouterLink
+            <span class="block max-w-64 whitespace-normal break-words">{{
+                row[field] ?? t('ui.unavailableValue')
+            }}</span>
+        </template>
+        <template #cell-number="{ row }">
+            <RouterLink
+                v-if="canOpen"
                 :to="{ name: 'order-detail', params: { id: row.id }, query: $route.query }"
-                class="secondary-button"
-                :aria-label="t('orders.open', { number: row.purchaseOrderNumber })"
-                >{{ t('orders.detail') }}</RouterLink
-            ></template
-        >
+                class="text-primary hover:underline"
+                >{{ row.number }}</RouterLink
+            >
+            <span v-else>{{ row.number }}</span>
+        </template>
     </AppTable>
 </template>

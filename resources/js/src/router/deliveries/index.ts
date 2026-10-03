@@ -1,3 +1,4 @@
+import { integrationPermissions } from '@/core/constants/business-permissions'
 import type { RouteRecordRaw } from 'vue-router'
 import { accessRules } from '../access-rules'
 const meta = {
@@ -19,7 +20,9 @@ export const deliveryRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/deliveries/DeliveryFormPage.vue'),
         meta: {
             ...meta,
-            anyPermissions: ['deliveries.create.all'],
+            featureUnavailable: false,
+            requiredPermissions: [...integrationPermissions['deliveries.create']],
+            anyPermissions: [],
         },
     },
     {

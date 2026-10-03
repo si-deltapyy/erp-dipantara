@@ -1,3 +1,4 @@
+import { integrationPermissions } from '@/core/constants/business-permissions'
 import type { RouteRecordRaw } from 'vue-router'
 import { accessRules } from '../access-rules'
 const meta = {
@@ -25,7 +26,9 @@ export const gradingRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/gradings/GradingFormPage.vue'),
         meta: {
             ...meta,
-            anyPermissions: ['gradings.create.all', 'gradings.create.assigned'],
+            featureUnavailable: false,
+            requiredPermissions: [...integrationPermissions['gradings.create']],
+            anyPermissions: [],
         },
     },
     {

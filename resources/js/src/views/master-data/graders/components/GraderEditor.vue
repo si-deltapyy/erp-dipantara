@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { canEditGraderEmail } from '@/core/domain/grader-policy'
 import { useI18n } from 'vue-i18n'
 import { nextTick, ref } from 'vue'
-import type { Grader } from '@/core/types/grader'
+import type { GraderRecord } from '@/core/types/grader'
 import { useGraderForm } from '../composables/useGraderForm'
 import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
 import GraderFields from './GraderFields.vue'
@@ -10,7 +9,7 @@ import AppModal from '@/components/ui/AppModal.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppConfirmDialog from '@/components/ui/AppConfirmDialog.vue'
 import { useSessionStore } from '@/stores/session'
-const props = defineProps<{ grader?: Grader }>()
+const props = defineProps<{ grader: GraderRecord }>()
 const emit = defineEmits<{ saved: []; close: [] }>()
 const { t } = useI18n()
 const session = useSessionStore()
@@ -34,18 +33,14 @@ async function submit(): Promise<void> {
 <template>
     <AppModal
         :open="true"
-        :title="t(grader ? 'graders.edit' : 'graders.add')"
-        initial-focus="#grader-name"
+        :title="t('graders.edit')"
+        initial-focus="#grader-phone"
         :busy="pending"
         @close="close"
     >
         <form ref="form" class="space-y-5" novalidate @submit.prevent="submit">
-            <GraderFields
-                v-model="draft"
-                :errors="errors"
-                :disabled="pending || uncertain"
-                :email-locked="!!grader && !canEditGraderEmail(grader.provisioningStatus)"
-            />
+            <p class="text-sm font-semibold">{{ grader.name }}</p>
+            <GraderFields v-model="draft" :errors="errors" :disabled="pending || uncertain" />
             <div
                 v-if="error"
                 role="alert"
@@ -61,8 +56,8 @@ async function submit(): Promise<void> {
                 <AppButton variant="secondary" :disabled="pending" @click="close">{{
                     t('graders.cancel')
                 }}</AppButton>
-                <AppButton type="submit" :pending="pending">{{
-                    t(uncertain ? 'graders.retry' : 'graders.save')
+                <AppButton type="submit" :pending="pending" :disabled="uncertain">{{
+                    t('graders.save')
                 }}</AppButton>
             </div>
         </form>

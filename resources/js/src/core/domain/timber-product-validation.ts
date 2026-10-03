@@ -1,4 +1,8 @@
-import type { TimberProduct, TimberProductInput } from '@/core/types/timber-product'
+import type {
+    TimberProduct,
+    TimberProductInput,
+    TimberProductCreateInput,
+} from '@/core/types/timber-product'
 import { canonicalDecimal, isTimberDimension, normalizeDecimalInput } from './timber-measurements'
 
 export type TimberProductField = keyof TimberProductInput
@@ -58,4 +62,34 @@ export function timberProductDraft(record: TimberProduct): TimberProductInput {
         purchasePrice: record.purchasePrice ?? '',
         salePrice: record.salePrice ?? '',
     }
+}
+
+export function emptyTimberProductCreate(): TimberProductCreateInput {
+    return {
+        name: '',
+        type: '',
+        grade: '',
+        dimensionLength: '',
+        dimensionWidth: '',
+        dimensionHeight: '',
+        dimensionDiameter: '',
+        volume: '',
+        price: '',
+    }
+}
+export function validateTimberProductCreate(
+    input: TimberProductCreateInput,
+): Partial<Record<keyof TimberProductCreateInput, string>> {
+    const errors: Partial<Record<keyof TimberProductCreateInput, string>> = {}
+    for (const field of Object.keys(input) as (keyof TimberProductCreateInput)[]) {
+        const value = input[field].trim()
+        if (!value && field !== 'volume') errors[field] = 'timber-products.required'
+        else if (['name', 'type', 'grade'].includes(field)) {
+            if (value.length > 255) errors[field] = 'timber-products.tooLong'
+        } else if (value && (!/^\d+(\.\d+)?$/.test(value) || !Number.isFinite(Number(value))))
+            errors[field] = 'timber-products.invalid'
+        else if (field === 'price' && !/^\d+$/.test(value))
+            errors[field] = 'timber-products.integerPrice'
+    }
+    return errors
 }

@@ -1,6 +1,6 @@
 import { parseInvoiceTerms } from './contracts/invoice-input'
 import { parseDeliveryDate } from './contracts/delivery-input'
-import type { Invoice, InvoiceQuery } from '@/core/types/invoice'
+import type { Invoice, InvoiceRecord, InvoiceQuery } from '@/core/types/invoice'
 import { parseMetadata } from './contracts/response-parsers'
 import { parseTimestamp } from './contracts/timestamp-parser'
 import { parseBuyerQuery } from './buyer-mapper'
@@ -9,6 +9,7 @@ import {
     parseObject,
     parseString,
     parseId,
+    parseNumericId,
     parseInteger,
     parseMoney,
     requireKeys,
@@ -103,5 +104,17 @@ export function parseInvoiceQuery(query: InvoiceQuery): InvoiceQuery {
         ...(query.purchaseOrderId ? { purchaseOrderId: parseId(query.purchaseOrderId) } : {}),
         ...(query.mitraId ? { mitraId: parseId(query.mitraId) } : {}),
         ...(query.direction ? { direction: query.direction } : {}),
+    }
+}
+
+export function parseInvoiceRecord(value: unknown): InvoiceRecord {
+    const invoice = parseObject(value, 'invoice')
+    return {
+        id: parseNumericId(invoice.id),
+        number: parseString(invoice.invoice_number, 'invoice_number'),
+        invoiceDate: parseDeliveryDate(invoice.invoice_date, 'invoice_date'),
+        invoiceType: parseString(invoice.type_invoice, 'type_invoice'),
+        transactionId: parseNumericId(invoice.transaction_id, 'transaction_id'),
+        notes: nullable(invoice.note, 'note'),
     }
 }

@@ -8,7 +8,7 @@ import type { Invoice, InvoiceInput } from '@/core/types/invoice'
 import { useSessionStore } from '@/stores/session'
 import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
 import { useInvoiceForm } from '../composables/useInvoiceForm'
-import ApprovedPurchaseOrderLookup from '@/views/orders/components/ApprovedPurchaseOrderLookup.vue'
+import PurchaseOrderLookup from '@/views/purchase-orders/components/PurchaseOrderLookup.vue'
 import MasterLookup from '@/views/master-data/components/MasterLookup.vue'
 import InvoiceTerms from './InvoiceTerms.vue'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
@@ -63,7 +63,7 @@ async function submit(): Promise<void> {
 <template>
     <form ref="formElement" class="min-w-0 space-y-6" novalidate @submit.prevent="submit">
         <AppPanel :title="t('invoices.context')" class="space-y-5">
-            <ApprovedPurchaseOrderLookup
+            <PurchaseOrderLookup
                 v-if="!invoice"
                 id="invoice-po"
                 :model-value="draft.purchaseOrderId"
