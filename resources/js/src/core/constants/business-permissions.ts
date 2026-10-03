@@ -103,6 +103,53 @@ export const businessPermissions = [
     'timber-products.update.all',
 ] as const
 export type BusinessPermission = (typeof businessPermissions)[number]
+
+export const backendPermissionCapabilities: Readonly<
+    Record<string, readonly BusinessPermission[]>
+> = {
+    'manage products': [
+        'timber-products.read.all',
+        'timber-products.create.all',
+        'timber-prices.read.all',
+    ],
+    'manage mitras': ['mitras.read.all', 'mitras.create.all', 'mitras.update.all'],
+    'manage graders': ['graders.read.all', 'graders.update.all'],
+    'manage rekenings': ['bank-accounts.read.all'],
+    'manage pre-orders': [
+        'purchase-orders.read.all',
+        'purchase-orders.create.all',
+        'purchase-orders.update.all',
+        'buyers.read.all',
+        'buyers.create.all',
+        'buyers.update.all',
+    ],
+    'manage orders': ['orders.read.all', 'orders.create.all'],
+    'manage gradings': ['gradings.read.all', 'gradings.create.all'],
+    'manage logs payments': ['payments.read.all'],
+}
+
+export const backendWorkflowCapabilities: readonly {
+    required: readonly string[]
+    capabilities: readonly BusinessPermission[]
+}[] = [
+    {
+        required: ['manage pre-orders', 'manage orders'],
+        capabilities: ['deliveries.read.all', 'deliveries.create.all'],
+    },
+    {
+        required: ['make invoices', 'make transactions'],
+        capabilities: ['invoices.read.all'],
+    },
+    {
+        required: [
+            'manage pre-orders',
+            'manage logs payments',
+            'make invoices',
+            'make transactions',
+        ],
+        capabilities: ['dashboard.read.all'],
+    },
+]
 type OperationOf<T> = T extends `${infer Resource}.${infer Action}.${string}`
     ? `${Resource}.${Action}`
     : never
