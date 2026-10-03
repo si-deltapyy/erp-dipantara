@@ -5,10 +5,11 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite",
+        "dev:staging": "vite --config vite.staging.config.js --mode staging",
         "typecheck": "vue-tsc --noEmit",
         "lint": "eslint resources/js/src && node scripts/check-frontend.mjs",
-        "format:check": "prettier --check resources/js/src scripts/check-frontend.mjs vite.config.js eslint.config.js tailwind.frontend.config.js tsconfig.json .prettierrc.json package.json",
-        "format": "prettier --write resources/js/src scripts/check-frontend.mjs vite.config.js eslint.config.js tailwind.frontend.config.js tsconfig.json .prettierrc.json package.json",
+        "format:check": "prettier --check resources/js/src scripts/check-frontend.mjs vite.config.js vite.staging.config.js staging-preview.html eslint.config.js tailwind.frontend.config.js tsconfig.json .prettierrc.json package.json",
+        "format": "prettier --write resources/js/src scripts/check-frontend.mjs vite.config.js vite.staging.config.js staging-preview.html eslint.config.js tailwind.frontend.config.js tsconfig.json .prettierrc.json package.json",
         "postinstall": "patch-package"
     },
     "devDependencies": {
