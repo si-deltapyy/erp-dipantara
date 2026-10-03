@@ -1,27 +1,32 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { useDeliveryApi } from './composables/useDeliveryApi'
-import { useRecordDetail } from '@/composables/useRecordDetail'
+import { useMasterList } from '@/composables/useMasterList'
+import DeliveryTable from './components/DeliveryTable.vue'
+import AppPagination from '@/components/ui/AppPagination.vue'
+import AppTextInput from '@/components/ui/AppTextInput.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppPageHeader from '@/components/ui/AppPageHeader.vue'
 import AppPanel from '@/components/ui/AppPanel.vue'
 import AppState from '@/components/ui/AppState.vue'
 const { t } = useI18n()
 const api = useDeliveryApi()
-const {
-    record: records,
-    loading,
-    error,
-    refresh,
-} = useRecordDetail(
-    {
-        get: (_id, signal) =>
-            api.list({ page: 1, perPage: 20, search: '', sort: '-createdAt' }, signal),
-        subscribe: api.subscribe,
-    },
+const { response, search, searchRecords, loading, error, refresh, changePage } = useMasterList(
+    api,
     'deliveries',
-    true,
-    () => 'deliveries',
+    undefined,
+    {
+        searchText: (delivery) =>
+            [
+                delivery.purchaseOrderNumber,
+                delivery.mitraName,
+                delivery.licensePlate,
+                delivery.buyerSakrNumber,
+                delivery.companySakrNumber,
+            ].join(' '),
+        compare: (left, right) =>
+            left.deliveryDate.localeCompare(right.deliveryDate) || left.id.localeCompare(right.id),
+    },
 )
 </script>
 <template>
@@ -40,9 +45,32 @@ const {
                     t('deliveries.refresh')
                 }}</AppButton></template
             >
+            <form class="mb-5 flex items-end gap-3" @submit.prevent="searchRecords">
+                <AppTextInput
+                    id="delivery-search"
+                    v-model="search"
+                    :label="t('deliveries.search')"
+                    :maxlength="200"
+                    class="flex-1"
+                />
+                <AppButton type="submit" variant="secondary">{{
+                    t('deliveries.searchAction')
+                }}</AppButton>
+            </form>
             <AppState v-if="loading" kind="loading" />
             <AppState v-else-if="error" kind="error" :message="t(error)" @retry="refresh" />
-            <AppState v-else-if="records" kind="empty" />
+            <DeliveryTable v-else-if="response" :deliveries="response.data" />
+            <template #footer>
+                <AppPagination
+                    v-if="response && !error"
+                    numbered
+                    :disabled="loading"
+                    :page="response.meta.page"
+                    :page-size="response.meta.perPage"
+                    :total="response.meta.total"
+                    @update:page="changePage"
+                />
+            </template>
         </AppPanel>
     </section>
 </template>
