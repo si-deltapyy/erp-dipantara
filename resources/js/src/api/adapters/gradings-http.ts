@@ -3,7 +3,7 @@ import type { GradingsApi } from '@/core/types/grading'
 import { ApiError } from '@/core/types/api-error'
 import { createHttpClient } from '@/services/http-client'
 import { parseGradingRecord } from '@/api/grading-mapper'
-import { normalizeApiError } from '@/services/api-error'
+import { mapApiFieldErrors } from '@/services/api-error'
 import { parseObject, parseNumericId } from '@/api/contracts/value-parsers'
 import { parseCollection, parseDetail } from '@/api/contracts/response-parsers'
 
@@ -37,7 +37,6 @@ export function createHttpGradings(client: AxiosInstance = createHttpClient()): 
                     ).data,
                 }
             } catch (cause) {
-                const failure = normalizeApiError(cause)
                 const fields: Readonly<Record<string, string>> = {
                     pre_order_id: 'purchaseOrderId',
                     mitra_id: 'mitraId',
@@ -46,17 +45,7 @@ export function createHttpGradings(client: AxiosInstance = createHttpClient()): 
                     grading_date: 'gradingDate',
                     note: 'notes',
                 }
-                throw new ApiError(
-                    failure.kind,
-                    Object.fromEntries(
-                        Object.entries(failure.fieldErrors).map(([field, messages]) => [
-                            fields[field] ?? field,
-                            messages,
-                        ]),
-                    ),
-                    failure.code,
-                    failure.requestId,
-                )
+                throw mapApiFieldErrors(cause, fields)
             }
         },
         update: unavailable,

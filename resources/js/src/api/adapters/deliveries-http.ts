@@ -3,7 +3,7 @@ import type { DeliveriesApi } from '@/core/types/delivery'
 import { ApiError } from '@/core/types/api-error'
 import { createHttpClient } from '@/services/http-client'
 import { parseDeliveryRecord } from '@/api/delivery-mapper'
-import { normalizeApiError } from '@/services/api-error'
+import { mapApiFieldErrors } from '@/services/api-error'
 import { parseNumericId, parseObject } from '@/api/contracts/value-parsers'
 import { parseCollection, parseDetail } from '@/api/contracts/response-parsers'
 
@@ -40,7 +40,6 @@ export function createHttpDeliveries(client: AxiosInstance = createHttpClient())
                     ).data,
                 }
             } catch (cause) {
-                const failure = normalizeApiError(cause)
                 const fields: Readonly<Record<string, string>> = {
                     pre_order_id: 'purchaseOrderId',
                     mitra_id: 'mitraId',
@@ -52,17 +51,7 @@ export function createHttpDeliveries(client: AxiosInstance = createHttpClient())
                     delivery_status: 'status',
                     note: 'notes',
                 }
-                throw new ApiError(
-                    failure.kind,
-                    Object.fromEntries(
-                        Object.entries(failure.fieldErrors).map(([field, messages]) => [
-                            fields[field] ?? field,
-                            messages,
-                        ]),
-                    ),
-                    failure.code,
-                    failure.requestId,
-                )
+                throw mapApiFieldErrors(cause, fields)
             }
         },
         update: unavailable,

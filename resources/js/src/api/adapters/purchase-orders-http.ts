@@ -6,7 +6,7 @@ import type {
     PurchaseOrderWriteOptions,
 } from '@/core/types/purchase-order'
 import { createHttpClient } from '@/services/http-client'
-import { normalizeApiError } from '@/services/api-error'
+import { mapApiFieldErrors } from '@/services/api-error'
 import { parsePage, parseDetail } from '@/api/contracts/response-parsers'
 import { parsePurchaseOrderRecord, parsePurchaseOrderDetail } from '@/api/purchase-order-mapper'
 import { parseInteger, parseNumericId, parseObject } from '@/api/contracts/value-parsers'
@@ -45,7 +45,6 @@ export function createHttpPurchaseOrders(
                 ).data,
             }
         } catch (cause) {
-            const failure = normalizeApiError(cause)
             const fields: Readonly<Record<string, string>> = {
                 buyer_id: 'buyerId',
                 product_id: 'productId',
@@ -55,17 +54,7 @@ export function createHttpPurchaseOrders(
                 total_price: 'totalAmount',
                 note: 'notes',
             }
-            throw new ApiError(
-                failure.kind,
-                Object.fromEntries(
-                    Object.entries(failure.fieldErrors).map(([field, messages]) => [
-                        fields[field] ?? field,
-                        messages,
-                    ]),
-                ),
-                failure.code,
-                failure.requestId,
-            )
+            throw mapApiFieldErrors(cause, fields)
         }
     }
     return {

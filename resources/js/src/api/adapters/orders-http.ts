@@ -2,7 +2,7 @@ import { ApiError } from '@/core/types/api-error'
 import type { AxiosInstance } from 'axios'
 import type { OrdersApi } from '@/core/types/order'
 import { createHttpClient } from '@/services/http-client'
-import { normalizeApiError } from '@/services/api-error'
+import { mapApiFieldErrors } from '@/services/api-error'
 import { parsePage, parseDetail } from '@/api/contracts/response-parsers'
 import { parseOrderRecord, parseOrderDetail } from '@/api/order-mapper'
 import { parseInteger, parseNumericId, parseObject } from '@/api/contracts/value-parsers'
@@ -50,7 +50,6 @@ export function createHttpOrders(client: AxiosInstance = createHttpClient()): Or
                     ).data,
                 }
             } catch (cause) {
-                const failure = normalizeApiError(cause)
                 const fields: Readonly<Record<string, string>> = {
                     pre_order_id: 'purchaseOrderId',
                     order_number: 'number',
@@ -61,17 +60,7 @@ export function createHttpOrders(client: AxiosInstance = createHttpClient()): Or
                     grader_buyer_phone_number: 'buyerGraderPhone',
                     note: 'notes',
                 }
-                throw new ApiError(
-                    failure.kind,
-                    Object.fromEntries(
-                        Object.entries(failure.fieldErrors).map(([field, messages]) => [
-                            fields[field] ?? field,
-                            messages,
-                        ]),
-                    ),
-                    failure.code,
-                    failure.requestId,
-                )
+                throw mapApiFieldErrors(cause, fields)
             }
         },
         update: unavailable,

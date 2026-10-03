@@ -2,7 +2,7 @@ import type { AxiosInstance } from 'axios'
 import type { TimberProductsApi } from '@/core/types/timber-product'
 import { ApiError } from '@/core/types/api-error'
 import { createHttpClient } from '@/services/http-client'
-import { normalizeApiError } from '@/services/api-error'
+import { mapApiFieldErrors } from '@/services/api-error'
 import { parseCollection, parseDetail } from '@/api/contracts/response-parsers'
 import { parseTimberProductRecord } from '@/api/timber-product-mapper'
 
@@ -38,24 +38,13 @@ export function createHttpTimberProducts(
                 )
                 return parseDetail(response.data, parseTimberProductRecord).data
             } catch (cause) {
-                const failure = normalizeApiError(cause)
                 const fields: Readonly<Record<string, string>> = {
                     dimension_length: 'dimensionLength',
                     dimension_width: 'dimensionWidth',
                     dimension_height: 'dimensionHeight',
                     dimension_diameter: 'dimensionDiameter',
                 }
-                throw new ApiError(
-                    failure.kind,
-                    Object.fromEntries(
-                        Object.entries(failure.fieldErrors).map(([field, messages]) => [
-                            fields[field] ?? field,
-                            messages,
-                        ]),
-                    ),
-                    failure.code,
-                    failure.requestId,
-                )
+                throw mapApiFieldErrors(cause, fields)
             }
         },
         update: unavailable,
