@@ -20,7 +20,7 @@ export interface TimberProductRecord {
     readonly dimensionWidth: string
     readonly dimensionHeight: string
     readonly dimensionDiameter: string
-    readonly volume: string
+    readonly volume: string | null
     readonly price: string
     readonly createdAt: string
     readonly updatedAt: string

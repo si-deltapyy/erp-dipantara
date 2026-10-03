@@ -114,7 +114,7 @@ export function parseTimberProductRecord(value: unknown): TimberProductRecord {
         dimensionWidth: parseNumericDecimal(product.dimension_width, 'dimension_width'),
         dimensionHeight: parseNumericDecimal(product.dimension_height, 'dimension_height'),
         dimensionDiameter: parseNumericDecimal(product.dimension_diameter, 'dimension_diameter'),
-        volume: parseNumericDecimal(product.volume, 'volume'),
+        volume: product.volume === null ? null : parseNumericDecimal(product.volume, 'volume'),
         price: parseNumericMoney(product.price, 'price'),
         createdAt: parseTimestamp(product.created_at, 'created_at'),
         updatedAt: parseTimestamp(product.updated_at, 'updated_at'),

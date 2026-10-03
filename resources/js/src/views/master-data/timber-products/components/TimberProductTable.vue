@@ -41,6 +41,7 @@ const columns = computed<readonly TableColumn<TimberProductRecord>[]>(() => {
                 row.name
             }}</span></template
         >
+        <template #cell-volume="{ row }">{{ row.volume ?? t('ui.unavailableValue') }}</template>
         <template #cell-price="{ row }">{{ formatMoney(row.price) }}</template>
     </AppTable>
 </template>
