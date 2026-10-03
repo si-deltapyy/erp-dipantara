@@ -51,8 +51,19 @@ export interface PurchaseOrderWriteOptions {
     readonly idempotencyKey: string
     readonly snapshotGeneration?: string
 }
+export interface PurchaseOrderRecord {
+    readonly id: string
+    readonly number: string
+    readonly buyerName: string | null
+    readonly productName: string | null
+    readonly orderDate: string
+    readonly closingDate: string
+    readonly quantity: number
+    readonly totalAmount: string | null
+    readonly status: 'pending' | 'on_process' | 'delivered' | 'completed'
+}
 export interface PurchaseOrdersApi {
-    list(query: PurchaseOrderQuery, signal: AbortSignal): Promise<PageResponse<PurchaseOrder>>
+    list(query: PurchaseOrderQuery, signal: AbortSignal): Promise<PageResponse<PurchaseOrderRecord>>
     get(id: string, signal: AbortSignal): Promise<PurchaseOrder>
     create(input: PurchaseOrderInput, options: PurchaseOrderWriteOptions): Promise<PurchaseOrder>
     update(

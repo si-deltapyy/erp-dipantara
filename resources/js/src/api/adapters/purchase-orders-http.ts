@@ -3,6 +3,7 @@ import type { AxiosInstance } from 'axios'
 import type { PurchaseOrdersApi } from '@/core/types/purchase-order'
 import { createHttpClient } from '@/services/http-client'
 import { parsePage } from '@/api/contracts/response-parsers'
+import { parsePurchaseOrderRecord } from '@/api/purchase-order-mapper'
 import { parseInteger } from '@/api/contracts/value-parsers'
 
 export function createHttpPurchaseOrders(
@@ -15,11 +16,12 @@ export function createHttpPurchaseOrders(
         async list(query, signal) {
             const response = await client.get<unknown>('/api/v1/pre-orders', {
                 signal,
-                params: { page: parseInteger(query.page, 'page') },
+                params: {
+                    page: parseInteger(query.page, 'page'),
+                    search: query.search.trim() || undefined,
+                },
             })
-            return parsePage(response.data, () => {
-                throw new ApiError('unexpected', {}, 'record.unconfirmed')
-            })
+            return parsePage(response.data, parsePurchaseOrderRecord)
         },
         get: unavailable,
         create: unavailable,

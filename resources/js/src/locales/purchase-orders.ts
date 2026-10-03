@@ -46,7 +46,8 @@ export default {
         cancel: 'Batal',
         refresh: 'Muat ulang',
         retryWrite: 'Ulangi permintaan',
-        search: 'Cari nomor PO atau Buyer',
+        search: 'Cari nomor PO',
+        closingDate: 'Tanggal penutupan',
         searchAction: 'Cari',
         apply: 'Terapkan filter',
         sort: 'Urutan',
@@ -70,6 +71,10 @@ export default {
         uncertain:
             'Hasil permintaan belum diketahui. Ulangi permintaan yang sama untuk memastikan hasilnya tanpa menggandakan data.',
         statuses: {
+            pending: 'Menunggu',
+            on_process: 'Dalam proses',
+            delivered: 'Terkirim',
+            completed: 'Selesai',
             draft: 'Draft',
             submitted: 'Diajukan',
             approved: 'Disetujui',

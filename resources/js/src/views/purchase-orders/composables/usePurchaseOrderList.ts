@@ -1,7 +1,7 @@
 import type { Ref, ShallowRef, ComputedRef } from 'vue'
 import { computed, onScopeDispose, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import type { PurchaseOrder, PurchaseOrderQuery } from '@/core/types/purchase-order'
+import type { PurchaseOrderRecord, PurchaseOrderQuery } from '@/core/types/purchase-order'
 import { purchaseOrderStatuses } from '@/core/types/purchase-order'
 import type { PageResponse } from '@/core/types/contracts'
 import { useSession } from '@/composables/useSession'
@@ -12,7 +12,7 @@ import { canCreatePurchaseOrder } from '@/core/domain/purchase-order-policy'
 import { usePurchaseOrderApi } from './usePurchaseOrderApi'
 
 interface PurchaseOrderListState {
-    response: ShallowRef<PageResponse<PurchaseOrder> | undefined>
+    response: ShallowRef<PageResponse<PurchaseOrderRecord> | undefined>
     query: ComputedRef<PurchaseOrderQuery>
     search: Ref<string>
     status: Ref<string>
@@ -58,7 +58,7 @@ export function usePurchaseOrderList(): PurchaseOrderListState {
     const graderId = ref(query.value.graderId ?? '')
     const buyerId = ref(query.value.buyerId ?? '')
     const sort = ref(query.value.sort)
-    const response = shallowRef<PageResponse<PurchaseOrder>>()
+    const response = shallowRef<PageResponse<PurchaseOrderRecord>>()
     const loading = ref(false)
     const error = ref('')
     let active: AbortController | undefined

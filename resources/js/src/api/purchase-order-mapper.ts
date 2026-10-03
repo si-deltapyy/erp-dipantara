@@ -1,5 +1,6 @@
 import type {
     PurchaseOrder,
+    PurchaseOrderRecord,
     PurchaseOrderRejection,
     PurchaseOrderInput,
     PurchaseOrderUpdate,
@@ -13,6 +14,8 @@ import { parseBuyerQuery } from './buyer-mapper'
 import {
     invalidContract,
     parseId,
+    parseNumericId,
+    parseNumericMoney,
     parseInteger,
     parseMoney,
     parseObject,
@@ -160,5 +163,33 @@ export function parsePurchaseOrderRejection(value: unknown): PurchaseOrderReject
     return {
         version: parseInteger(record.version, 'version'),
         reason: text(record.reason, 'reason', 2000).trim(),
+    }
+}
+
+export function parsePurchaseOrderRecord(value: unknown): PurchaseOrderRecord {
+    const record = parseObject(value, 'purchaseOrder')
+    const status = record.pre_order_status
+    if (
+        status !== 'pending' &&
+        status !== 'on_process' &&
+        status !== 'delivered' &&
+        status !== 'completed'
+    )
+        return invalidContract('pre_order_status')
+    const buyer = record.buyer === null ? null : parseObject(record.buyer, 'buyer')
+    const product = record.product === null ? null : parseObject(record.product, 'product')
+    return {
+        id: parseNumericId(record.id),
+        number: parseString(record.pre_order_number, 'pre_order_number'),
+        buyerName: buyer === null ? null : parseString(buyer.company_name, 'buyer.company_name'),
+        productName: product === null ? null : parseString(product.name, 'product.name'),
+        orderDate: parseDate(record.pre_order_date),
+        closingDate: parseDate(record.pre_order_closing_date),
+        quantity: parseInteger(record.quantity, 'quantity', 0),
+        totalAmount:
+            record.total_price === null
+                ? null
+                : parseNumericMoney(record.total_price, 'total_price'),
+        status,
     }
 }
