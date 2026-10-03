@@ -1,66 +1,42 @@
+import { integrationPermissions } from '@/core/constants/business-permissions'
+import { canAccess } from '@/core/domain/access-policy'
+import { computed, shallowRef } from 'vue'
 import type { ComputedRef } from 'vue'
-import { computed } from 'vue'
-import type { Delivery, DeliveryInput } from '@/core/types/delivery'
-import { deliveryDraft, validateDelivery } from '@/core/domain/delivery-draft'
+import type { DeliveryCreateInput } from '@/core/types/delivery'
+import { emptyDeliveryCreate, validateDeliveryCreate } from '@/core/domain/delivery-draft'
 import { useMasterForm } from '@/composables/useMasterForm'
 import { useSessionStore } from '@/stores/session'
 import { useDeliveryRecoveryStore } from '@/stores/delivery-recovery'
 import { useDeliveryApi } from './useDeliveryApi'
-import { canActOnDelivery, canCreateDelivery } from '@/core/domain/delivery-policy'
 import { ApiError } from '@/core/types/api-error'
-type DeliveryFormState = ReturnType<typeof useMasterForm<DeliveryInput>> & {
-    permitted: ComputedRef<boolean>
-}
 export function useDeliveryForm(
-    delivery: Delivery | undefined,
-    saved: (delivery: Delivery) => void,
-): DeliveryFormState {
+    saved: (delivery: { readonly id: string }) => void,
+): ReturnType<typeof useMasterForm<DeliveryCreateInput>> & { permitted: ComputedRef<boolean> } {
     const api = useDeliveryApi()
     const store = useSessionStore()
     const recovery = useDeliveryRecoveryStore()
-    const actorId = store.user?.id
-    const candidate = recovery.snapshot
-    const snapshot =
-        candidate && candidate.actorId === actorId && candidate.delivery?.id === delivery?.id
-            ? candidate
-            : null
-    const baseline = snapshot?.delivery ?? delivery
+    const snapshot = recovery.snapshot?.actorId === store.user?.id ? recovery.snapshot : null
     recovery.$reset()
-    let completed: Delivery | undefined
-    const permitted = computed(
-        () =>
-            store.user?.id === actorId &&
-            (baseline
-                ? canActOnDelivery(store.user, baseline, 'update')
-                : canCreateDelivery(store.user)),
+    const completed = shallowRef<{ readonly id: string }>()
+    const permitted = computed(() =>
+        canAccess(store.user, integrationPermissions['deliveries.create']),
     )
-    const form = useMasterForm<DeliveryInput>({
+    const form = useMasterForm<DeliveryCreateInput>({
         resource: 'deliveries',
-        initial: deliveryDraft(baseline),
+        retrySafe: false,
+        initial: emptyDeliveryCreate(),
         snapshot,
-        validate: validateDelivery,
+        validate: validateDeliveryCreate,
         write: async (draft, signal, idempotencyKey) => {
             if (!permitted.value) throw new ApiError('forbidden')
-            const options = {
-                signal,
-                idempotencyKey,
-                snapshotGeneration: baseline?.snapshotGeneration,
-            }
-            completed = baseline
-                ? await api.update(baseline.id, { ...draft, version: baseline.version }, options)
-                : await api.create(draft, options)
+            completed.value = await api.create(draft, { signal, idempotencyKey })
         },
         recover: (draft, idempotencyKey, actorId) => {
-            recovery.snapshot = { actorId, delivery: baseline, draft, idempotencyKey }
+            recovery.snapshot = { actorId, draft, idempotencyKey }
         },
         saved: () => {
-            if (completed) saved(completed)
+            if (completed.value) saved(completed.value)
         },
     })
-    const dirty = computed(
-        () =>
-            JSON.stringify({ ...form.draft.value, availabilityToken: '' }) !==
-            JSON.stringify(deliveryDraft(baseline)),
-    )
-    return { ...form, dirty, permitted }
+    return { ...form, permitted }
 }

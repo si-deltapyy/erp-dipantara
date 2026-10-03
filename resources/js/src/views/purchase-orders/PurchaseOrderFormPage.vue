@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { integrationPermissions } from '@/core/constants/business-permissions'
+import { canAccess } from '@/core/domain/access-policy'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useSessionStore } from '@/stores/session'
-import { canActOnPurchaseOrder, canCreatePurchaseOrder } from '@/core/domain/purchase-order-policy'
 import { usePurchaseOrderDetail } from './composables/usePurchaseOrderDetail'
 import PurchaseOrderEditor from './components/PurchaseOrderEditor.vue'
 import AppButton from '@/components/ui/AppButton.vue'
@@ -13,10 +14,15 @@ const route = useRoute()
 const session = useSessionStore()
 const { order, loading, error, refresh } = usePurchaseOrderDetail()
 const editing = computed(() => typeof route.params.id === 'string')
-const permitted = computed(() =>
-    editing.value
-        ? !!order.value && canActOnPurchaseOrder(session.user, order.value, 'update')
-        : canCreatePurchaseOrder(session.user),
+const permitted = computed(
+    () =>
+        canAccess(
+            session.user,
+            integrationPermissions[
+                editing.value ? 'purchase-orders.update' : 'purchase-orders.create'
+            ],
+        ) &&
+        (!editing.value || !!order.value),
 )
 </script>
 <template>

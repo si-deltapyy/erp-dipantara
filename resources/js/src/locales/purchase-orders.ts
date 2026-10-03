@@ -1,6 +1,15 @@
 export default {
     'purchase-orders': {
         material: 'Material kayu',
+        totalHint: 'Opsional. Isi total kesepakatan dalam rupiah bulat tanpa pemisah ribuan.',
+        workflowUnavailable: 'Approval, dokumen, dan closing belum tersedia.',
+        detailFields: {
+            buyerName: 'Buyer',
+            productName: 'Material kayu',
+            orderDate: 'Tanggal PO',
+            closingDate: 'Tanggal penutupan',
+            quantity: 'Jumlah batang',
+        },
         quantityHeading: 'Jumlah batang',
         priceHeading: 'Harga satuan',
         history: 'Riwayat Buyer',
@@ -29,7 +38,7 @@ export default {
             'Masukkan harga kesepakatan dalam rupiah dengan dua angka desimal, contoh 150000.00. Total dihitung saat draft disimpan.',
         addLine: 'Tambah baris',
         removeLine: 'Hapus baris {number}',
-        save: 'Simpan draft',
+        save: 'Simpan PO',
         submit: 'Submit PO',
         reviewQueue: 'Menunggu review',
         approve: 'Setujui PO',
@@ -46,7 +55,8 @@ export default {
         cancel: 'Batal',
         refresh: 'Muat ulang',
         retryWrite: 'Ulangi permintaan',
-        search: 'Cari nomor PO atau Buyer',
+        search: 'Cari nomor PO',
+        closingDate: 'Tanggal penutupan',
         searchAction: 'Cari',
         apply: 'Terapkan filter',
         sort: 'Urutan',
@@ -68,8 +78,12 @@ export default {
         conflictHint:
             'Draft dipertahankan. Kembali ke detail untuk memuat versi terbaru sebelum mengedit ulang.',
         uncertain:
-            'Hasil permintaan belum diketahui. Ulangi permintaan yang sama untuk memastikan hasilnya tanpa menggandakan data.',
+            'Hasil penyimpanan belum diketahui. Kembali ke daftar dan periksa data sebelum mencoba lagi.',
         statuses: {
+            pending: 'Menunggu',
+            on_process: 'Dalam proses',
+            delivered: 'Terkirim',
+            completed: 'Selesai',
             draft: 'Draft',
             submitted: 'Diajukan',
             approved: 'Disetujui',

@@ -2,22 +2,24 @@ import type {
     AvailableTimber,
     AvailabilityQuery,
     Delivery,
+    DeliveryRecord,
     DeliveryQuery,
 } from '@/core/types/delivery'
-import { deliveryStatuses } from '@/core/types/delivery'
+import { deliveryStatuses, deliveryRecordStatuses } from '@/core/types/delivery'
 import { parseBuyerQuery } from './buyer-mapper'
 import { parseMetadata } from './contracts/response-parsers'
 import { parseTimestamp } from './contracts/timestamp-parser'
-import { parseDeliveryInput } from './contracts/delivery-input'
+import { parseDeliveryInput, parseDeliveryDate } from './contracts/delivery-input'
 import {
     invalidContract,
     parseId,
+    parseNumericId,
     parseInteger,
     parseObject,
     parseString,
     requireKeys,
 } from './contracts/value-parsers'
-export { parseDeliveryInput } from './contracts/delivery-input'
+export { parseDeliveryInput, parseDeliveryDate } from './contracts/delivery-input'
 
 export function parseDelivery(value: unknown): Delivery {
     const record = parseObject(value, 'delivery')
@@ -156,5 +158,27 @@ export function parseAvailabilityQuery(query: AvailabilityQuery): AvailabilityQu
         purchaseOrderId: parseId(query.purchaseOrderId, 'purchaseOrderId'),
         ...(query.assignmentId ? { assignmentId: parseId(query.assignmentId) } : {}),
         ...(query.excludeDeliveryId ? { excludeDeliveryId: parseId(query.excludeDeliveryId) } : {}),
+    }
+}
+
+export function parseDeliveryRecord(value: unknown): DeliveryRecord {
+    const delivery = parseObject(value, 'delivery')
+    const preOrder =
+        delivery.pre_order === null ? null : parseObject(delivery.pre_order, 'pre_order')
+    const mitra = delivery.mitra === null ? null : parseObject(delivery.mitra, 'mitra')
+    const status = deliveryRecordStatuses.find((status) => status === delivery.delivery_status)
+    if (!status) return invalidContract('delivery_status')
+    return {
+        id: parseNumericId(delivery.id),
+        purchaseOrderNumber:
+            preOrder === null
+                ? null
+                : parseString(preOrder.pre_order_number, 'pre_order.pre_order_number'),
+        mitraName: mitra === null ? null : parseString(mitra.name, 'mitra.name'),
+        deliveryDate: parseDeliveryDate(delivery.delivery_date),
+        licensePlate: parseString(delivery.car_plate_number, 'car_plate_number'),
+        status,
+        buyerSakrNumber: parseString(delivery.SAKR_number_to_buyer, 'SAKR_number_to_buyer'),
+        companySakrNumber: parseString(delivery.SAKR_number_to_company, 'SAKR_number_to_company'),
     }
 }

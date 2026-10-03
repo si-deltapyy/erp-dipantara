@@ -62,16 +62,48 @@ export interface AvailableTimber {
     readonly availableQuantity: number
     readonly snapshotToken: string
 }
+export const deliveryRecordStatuses = [
+    'pending',
+    'delivered',
+    'cancelled',
+    'returned',
+    'in_transit',
+    'on_the_way',
+] as const
+export interface DeliveryRecord {
+    readonly id: string
+    readonly purchaseOrderNumber: string | null
+    readonly mitraName: string | null
+    readonly deliveryDate: string
+    readonly licensePlate: string
+    readonly status: (typeof deliveryRecordStatuses)[number]
+    readonly buyerSakrNumber: string
+    readonly companySakrNumber: string
+}
+export interface DeliveryCreateInput {
+    readonly purchaseOrderId: string
+    readonly mitraId: string
+    readonly graderId: string
+    readonly deliveryDate: string
+    readonly licensePlate: string
+    readonly buyerSakrNumber: string
+    readonly companySakrNumber: string
+    readonly status: (typeof deliveryRecordStatuses)[number]
+    readonly notes: string
+}
 export interface DeliveriesApi {
     dispatch(id: string, input: WorkflowVersion, options: WorkflowWriteOptions): Promise<Delivery>
     receive(id: string, input: WorkflowVersion, options: WorkflowWriteOptions): Promise<Delivery>
-    list(query: DeliveryQuery, signal: AbortSignal): Promise<readonly Delivery[]>
+    list(query: DeliveryQuery, signal: AbortSignal): Promise<readonly DeliveryRecord[]>
     get(id: string, signal: AbortSignal): Promise<Delivery>
     availability(
         query: AvailabilityQuery,
         signal: AbortSignal,
     ): Promise<PageResponse<AvailableTimber>>
-    create(input: DeliveryInput, options: WorkflowWriteOptions): Promise<Delivery>
+    create(
+        input: DeliveryCreateInput,
+        options: WorkflowWriteOptions,
+    ): Promise<{ readonly id: string }>
     update(
         id: string,
         input: DeliveryInput & { version: number },

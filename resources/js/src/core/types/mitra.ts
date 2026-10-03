@@ -36,6 +36,6 @@ export interface MitrasApi {
     lookup(query: MitraQuery, signal: AbortSignal): Promise<PageResponse<MitraLookup>>
     get(id: string, signal: AbortSignal): Promise<Mitra>
     create(input: MitraInput, options: MitraWriteOptions): Promise<MitraRecord>
-    update(id: string, input: MitraUpdate, options: MitraWriteOptions): Promise<Mitra>
+    update(id: string, input: MitraInput, options: MitraWriteOptions): Promise<MitraRecord>
     subscribe(listener: () => void): () => void
 }

@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
-import type { Grader, GraderInput } from '@/core/types/grader'
+import type { Grader, GraderRecord, GraderContactInput } from '@/core/types/grader'
 
 export interface GraderRecovery {
     readonly actorId: string
-    readonly grader?: Grader
-    readonly draft: GraderInput
+    readonly grader?: GraderRecord
+    readonly draft: GraderContactInput
     readonly idempotencyKey: string
 }
 export const useGraderRecoveryStore = defineStore('grader-recovery', {

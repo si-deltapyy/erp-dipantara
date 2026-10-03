@@ -39,7 +39,7 @@ function fieldError(field: MitraField): string | undefined {
             id="mitra-phone"
             :model-value="modelValue.phone"
             :label="t('mitras.phone')"
-            :hint="t('mitras.optional')"
+            aria-required="true"
             :error="fieldError('phone')"
             :disabled="disabled"
             :maxlength="40"
@@ -49,6 +49,7 @@ function fieldError(field: MitraField): string | undefined {
         />
         <AppTextInput
             id="mitra-grader-group"
+            aria-required="true"
             :model-value="modelValue.graderGroup"
             :label="t('mitras.graderGroup')"
             :error="fieldError('graderGroup')"
@@ -61,10 +62,10 @@ function fieldError(field: MitraField): string | undefined {
             class="sm:col-span-2"
             :model-value="modelValue.address"
             :label="t('mitras.address')"
-            :hint="t('mitras.optional')"
+            aria-required="true"
             :error="fieldError('address')"
             :disabled="disabled"
-            :maxlength="1000"
+            :maxlength="255"
             autocomplete="street-address"
             @update:model-value="update('address', $event)"
         />

@@ -49,6 +49,14 @@ export interface InvoiceRevision extends WorkflowVersion {
 export interface InvoiceVersion extends WorkflowVersion {
     readonly revisionNumber: number
 }
+export interface InvoiceRecord {
+    readonly id: string
+    readonly number: string
+    readonly invoiceDate: string
+    readonly invoiceType: string
+    readonly transactionId: string
+    readonly notes: string | null
+}
 export interface InvoicesApi {
     summary(purchaseOrderId: string, signal: AbortSignal): Promise<PurchaseOrderInvoiceSummary>
     settlement(id: string, signal: AbortSignal): Promise<InvoiceSettlement>
@@ -63,5 +71,5 @@ export interface InvoicesApi {
     ): Promise<Invoice>
     issue(id: string, input: InvoiceVersion, options: WorkflowWriteOptions): Promise<Invoice>
     subscribe(listener: () => void): () => void
-    list(query: InvoiceQuery, signal: AbortSignal): Promise<readonly Invoice[]>
+    list(query: InvoiceQuery, signal: AbortSignal): Promise<readonly InvoiceRecord[]>
 }

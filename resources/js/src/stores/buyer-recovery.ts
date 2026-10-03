@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
-import type { Buyer, BuyerInput } from '@/core/types/buyer'
+import type { BuyerRecord, BuyerInput } from '@/core/types/buyer'
 
 export interface BuyerRecovery {
     readonly actorId: string
-    readonly buyer?: Buyer
+    readonly buyer?: BuyerRecord
     readonly draft: BuyerInput
     readonly idempotencyKey: string
 }

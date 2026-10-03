@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { nextTick, ref } from 'vue'
-import type { Buyer } from '@/core/types/buyer'
+import type { BuyerRecord } from '@/core/types/buyer'
 import { useBuyerForm } from '../composables/useBuyerForm'
 import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
 import BuyerFields from './BuyerFields.vue'
@@ -9,7 +9,7 @@ import AppModal from '@/components/ui/AppModal.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppConfirmDialog from '@/components/ui/AppConfirmDialog.vue'
 import { useSessionStore } from '@/stores/session'
-const props = defineProps<{ buyer?: Buyer }>()
+const props = defineProps<{ buyer?: BuyerRecord }>()
 const emit = defineEmits<{ saved: []; close: [] }>()
 const { t } = useI18n()
 const session = useSessionStore()
@@ -55,8 +55,8 @@ async function submit(): Promise<void> {
                 <AppButton variant="secondary" :disabled="pending" @click="close">{{
                     t('buyers.cancel')
                 }}</AppButton>
-                <AppButton type="submit" :pending="pending">{{
-                    t(uncertain ? 'buyers.retry' : 'buyers.save')
+                <AppButton type="submit" :pending="pending" :disabled="uncertain">{{
+                    t('buyers.save')
                 }}</AppButton>
             </div>
         </form>

@@ -1,47 +1,38 @@
 import { inject } from 'vue'
 import { timberProductsApiKey } from '@/api/timber-products-api'
-import type { TimberProduct, TimberProductInput } from '@/core/types/timber-product'
+import type { TimberProductCreateInput } from '@/core/types/timber-product'
 import {
-    timberProductDraft,
-    emptyTimberProduct,
-    validateTimberProduct,
-    normalizeTimberInput,
+    emptyTimberProductCreate,
+    validateTimberProductCreate,
 } from '@/core/domain/timber-product-validation'
+import { ApiError } from '@/core/types/api-error'
 import { useSessionStore } from '@/stores/session'
 import { useTimberProductRecoveryStore } from '@/stores/timber-product-recovery'
 import { useMasterForm } from '@/composables/useMasterForm'
 
 export function useTimberProductForm(
-    timberProduct: TimberProduct | undefined,
     saved: () => void,
-): ReturnType<typeof useMasterForm<TimberProductInput>> {
+): ReturnType<typeof useMasterForm<TimberProductCreateInput>> {
     const api = inject(timberProductsApiKey)
     if (!api) throw new Error('TimberProducts API is not configured')
     const store = useSessionStore()
     const recovery = useTimberProductRecoveryStore()
     const snapshot = recovery.snapshot?.actorId === store.user?.id ? recovery.snapshot : null
     recovery.$reset()
-    return useMasterForm<TimberProductInput>({
+    return useMasterForm<TimberProductCreateInput>({
         resource: 'timber-products',
-        initial: timberProduct ? timberProductDraft(timberProduct) : emptyTimberProduct(),
+        retrySafe: false,
+        requiredPermission: 'timber-products.create.all',
+        initial: emptyTimberProductCreate(),
         snapshot,
-        validate: validateTimberProduct,
+        validate: validateTimberProductCreate,
         write: (draft, signal, idempotencyKey) => {
-            const options = {
-                signal,
-                idempotencyKey,
-                snapshotGeneration: timberProduct?.snapshotGeneration,
-            }
-            return timberProduct
-                ? api.update(
-                      timberProduct.id,
-                      { ...normalizeTimberInput(draft), version: timberProduct.version },
-                      options,
-                  )
-                : api.create(normalizeTimberInput(draft), options)
+            if (!store.user?.permissions.includes('timber-prices.read.all'))
+                throw new ApiError('forbidden')
+            return api.create(draft, { signal, idempotencyKey })
         },
         recover: (draft, idempotencyKey, actorId) => {
-            recovery.snapshot = { actorId, timberProduct, draft, idempotencyKey }
+            recovery.snapshot = { actorId, draft, idempotencyKey }
         },
         saved,
     })

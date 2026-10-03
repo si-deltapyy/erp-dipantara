@@ -23,10 +23,36 @@ export interface OrderQuery extends MasterListQuery {
     readonly status?: OrderStatus
 }
 export type OrderWriteOptions = PurchaseOrderWriteOptions
+export interface OrderRecord {
+    readonly id: string
+    readonly number: string
+    readonly orderDate: string
+    readonly purchaseOrderNumber: string | null
+    readonly buyerName: string | null
+    readonly mitraName: string | null
+    readonly graderName: string | null
+    readonly buyerGraderName: string
+    readonly notes: string | null
+}
+export interface OrderCreateInput {
+    readonly purchaseOrderId: string
+    readonly number: string
+    readonly orderDate: string
+    readonly mitraId: string
+    readonly graderId: string
+    readonly buyerGraderName: string
+    readonly buyerGraderPhone: string
+    readonly notes: string
+}
+export interface OrderDetail extends OrderRecord {
+    readonly purchaseOrderId: string
+    readonly buyerGraderPhone: string
+    readonly purchaseOrderStatus: 'pending' | 'on_process' | 'delivered' | 'completed' | null
+}
 export interface OrdersApi extends WorkflowApi<Order> {
-    list(query: OrderQuery, signal: AbortSignal): Promise<PageResponse<Order>>
-    get(id: string, signal: AbortSignal): Promise<Order>
-    create(input: OrderInput, options: OrderWriteOptions): Promise<Order>
+    list(query: OrderQuery, signal: AbortSignal): Promise<PageResponse<OrderRecord>>
+    get(id: string, signal: AbortSignal): Promise<OrderDetail>
+    create(input: OrderCreateInput, options: OrderWriteOptions): Promise<{ readonly id: string }>
     update(
         id: string,
         input: OrderInput & { readonly version: number },

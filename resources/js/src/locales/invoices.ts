@@ -1,5 +1,8 @@
 export default {
     invoices: {
+        invoiceType: 'Jenis invoice',
+        transactionId: 'ID transaksi',
+        recordSearch: 'Cari nomor, jenis invoice, atau ID transaksi',
         allBalances: 'Semua saldo',
         outstandingOnly: 'Masih terutang',
         balanceFilter: 'Saldo',

@@ -1,82 +1,44 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import type { GraderInput } from '@/core/types/grader'
-import type { GraderErrors, GraderField } from '@/core/domain/grader-validation'
+import type { GraderContactInput } from '@/core/types/grader'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
-import AppTextarea from '@/components/ui/AppTextarea.vue'
 const props = defineProps<{
-    modelValue: GraderInput
-    errors: GraderErrors
+    modelValue: GraderContactInput
+    errors: Partial<Record<keyof GraderContactInput, string>>
     disabled: boolean
-    emailLocked: boolean
 }>()
-const emit = defineEmits<{ 'update:modelValue': [value: GraderInput] }>()
+const emit = defineEmits<{ 'update:modelValue': [value: GraderContactInput] }>()
 const { t, te } = useI18n()
-function update(field: GraderField, value: string): void {
+function update(field: keyof GraderContactInput, value: string): void {
     emit('update:modelValue', { ...props.modelValue, [field]: value })
 }
-function fieldError(field: GraderField): string | undefined {
-    const message = props.errors[field]
-    return message
-        ? te(message)
-            ? t(message)
-            : message === 'contract.invalid'
-              ? t('graders.invalid')
-              : message
-        : undefined
+function fieldError(field: keyof GraderContactInput): string | undefined {
+    const error = props.errors[field]
+    return error && te(error) ? t(error) : error
 }
 </script>
 <template>
     <div class="grid gap-5 sm:grid-cols-2">
-        <p class="text-sm text-muted sm:col-span-2">{{ t('graders.requiredHint') }}</p>
-        <AppTextInput
-            id="grader-name"
-            class="sm:col-span-2"
-            :model-value="modelValue.name"
-            :label="t('graders.name')"
-            :error="fieldError('name')"
-            :disabled="disabled"
-            :maxlength="255"
-            autocomplete="name"
-            aria-required="true"
-            @update:model-value="update('name', $event)"
-        />
-        <AppTextInput
-            id="grader-email"
-            type="email"
-            :model-value="modelValue.email"
-            :label="t('graders.email')"
-            :hint="emailLocked ? t('graders.emailLocked') : undefined"
-            :error="fieldError('email')"
-            :disabled="disabled || emailLocked"
-            :maxlength="254"
-            autocomplete="email"
-            aria-required="true"
-            @update:model-value="update('email', $event)"
-        />
         <AppTextInput
             id="grader-phone"
             :model-value="modelValue.phone"
             :label="t('graders.phone')"
-            :hint="t('graders.optional')"
             :error="fieldError('phone')"
             :disabled="disabled"
             :maxlength="40"
             inputmode="tel"
-            autocomplete="tel"
+            required
             @update:model-value="update('phone', $event)"
         />
-        <AppTextarea
-            id="grader-address"
-            class="sm:col-span-2"
-            :model-value="modelValue.address"
-            :label="t('graders.address')"
-            :hint="t('graders.optional')"
-            :error="fieldError('address')"
+        <AppTextInput
+            id="grader-group"
+            :model-value="modelValue.graderGroup"
+            :label="t('graders.graderGroup')"
+            :error="fieldError('graderGroup')"
             :disabled="disabled"
-            :maxlength="1000"
-            autocomplete="street-address"
-            @update:model-value="update('address', $event)"
+            :maxlength="255"
+            required
+            @update:model-value="update('graderGroup', $event)"
         />
     </div>
 </template>

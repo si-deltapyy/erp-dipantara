@@ -2,23 +2,23 @@
 import { nextTick, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import type { Order } from '@/core/types/order'
+import type { OrderCreateInput } from '@/core/types/order'
 import { useSessionStore } from '@/stores/session'
 import { useOrderForm } from '../composables/useOrderForm'
 import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
-import ApprovedPurchaseOrderLookup from './ApprovedPurchaseOrderLookup.vue'
+import PurchaseOrderLookup from '@/views/purchase-orders/components/PurchaseOrderLookup.vue'
+import MasterLookup from '@/views/master-data/components/MasterLookup.vue'
+import AppTextInput from '@/components/ui/AppTextInput.vue'
 import AppTextarea from '@/components/ui/AppTextarea.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppConfirmDialog from '@/components/ui/AppConfirmDialog.vue'
-const props = defineProps<{ order?: Order }>()
-const { t } = useI18n()
+const { t, te } = useI18n()
 const router = useRouter()
 const route = useRoute()
 const store = useSessionStore()
 const formElement = ref<HTMLFormElement>()
 const saved = ref(false)
 const { draft, errors, error, pending, uncertain, dirty, permitted, save } = useOrderForm(
-    props.order,
     (order) => {
         saved.value = true
         void router.replace({
@@ -37,27 +37,62 @@ async function submit(): Promise<void> {
     await nextTick()
     formElement.value?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus()
 }
+function message(field: keyof OrderCreateInput): string | undefined {
+    const error = errors.value[field]
+    return error && te(error) ? t(error) : error
+}
 </script>
 <template>
     <form ref="formElement" class="panel space-y-6" novalidate @submit.prevent="submit">
-        <ApprovedPurchaseOrderLookup
-            v-if="!order"
+        <PurchaseOrderLookup
             id="order-po"
             :model-value="draft.purchaseOrderId"
             :label="t('orders.number')"
-            :error="errors.purchaseOrderId ? t(errors.purchaseOrderId) : ''"
+            :error="message('purchaseOrderId')"
             :disabled="pending || uncertain || !permitted"
             @update:model-value="draft = { ...draft, purchaseOrderId: $event }"
         />
-        <p v-else>{{ t('orders.number') }}: {{ order.purchaseOrderNumber }}</p>
+        <div class="grid gap-5 sm:grid-cols-2">
+            <MasterLookup
+                v-for="kind in ['mitra', 'grader'] as const"
+                :id="`order-${kind}`"
+                :key="kind"
+                :kind="kind"
+                :label="t(`orders.${kind}`)"
+                :model-value="draft[kind === 'mitra' ? 'mitraId' : 'graderId']"
+                :error="message(kind === 'mitra' ? 'mitraId' : 'graderId')"
+                :disabled="pending || uncertain || !permitted"
+                @update:model-value="
+                    draft = { ...draft, [kind === 'mitra' ? 'mitraId' : 'graderId']: $event }
+                "
+            />
+            <AppTextInput
+                v-for="field in [
+                    'number',
+                    'orderDate',
+                    'buyerGraderName',
+                    'buyerGraderPhone',
+                ] as const"
+                :id="`order-${field}`"
+                :key="field"
+                :type="field === 'orderDate' ? 'date' : 'text'"
+                :label="t(`orders.createFields.${field}`)"
+                :model-value="draft[field]"
+                :error="message(field)"
+                :disabled="pending || uncertain || !permitted"
+                :maxlength="255"
+                required
+                @update:model-value="draft = { ...draft, [field]: $event }"
+            />
+        </div>
         <AppTextarea
             id="order-notes"
             :model-value="draft.notes ?? ''"
             :label="t('orders.notes')"
             :maxlength="2000"
-            :error="errors.notes ? t(errors.notes) : ''"
+            :error="message('notes')"
             :disabled="pending || uncertain || !permitted"
-            @update:model-value="draft = { ...draft, notes: $event || null }"
+            @update:model-value="draft = { ...draft, notes: $event }"
         />
         <div
             v-if="error"
@@ -73,15 +108,14 @@ async function submit(): Promise<void> {
         <div class="wf-form-actions">
             <RouterLink
                 :to="{
-                    name: order ? 'order-detail' : 'orders',
-                    params: order ? { id: order.id } : {},
+                    name: 'orders',
                     query: $route.query,
                 }"
                 class="secondary-button"
                 >{{ t('orders.cancel') }}</RouterLink
             >
-            <AppButton type="submit" :pending="pending" :disabled="!permitted">{{
-                t(uncertain ? 'orders.retryWrite' : 'orders.save')
+            <AppButton type="submit" :pending="pending" :disabled="!permitted || uncertain">{{
+                t('orders.save')
             }}</AppButton>
         </div>
     </form>

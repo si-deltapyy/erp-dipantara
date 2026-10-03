@@ -34,6 +34,7 @@ function choose(value: string): void {
     <div class="min-w-0 space-y-2">
         <AppSelect
             :id="id"
+            renderer="nice"
             :model-value="modelValue"
             :label="label"
             :options="[{ value: '', label: t('purchase-orders.choose') }, ...options]"

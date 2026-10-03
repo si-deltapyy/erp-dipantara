@@ -1,12 +1,15 @@
-import type { Payment, PaymentQuery } from '@/core/types/payment'
+import type { Payment, PaymentRecord, PaymentQuery } from '@/core/types/payment'
 import {
     invalidContract,
     parseId,
+    parseNumericId,
+    parseNumericMoney,
     parseMoney,
     parseObject,
     parseString,
     requireKeys,
 } from './contracts/value-parsers'
+import { parseDeliveryDate } from './contracts/delivery-input'
 import { parsePaymentInput } from './contracts/payment-input'
 import { parseMetadata } from './contracts/response-parsers'
 import { parseTimestamp } from './contracts/timestamp-parser'
@@ -103,5 +106,32 @@ export function parsePaymentQuery(query: PaymentQuery): PaymentQuery {
         ...(query.purchaseOrderId ? { purchaseOrderId: parseId(query.purchaseOrderId) } : {}),
         ...(query.status ? { status: query.status } : {}),
         ...(query.direction ? { direction: query.direction } : {}),
+    }
+}
+
+export function parsePaymentRecord(value: unknown): PaymentRecord {
+    const payment = parseObject(value, 'payment')
+    const preOrder = payment.pre_order === null ? null : parseObject(payment.pre_order, 'pre_order')
+    const buyer =
+        preOrder === null || preOrder.buyer === null
+            ? null
+            : parseObject(preOrder.buyer, 'pre_order.buyer')
+    const status = payment.payment_status
+    if (status !== 'pending' && status !== 'completed' && status !== 'cancelled')
+        return invalidContract('payment_status')
+    return {
+        id: parseNumericId(payment.id),
+        purchaseOrderNumber:
+            preOrder === null
+                ? null
+                : parseString(preOrder.pre_order_number, 'pre_order.pre_order_number'),
+        buyerName:
+            buyer === null ? null : parseString(buyer.company_name, 'pre_order.buyer.company_name'),
+        paymentDate: parseDeliveryDate(payment.payment_date, 'payment_date'),
+        dueDate: parseDeliveryDate(payment.payment_due_date, 'payment_due_date'),
+        amount: parseNumericMoney(payment.payment_amount, 'payment_amount'),
+        buyerTerm: parseString(payment.buyer_payment_termin, 'buyer_payment_termin'),
+        mitraTerm: parseString(payment.mitra_payment_termin, 'mitra_payment_termin'),
+        status,
     }
 }

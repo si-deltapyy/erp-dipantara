@@ -1,73 +1,55 @@
-import type { ComputedRef, ShallowRef } from 'vue'
+import { integrationPermissions } from '@/core/constants/business-permissions'
+import { canAccess } from '@/core/domain/access-policy'
 import { computed, shallowRef } from 'vue'
-import type { PurchaseOrder, PurchaseOrderInput } from '@/core/types/purchase-order'
-import { purchaseOrderDraft, validatePurchaseOrder } from '@/core/domain/purchase-order-draft'
+import type { ComputedRef } from 'vue'
+import type { PurchaseOrderDetail, PurchaseOrderWriteInput } from '@/core/types/purchase-order'
+import {
+    purchaseOrderWriteDraft,
+    validatePurchaseOrderWrite,
+} from '@/core/domain/purchase-order-draft'
 import { useMasterForm } from '@/composables/useMasterForm'
 import { useSessionStore } from '@/stores/session'
 import { usePurchaseOrderRecoveryStore } from '@/stores/purchase-order-recovery'
 import { usePurchaseOrderApi } from './usePurchaseOrderApi'
-import { canActOnPurchaseOrder, canCreatePurchaseOrder } from '@/core/domain/purchase-order-policy'
 import { ApiError } from '@/core/types/api-error'
 
-type PurchaseOrderFormState = ReturnType<typeof useMasterForm<PurchaseOrderInput>> & {
-    permitted: ComputedRef<boolean>
-    completed: ShallowRef<PurchaseOrder | undefined>
-}
-
 export function usePurchaseOrderForm(
-    order: PurchaseOrder | undefined,
-    saved: (order: PurchaseOrder) => void,
-): PurchaseOrderFormState {
+    order: PurchaseOrderDetail | undefined,
+    saved: (order: { readonly id: string }) => void,
+): ReturnType<typeof useMasterForm<PurchaseOrderWriteInput>> & { permitted: ComputedRef<boolean> } {
     const api = usePurchaseOrderApi()
     const store = useSessionStore()
     const recovery = usePurchaseOrderRecoveryStore()
-    const actorId = store.user?.id
-    const candidate = recovery.snapshot
     const snapshot =
-        candidate &&
-        candidate.actorId === actorId &&
-        candidate.action === 'save' &&
-        candidate.order?.id === order?.id
-            ? candidate
+        recovery.form?.actorId === store.user?.id && recovery.form?.order?.id === order?.id
+            ? recovery.form
             : null
-    const baseline = snapshot?.order ?? order
     recovery.$reset()
-    const completed = shallowRef<PurchaseOrder>()
-    const permitted = computed(
-        () =>
-            store.user?.id === actorId &&
-            (baseline
-                ? canActOnPurchaseOrder(store.user, baseline, 'update')
-                : canCreatePurchaseOrder(store.user)),
+    const completed = shallowRef<{ readonly id: string }>()
+    const permitted = computed(() =>
+        canAccess(
+            store.user,
+            integrationPermissions[order ? 'purchase-orders.update' : 'purchase-orders.create'],
+        ),
     )
-    const form = useMasterForm<PurchaseOrderInput>({
+    const form = useMasterForm<PurchaseOrderWriteInput>({
         resource: 'purchase-orders',
-        initial: purchaseOrderDraft(baseline),
+        retrySafe: false,
+        initial: purchaseOrderWriteDraft(order),
         snapshot,
-        validate: validatePurchaseOrder,
+        validate: validatePurchaseOrderWrite,
         write: async (draft, signal, idempotencyKey) => {
             if (!permitted.value) throw new ApiError('forbidden')
-            const options = {
-                signal,
-                idempotencyKey,
-                snapshotGeneration: baseline?.snapshotGeneration,
-            }
-            completed.value = baseline
-                ? await api.update(baseline.id, { ...draft, version: baseline.version }, options)
-                : await api.create(draft, options)
+            completed.value = order
+                ? await api.update(order.id, draft, { signal, idempotencyKey })
+                : await api.create(draft, { signal, idempotencyKey })
         },
-        recover: (draft, idempotencyKey, id) => {
-            recovery.snapshot = {
-                actorId: id,
-                order: baseline,
-                draft: purchaseOrderDraft(draft),
-                idempotencyKey,
-                action: 'save',
-            }
+        recover: (draft, idempotencyKey, actorId) => {
+            recovery.form = { actorId, order, draft, idempotencyKey }
         },
         saved: () => {
             if (completed.value) saved(completed.value)
         },
     })
-    return { ...form, permitted, completed }
+    return { ...form, permitted }
 }

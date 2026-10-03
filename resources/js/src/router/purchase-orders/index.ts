@@ -1,3 +1,4 @@
+import { integrationPermissions } from '@/core/constants/business-permissions'
 import type { RouteRecordRaw } from 'vue-router'
 import { accessRules } from '../access-rules'
 const meta = {
@@ -29,14 +30,21 @@ export const purchaseOrderRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/purchase-orders/PurchaseOrderFormPage.vue'),
         meta: {
             ...meta,
-            anyPermissions: ['purchase-orders.create.own', 'purchase-orders.create.all'],
+            featureUnavailable: false,
+            requiredPermissions: [...integrationPermissions['purchase-orders.create']],
+            anyPermissions: [],
         },
     },
     {
         path: '/purchase-orders/:id',
         name: 'purchase-order-detail',
         component: () => import('@/views/purchase-orders/PurchaseOrderDetailPage.vue'),
-        meta,
+        meta: {
+            ...meta,
+            featureUnavailable: false,
+            requiredPermissions: [...integrationPermissions['purchase-orders.read']],
+            anyPermissions: [],
+        },
     },
     {
         path: '/purchase-orders/:id/edit',
@@ -44,7 +52,9 @@ export const purchaseOrderRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/purchase-orders/PurchaseOrderFormPage.vue'),
         meta: {
             ...meta,
-            anyPermissions: ['purchase-orders.update.own', 'purchase-orders.update.all'],
+            featureUnavailable: false,
+            requiredPermissions: [...integrationPermissions['purchase-orders.update']],
+            anyPermissions: [],
         },
     },
 ]

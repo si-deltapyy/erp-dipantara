@@ -1,4 +1,4 @@
-import type { GradingInput, GradingRow } from '@/core/types/grading'
+import type { GradingInput, GradingRow, GradingCreateInput } from '@/core/types/grading'
 import type { Assignment } from '@/core/types/assignment'
 import { isTimberDimension } from './timber-measurements'
 export function newGradingRow(assignment: Assignment): GradingRow {
@@ -44,5 +44,37 @@ export function validateGrading(input: GradingInput): Record<string, string> {
         if (!isTimberDimension(row.lengthM)) errors[`rows.${index}.lengthM`] = 'gradings.invalid'
         if (!row.gradeCode.trim()) errors[`rows.${index}.gradeCode`] = 'gradings.invalid'
     })
+    return errors
+}
+
+export function emptyGradingCreate(): GradingCreateInput {
+    return {
+        purchaseOrderId: '',
+        mitraId: '',
+        graderId: '',
+        productId: '',
+        gradingDate: '',
+        notes: '',
+    }
+}
+export function validateGradingCreate(
+    input: GradingCreateInput,
+): Partial<Record<keyof GradingCreateInput, string>> {
+    const errors: Partial<Record<keyof GradingCreateInput, string>> = {}
+    for (const field of [
+        'purchaseOrderId',
+        'mitraId',
+        'graderId',
+        'productId',
+        'gradingDate',
+    ] as const)
+        if (!input[field].trim()) errors[field] = 'gradings.required'
+    if (
+        !/^\d{4}-\d{2}-\d{2}$/.test(input.gradingDate) ||
+        !Number.isFinite(Date.parse(input.gradingDate)) ||
+        new Date(input.gradingDate).toISOString().slice(0, 10) !== input.gradingDate
+    )
+        errors.gradingDate = 'gradings.invalid'
+    if (input.notes.length > 2000) errors.notes = 'gradings.invalid'
     return errors
 }

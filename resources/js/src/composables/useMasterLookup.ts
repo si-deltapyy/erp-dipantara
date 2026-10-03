@@ -34,28 +34,51 @@ export function useMasterLookup(
     const session = useSession()
     const store = useSessionStore()
     const search = ref('')
-    const page = ref(1)
-    const total = ref(0)
+    const visibleCount = ref(20)
+    const appliedSearch = ref('')
+    const resource = {
+        buyer: 'buyers',
+        timber: 'timber-products',
+        mitra: 'mitras',
+        grader: 'graders',
+    }[kind]
     const choices = shallowRef<readonly { id: string; label: string }[]>([])
     const loading = ref(false)
     const error = ref('')
     let active: AbortController | undefined
     async function load(reset = true): Promise<void> {
         active?.abort()
+        loading.value = false
+        error.value = ''
+        if (
+            !store.user?.permissions.includes(`${resource}.read.all`) ||
+            (kind === 'timber' && !store.user.permissions.includes('timber-prices.read.all'))
+        ) {
+            choices.value = []
+            error.value = 'ui.scopeUnavailable'
+            return
+        }
+        if (!reset) {
+            visibleCount.value += 20
+            return
+        }
+        choices.value = []
+        visibleCount.value = 20
+        appliedSearch.value = search.value.trim().toLocaleLowerCase('id-ID')
         const request = new AbortController()
         active = request
-        const next = reset ? 1 : page.value + 1
         loading.value = true
         error.value = ''
         try {
-            const response = await api.lookup(
-                { page: next, perPage: 20, search: search.value.trim(), sort: 'createdAt' },
+            const response = await api.list(
+                { page: 1, perPage: 20, search: '', sort: 'createdAt' },
                 request.signal,
             )
             if (request.signal.aborted) return
-            choices.value = reset ? response.data : [...choices.value, ...response.data]
-            page.value = next
-            total.value = response.meta.total
+            choices.value = response.map((record) => ({
+                id: record.id,
+                label: 'companyName' in record ? record.companyName : record.name,
+            }))
         } catch (cause) {
             if (request.signal.aborted || isRequestCancelled(cause)) return
             error.value = `purchase-orders.errors.${normalizeApiError(cause).kind}`
@@ -64,8 +87,15 @@ export function useMasterLookup(
             if (active === request) loading.value = false
         }
     }
+    const filtered = computed(() =>
+        choices.value.filter((choice) =>
+            choice.label.toLocaleLowerCase('id-ID').includes(appliedSearch.value),
+        ),
+    )
     const options = computed(() => {
-        const combined = new Map(choices.value.map((choice) => [choice.id, choice.label]))
+        const combined = new Map(
+            filtered.value.slice(0, visibleCount.value).map((choice) => [choice.id, choice.label]),
+        )
         if (selected.value.id && !combined.has(selected.value.id))
             combined.set(selected.value.id, selected.value.label || selected.value.id)
         return [...combined].map(([value, label]) => ({ value, label }))
@@ -85,6 +115,6 @@ export function useMasterLookup(
         loading,
         error,
         load,
-        hasMore: computed(() => page.value * 20 < total.value),
+        hasMore: computed(() => visibleCount.value < filtered.value.length),
     }
 }

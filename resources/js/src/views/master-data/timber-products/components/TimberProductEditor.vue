@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { computed, inject, nextTick, ref } from 'vue'
-import { timberProductsApiKey } from '@/api/timber-products-api'
-import { normalizeDecimalInput } from '@/core/domain/timber-measurements'
-import type { TimberProduct } from '@/core/types/timber-product'
+import { nextTick, ref } from 'vue'
 import { useTimberProductForm } from '../composables/useTimberProductForm'
 import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
 import TimberProductFields from './TimberProductFields.vue'
@@ -11,30 +8,13 @@ import AppModal from '@/components/ui/AppModal.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppConfirmDialog from '@/components/ui/AppConfirmDialog.vue'
 import { useSessionStore } from '@/stores/session'
-const props = defineProps<{ timberProduct?: TimberProduct }>()
 const emit = defineEmits<{ saved: []; close: [] }>()
 const { t } = useI18n()
 const session = useSessionStore()
 const form = ref<HTMLFormElement>()
-const { draft, errors, error, pending, uncertain, dirty, save } = useTimberProductForm(
-    props.timberProduct,
-    () => emit('saved'),
+const { draft, errors, error, pending, uncertain, dirty, save } = useTimberProductForm(() =>
+    emit('saved'),
 )
-const api = inject(timberProductsApiKey)
-const simulation = !!api?.previewVolume
-const volume = computed(() => {
-    if (api?.previewVolume)
-        return api.previewVolume(
-            normalizeDecimalInput(draft.value.diameterCm),
-            normalizeDecimalInput(draft.value.lengthM),
-        )
-    const original = props.timberProduct
-    return original &&
-        draft.value.diameterCm === original.diameterCm &&
-        draft.value.lengthM === original.lengthM
-        ? original.volumeM3
-        : null
-})
 const { confirming, requestDiscard, confirm, cancel } = useUnsavedChanges(
     () => dirty.value,
     () => pending.value && session.status === 'authenticated',
@@ -52,7 +32,7 @@ async function submit(): Promise<void> {
     <AppModal
         class="max-w-2xl"
         :open="true"
-        :title="t(timberProduct ? 'timber-products.edit' : 'timber-products.add')"
+        :title="t('timber-products.add')"
         initial-focus="#timber-product-name"
         :busy="pending"
         @close="close"
@@ -62,8 +42,6 @@ async function submit(): Promise<void> {
                 v-model="draft"
                 :errors="errors"
                 :disabled="pending || uncertain"
-                :volume="volume"
-                :simulation="simulation"
             />
             <div
                 v-if="error"
@@ -80,8 +58,8 @@ async function submit(): Promise<void> {
                 <AppButton variant="secondary" :disabled="pending" @click="close">{{
                     t('timber-products.cancel')
                 }}</AppButton>
-                <AppButton type="submit" :pending="pending">{{
-                    t(uncertain ? 'timber-products.retry' : 'timber-products.save')
+                <AppButton type="submit" :pending="pending" :disabled="uncertain">{{
+                    t('timber-products.save')
                 }}</AppButton>
             </div>
         </form>

@@ -6,6 +6,7 @@ export default {
         list: 'Daftar Buyer',
         add: 'Tambah Buyer',
         edit: 'Edit Buyer',
+        detail: 'Detail Buyer',
         companyName: 'Nama perusahaan',
         contactName: 'Nama kontak',
         phone: 'Nomor telepon',
@@ -24,12 +25,13 @@ export default {
         required: 'Field ini wajib diisi.',
         tooLong: 'Isi melebihi batas karakter.',
         invalid: 'Periksa kembali nilai field ini.',
-        requiredHint: 'Nama perusahaan dan nama kontak wajib diisi.',
+        requiredHint: 'Semua field wajib diisi.',
+        updateUnavailable: 'Perubahan Buyer belum tersedia.',
         discardTitle: 'Buang perubahan?',
         discardDescription: 'Perubahan yang belum disimpan akan hilang.',
         retry: 'Ulangi penyimpanan',
         uncertain:
-            'Hasil penyimpanan belum diketahui. Ulangi permintaan yang sama untuk memastikan hasilnya tanpa membuat data ganda.',
+            'Hasil penyimpanan belum diketahui. Tutup form dan periksa daftar sebelum menambahkan Buyer kembali.',
         conflictHint:
             'Data telah berubah. Tutup form lalu buka kembali untuk memuat versi terbaru. Draft Anda belum disimpan.',
         errors: {
