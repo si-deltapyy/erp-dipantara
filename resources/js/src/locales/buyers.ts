@@ -6,6 +6,7 @@ export default {
         list: 'Daftar Buyer',
         add: 'Tambah Buyer',
         edit: 'Edit Buyer',
+        detail: 'Detail Buyer',
         companyName: 'Nama perusahaan',
         contactName: 'Nama kontak',
         phone: 'Nomor telepon',

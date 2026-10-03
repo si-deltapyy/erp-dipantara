@@ -34,8 +34,8 @@ export interface BuyerWriteOptions {
 export interface BuyersApi {
     list(query: BuyerQuery, signal: AbortSignal): Promise<readonly BuyerRecord[]>
     lookup(query: BuyerQuery, signal: AbortSignal): Promise<PageResponse<BuyerLookup>>
-    get(id: string, signal: AbortSignal): Promise<Buyer>
+    get(id: string, signal: AbortSignal): Promise<BuyerRecord>
     create(input: BuyerInput, options: BuyerWriteOptions): Promise<BuyerRecord>
-    update(id: string, input: BuyerUpdate, options: BuyerWriteOptions): Promise<Buyer>
+    update(id: string, input: BuyerInput, options: BuyerWriteOptions): Promise<BuyerRecord>
     subscribe(listener: () => void): () => void
 }

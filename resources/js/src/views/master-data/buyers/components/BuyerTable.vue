@@ -8,7 +8,7 @@ defineProps<{
     buyers: readonly BuyerRecord[]
     state: 'ready' | 'loading' | 'error'
 }>()
-defineEmits<{ retry: [] }>()
+defineEmits<{ retry: []; select: [id: string] }>()
 const { t } = useI18n()
 const columns = computed<readonly TableColumn<BuyerRecord>[]>(() => [
     { key: 'companyName', label: t('buyers.companyName') },
@@ -27,9 +27,13 @@ const columns = computed<readonly TableColumn<BuyerRecord>[]>(() => [
         @retry="$emit('retry')"
     >
         <template #cell-companyName="{ row }"
-            ><span class="block min-w-40 max-w-64 whitespace-normal break-words font-semibold">{{
-                row.companyName
-            }}</span></template
+            ><button
+                type="button"
+                class="block min-w-40 max-w-64 whitespace-normal break-words font-semibold text-primary underline-offset-4 hover:underline"
+                @click="$emit('select', row.id)"
+            >
+                {{ row.companyName }}
+            </button></template
         >
         <template #cell-contactName="{ row }"
             ><span class="block max-w-48 whitespace-normal break-words">{{

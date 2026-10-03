@@ -1,34 +1,58 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useSessionStore } from '@/stores/session'
 import { useBuyerList } from './composables/useBuyerList'
 import BuyerTable from './components/BuyerTable.vue'
 import BuyerEditor from './components/BuyerEditor.vue'
+import BuyerFields from './components/BuyerFields.vue'
+import AppModal from '@/components/ui/AppModal.vue'
+import AppState from '@/components/ui/AppState.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
 import AppPagination from '@/components/ui/AppPagination.vue'
 import AppPageHeader from '@/components/ui/AppPageHeader.vue'
 import AppPanel from '@/components/ui/AppPanel.vue'
 const { t } = useI18n()
-const { response, query, search, loading, error, canCreate, refresh, searchBuyers, changePage } =
-    useBuyerList()
+const {
+    response,
+    query,
+    search,
+    loading,
+    error,
+    canCreate,
+    refresh,
+    searchBuyers,
+    changePage,
+    selectedId,
+    detail,
+} = useBuyerList()
 const session = useSessionStore()
 const editing = ref(false)
+const {
+    record: selectedBuyer,
+    loading: detailLoading,
+    error: detailError,
+    refresh: refreshDetail,
+} = detail
+const canUpdate = computed(() => !!session.user?.permissions.includes('buyers.update.all'))
 const success = ref(false)
 function open(): void {
+    selectedId.value = undefined
     success.value = false
     editing.value = true
 }
 function saved(): void {
     editing.value = false
+    selectedId.value = undefined
     success.value = true
     void refresh()
 }
 watch(
-    () => session.user?.id,
+    () => session.user,
     () => {
         editing.value = false
+        selectedId.value = undefined
         success.value = false
     },
 )
@@ -42,7 +66,6 @@ watch(
                 }}</AppButton></template
             >
         </AppPageHeader>
-        <p role="status" class="text-sm text-muted">{{ t('buyers.updateUnavailable') }}</p>
         <p v-if="success" role="status" class="text-sm text-primary">{{ t('buyers.saved') }}</p>
         <AppPanel :title="t('buyers.list')" class="space-y-5">
             <template #actions
@@ -76,6 +99,7 @@ watch(
                 :buyers="response?.data ?? []"
                 :state="loading ? 'loading' : error ? 'error' : 'ready'"
                 @retry="refresh"
+                @select="selectedId = $event"
             />
             <template #footer
                 ><AppPagination
@@ -88,6 +112,32 @@ watch(
                     @update:page="changePage"
             /></template>
         </AppPanel>
-        <BuyerEditor v-if="editing && canCreate" @close="editing = false" @saved="saved" />
+        <AppModal
+            :open="!!selectedId && !editing"
+            :title="t('buyers.detail')"
+            @close="selectedId = undefined"
+        >
+            <AppState v-if="detailLoading" kind="loading" />
+            <AppState
+                v-else-if="detailError"
+                kind="error"
+                :message="t(detailError)"
+                @retry="refreshDetail"
+            />
+            <template v-else-if="selectedBuyer">
+                <BuyerFields :model-value="selectedBuyer" :errors="{}" disabled />
+                <div class="wf-form-actions">
+                    <AppButton v-if="canUpdate" @click="editing = true">{{
+                        t('buyers.edit')
+                    }}</AppButton>
+                </div>
+            </template>
+        </AppModal>
+        <BuyerEditor
+            v-if="editing && (selectedBuyer ? canUpdate : canCreate)"
+            :buyer="selectedBuyer"
+            @close="editing = false"
+            @saved="saved"
+        />
     </section>
 </template>
