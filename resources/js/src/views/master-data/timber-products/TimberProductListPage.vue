@@ -27,6 +27,10 @@ const {
 } = useTimberProductList()
 const editing = ref(false)
 const success = ref(false)
+function open(): void {
+    editing.value = true
+    success.value = false
+}
 function saved(): void {
     editing.value = false
     success.value = true
@@ -47,14 +51,9 @@ watch(
             :description="t('timber-products.subtitle')"
         >
             <template #actions
-                ><AppButton
-                    v-if="canCreate && canReadPrice"
-                    @click="
-                        editing = true
-                        success = false
-                    "
-                    >{{ t('timber-products.add') }}</AppButton
-                ></template
+                ><AppButton v-if="canCreate && canReadPrice" @click="open">{{
+                    t('timber-products.add')
+                }}</AppButton></template
             >
         </AppPageHeader>
         <p v-if="success" role="status" class="text-sm text-primary">
