@@ -41,6 +41,7 @@ function fieldError(field: keyof typeof bankAccountFieldLimits): string | undefi
             :maxlength="limit"
             autocomplete="off"
             aria-required="true"
+            :name="field"
             @update:model-value="update(field, $event)"
         />
         <BankAccountOwnerFields

@@ -1,3 +1,4 @@
+import { isCalendarDate } from './input-validation'
 import type { Invoice, InvoiceInput } from '@/core/types/invoice'
 export function invoiceDraft(invoice?: Invoice): InvoiceInput {
     return {
@@ -14,21 +15,28 @@ export function invoiceDraft(invoice?: Invoice): InvoiceInput {
         notes: invoice?.notes ?? null,
     }
 }
-export function validateInvoice(input: InvoiceInput): Partial<Record<keyof InvoiceInput, string>> {
-    return {
-        ...(!input.purchaseOrderId ? { purchaseOrderId: 'invoices.required' } : {}),
-        ...(!input.invoiceDate ? { invoiceDate: 'invoices.required' } : {}),
-        ...(input.direction === 'payable' && !input.mitraId
-            ? { mitraId: 'invoices.required' }
-            : {}),
-        ...(!input.terms.length ||
-        input.terms.some(
-            (term) =>
-                !term.label.trim() ||
-                !/^\d+\.\d{2}$/.test(term.amount) ||
-                /^0+\.00$/.test(term.amount),
+export function validateInvoice(input: InvoiceInput): Record<string, string> {
+    const errors: Record<string, string> = {}
+    if (!input.purchaseOrderId.trim()) errors.purchaseOrderId = 'invoices.required'
+    if (!isCalendarDate(input.invoiceDate)) errors.invoiceDate = 'ui.validation.date'
+    if (!['receivable', 'payable'].includes(input.direction)) errors.direction = 'invoices.invalid'
+    if (!['down_payment', 'settlement'].includes(input.kind)) errors.kind = 'invoices.invalid'
+    if (input.direction === 'payable' && !input.mitraId?.trim())
+        errors.mitraId = 'invoices.required'
+    if (input.notes && [...input.notes].length > 2000) errors.notes = 'invoices.invalid'
+    if (!input.terms.length || input.terms.length > 50) errors.terms = 'invoices.invalidTerms'
+    input.terms.forEach((term, index) => {
+        if (!term.label.trim()) errors[`terms.${index}.label`] = 'ui.validation.required'
+        else if ([...term.label].length > 255)
+            errors[`terms.${index}.label`] = 'ui.validation.textLength'
+        if (
+            !/^\d+\.\d{2}$/.test(term.amount) ||
+            /^0+\.00$/.test(term.amount) ||
+            term.amount.length > 20
         )
-            ? { terms: 'invoices.invalidTerms' }
-            : {}),
-    }
+            errors[`terms.${index}.amount`] = 'invoices.invalidTerms'
+        if (term.dueDate !== null && !isCalendarDate(term.dueDate))
+            errors[`terms.${index}.dueDate`] = 'ui.validation.date'
+    })
+    return errors
 }

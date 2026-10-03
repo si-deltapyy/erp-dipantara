@@ -1,3 +1,4 @@
+import { isPhoneNumber } from './input-validation'
 import type { GraderInput, GraderContactInput } from '@/core/types/grader'
 
 export const graderFieldLimits = { name: 255, email: 254, phone: 40, address: 1000 }
@@ -15,6 +16,8 @@ export function validateGrader(input: GraderInput): GraderErrors {
     }
     if (input.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email.trim()))
         errors.email = 'graders.emailInvalid'
+    if (input.phone.trim() && !errors.phone && !isPhoneNumber(input.phone))
+        errors.phone = 'ui.validation.phone'
     return errors
 }
 export function emptyGrader(): GraderInput {
@@ -33,5 +36,7 @@ export function validateGraderContact(
         else if (input[field].length > (field === 'phone' ? 40 : 255))
             errors[field] = 'graders.tooLong'
     }
+    if (input.phone.trim() && !errors.phone && !isPhoneNumber(input.phone))
+        errors.phone = 'ui.validation.phone'
     return errors
 }

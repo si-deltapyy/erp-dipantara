@@ -1,3 +1,4 @@
+import { isCalendarDate, isRecordId, isPhoneNumber } from './input-validation'
 import type { OrderInput, OrderCreateInput } from '@/core/types/order'
 export function orderDraft(order?: OrderInput): OrderInput {
     return { purchaseOrderId: order?.purchaseOrderId ?? '', notes: order?.notes ?? null }
@@ -27,14 +28,13 @@ export function validateOrderCreate(
     const errors: Partial<Record<keyof OrderCreateInput, string>> = {}
     for (const field of Object.keys(input) as (keyof OrderCreateInput)[]) {
         if (field !== 'notes' && !input[field].trim()) errors[field] = 'orders.required'
-        else if (input[field].length > (field === 'notes' ? 2000 : 255))
-            errors[field] = 'orders.invalid'
+        else if (input[field].length > 255) errors[field] = 'ui.validation.textLength'
     }
-    if (
-        !/^\d{4}-\d{2}-\d{2}$/.test(input.orderDate) ||
-        !Number.isFinite(Date.parse(input.orderDate)) ||
-        new Date(input.orderDate).toISOString().slice(0, 10) !== input.orderDate
-    )
-        errors.orderDate = 'orders.invalid'
+    if (!isCalendarDate(input.orderDate)) errors.orderDate = 'ui.validation.date'
+    for (const field of ['purchaseOrderId', 'mitraId', 'graderId'] as const)
+        if (input[field] && !isRecordId(input[field])) errors[field] = 'ui.validation.selection'
+    if (input.buyerGraderPhone.length > 40) errors.buyerGraderPhone = 'ui.validation.phoneLength'
+    else if (input.buyerGraderPhone.trim() && !isPhoneNumber(input.buyerGraderPhone))
+        errors.buyerGraderPhone = 'ui.validation.phone'
     return errors
 }

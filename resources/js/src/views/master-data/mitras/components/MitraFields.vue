@@ -33,6 +33,7 @@ function fieldError(field: MitraField): string | undefined {
             :maxlength="255"
             autocomplete="name"
             aria-required="true"
+            :name="'name'"
             @update:model-value="update('name', $event)"
         />
         <AppTextInput
@@ -44,7 +45,9 @@ function fieldError(field: MitraField): string | undefined {
             :disabled="disabled"
             :maxlength="40"
             inputmode="tel"
+            :hint="t('ui.validation.phoneHint')"
             autocomplete="tel"
+            :name="'phone'"
             @update:model-value="update('phone', $event)"
         />
         <AppTextInput
@@ -55,6 +58,7 @@ function fieldError(field: MitraField): string | undefined {
             :error="fieldError('graderGroup')"
             :disabled="disabled"
             :maxlength="255"
+            :name="'graderGroup'"
             @update:model-value="update('graderGroup', $event)"
         />
         <AppTextarea
@@ -67,6 +71,7 @@ function fieldError(field: MitraField): string | undefined {
             :disabled="disabled"
             :maxlength="255"
             autocomplete="street-address"
+            :name="'address'"
             @update:model-value="update('address', $event)"
         />
     </div>

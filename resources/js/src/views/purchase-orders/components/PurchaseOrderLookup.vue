@@ -6,6 +6,7 @@ import AppTextInput from '@/components/ui/AppTextInput.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import { usePurchaseOrderLookup } from '../composables/usePurchaseOrderLookup'
 const props = defineProps<{
+    name?: string
     id: string
     label: string
     modelValue: string
@@ -33,6 +34,7 @@ function choose(value: string): void {
     <div class="min-w-0 space-y-2">
         <AppSelect
             :id="id"
+            :name="name"
             renderer="nice"
             :model-value="modelValue"
             :label="label"

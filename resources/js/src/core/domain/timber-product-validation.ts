@@ -1,3 +1,4 @@
+import { isNonnegativeDecimal, isNonnegativeInteger } from './input-validation'
 import type {
     TimberProduct,
     TimberProductInput,
@@ -86,10 +87,9 @@ export function validateTimberProductCreate(
         if (!value && field !== 'volume') errors[field] = 'timber-products.required'
         else if (['name', 'type', 'grade'].includes(field)) {
             if (value.length > 255) errors[field] = 'timber-products.tooLong'
-        } else if (value && (!/^\d+(\.\d+)?$/.test(value) || !Number.isFinite(Number(value))))
-            errors[field] = 'timber-products.invalid'
-        else if (field === 'price' && !/^\d+$/.test(value))
-            errors[field] = 'timber-products.integerPrice'
+        } else if (field === 'price' && !isNonnegativeInteger(value))
+            errors[field] = 'ui.validation.integer'
+        else if (value && !isNonnegativeDecimal(value)) errors[field] = 'ui.validation.decimal'
     }
     return errors
 }

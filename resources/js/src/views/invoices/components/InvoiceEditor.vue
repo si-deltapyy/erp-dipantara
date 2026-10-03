@@ -44,11 +44,6 @@ const { confirming, confirm, cancel } = useUnsavedChanges(
 )
 function update<K extends keyof InvoiceInput>(field: K, value: InvoiceInput[K]): void {
     draft.value = { ...draft.value, [field]: value }
-    errors.value = Object.fromEntries(
-        Object.entries(errors.value).filter(
-            ([key]) => key !== field && !key.startsWith(field + '.'),
-        ),
-    )
 }
 function changeDirection(value: string): void {
     if (value !== 'receivable' && value !== 'payable') return
@@ -70,17 +65,20 @@ async function submit(): Promise<void> {
                 :label="t('invoices.purchaseOrder')"
                 :error="errors.purchaseOrderId ? t(errors.purchaseOrderId) : ''"
                 :disabled="disabled"
+                name="purchaseOrderId"
                 @update:model-value="update('purchaseOrderId', $event)"
             />
             <p v-else>{{ invoice.purchaseOrderNumber }} / {{ invoice.counterpartyName }}</p>
             <div class="grid gap-4 sm:grid-cols-2">
                 <AppSelect
                     id="invoice-direction"
+                    :error="errors.direction ? t(errors.direction) : undefined"
                     renderer="nice"
                     :model-value="draft.direction"
                     :options="directions"
                     :label="t('invoices.direction')"
                     :disabled="disabled || !!invoice"
+                    name="direction"
                     @update:model-value="changeDirection"
                 />
                 <MasterLookup
@@ -92,6 +90,7 @@ async function submit(): Promise<void> {
                     :selected-label="invoice?.counterpartyName"
                     :disabled="disabled || !!invoice"
                     :error="errors.mitraId ? t(errors.mitraId) : ''"
+                    name="mitraId"
                     @update:model-value="update('mitraId', $event)"
                 />
                 <AppTextInput
@@ -101,16 +100,19 @@ async function submit(): Promise<void> {
                     :label="t('invoices.invoiceDate')"
                     :error="errors.invoiceDate ? t(errors.invoiceDate) : ''"
                     :disabled="disabled"
+                    name="invoiceDate"
                     @update:model-value="update('invoiceDate', $event)"
                 />
             </div>
             <AppSelect
                 id="invoice-kind"
+                :error="errors.kind ? t(errors.kind) : undefined"
                 renderer="nice"
                 :model-value="draft.kind"
                 :options="kinds"
                 :label="t('invoices.kind')"
                 :disabled="disabled || !!invoice"
+                name="kind"
                 @update:model-value="changeKind"
             />
         </AppPanel>
@@ -123,10 +125,12 @@ async function submit(): Promise<void> {
         <AppPanel :title="t('invoices.notes')">
             <AppTextInput
                 id="invoice-notes"
+                :error="errors.notes ? t(errors.notes) : undefined"
                 :label="t('invoices.notes')"
                 :model-value="draft.notes ?? ''"
                 :maxlength="2000"
                 :disabled="disabled"
+                name="notes"
                 @update:model-value="update('notes', $event || null)"
             />
         </AppPanel>

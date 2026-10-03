@@ -34,6 +34,7 @@ function message(field: keyof PurchaseOrderWriteInput): string | undefined {
             :selected-label="buyerLabel"
             :error="message('buyerId')"
             :disabled="disabled"
+            :name="'buyerId'"
             @update:model-value="update('buyerId', $event)"
             @selected="buyerLabel = $event"
         />
@@ -45,6 +46,7 @@ function message(field: keyof PurchaseOrderWriteInput): string | undefined {
             :selected-label="productLabel"
             :error="message('productId')"
             :disabled="disabled"
+            :name="'productId'"
             @update:model-value="update('productId', $event)"
             @selected="productLabel = $event"
         />
@@ -56,6 +58,7 @@ function message(field: keyof PurchaseOrderWriteInput): string | undefined {
             :disabled="disabled"
             :maxlength="255"
             required
+            :name="'number'"
             @update:model-value="update('number', $event)"
         />
         <AppTextInput
@@ -68,6 +71,7 @@ function message(field: keyof PurchaseOrderWriteInput): string | undefined {
             :error="message(field)"
             :disabled="disabled"
             required
+            :name="field"
             @update:model-value="update(field, $event)"
         />
         <AppTextInput
@@ -78,6 +82,7 @@ function message(field: keyof PurchaseOrderWriteInput): string | undefined {
             :error="message('quantity')"
             :disabled="disabled"
             required
+            :name="'quantity'"
             @update:model-value="update('quantity', $event)"
         />
         <AppTextInput
@@ -88,6 +93,7 @@ function message(field: keyof PurchaseOrderWriteInput): string | undefined {
             :model-value="modelValue.totalAmount"
             :error="message('totalAmount')"
             :disabled="disabled"
+            :name="'totalAmount'"
             @update:model-value="update('totalAmount', $event)"
         />
         <AppTextarea
@@ -97,7 +103,8 @@ function message(field: keyof PurchaseOrderWriteInput): string | undefined {
             :model-value="modelValue.notes"
             :error="message('notes')"
             :disabled="disabled"
-            :maxlength="2000"
+            :maxlength="255"
+            :name="'notes'"
             @update:model-value="update('notes', $event)"
         />
     </div>

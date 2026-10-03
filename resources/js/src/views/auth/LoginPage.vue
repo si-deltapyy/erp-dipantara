@@ -16,7 +16,9 @@ function errorText(value: string): string {
 async function submitForm(): Promise<void> {
     await submit()
     await nextTick()
-    summary.value?.focus()
+    const field = emailError.value ? 'login-email' : passwordError.value ? 'login-password' : ''
+    if (field) document.getElementById(field)?.focus()
+    else summary.value?.focus()
 }
 </script>
 <template>
@@ -44,6 +46,9 @@ async function submitForm(): Promise<void> {
             <AppTextInput
                 id="login-email"
                 v-model="email"
+                name="email"
+                maxlength="255"
+                required
                 :label="t('auth.email')"
                 type="email"
                 autocomplete="username"
@@ -53,6 +58,8 @@ async function submitForm(): Promise<void> {
             <AppTextInput
                 id="login-password"
                 v-model="password"
+                name="password"
+                required
                 :label="t('auth.livePassword')"
                 type="password"
                 autocomplete="current-password"

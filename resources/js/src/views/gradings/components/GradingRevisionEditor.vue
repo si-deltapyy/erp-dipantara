@@ -54,6 +54,7 @@ async function submit(): Promise<void> {
                     :label="t('gradings.gradingDate')"
                     :error="errors.gradingDate ? t(errors.gradingDate) : ''"
                     :disabled="pending || uncertain || !permitted"
+                    name="gradingDate"
                     @update:model-value="draft = { ...draft, gradingDate: $event }"
                 />
                 <AppTextarea
@@ -63,6 +64,7 @@ async function submit(): Promise<void> {
                     :maxlength="255"
                     :error="errors.reason ? t(errors.reason) : ''"
                     :disabled="pending || uncertain || !permitted"
+                    name="reason"
                     @update:model-value="draft = { ...draft, reason: $event }"
                 />
                 <p class="text-sm text-muted">{{ t('gradings.revisionHint') }}</p>

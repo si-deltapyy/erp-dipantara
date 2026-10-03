@@ -44,6 +44,7 @@ function fieldError(index: number, field: string): string {
             <div class="grid min-w-0 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <AppTextInput
                     :id="row.rowId + '-quantity'"
+                    :name="`rows.${index}.quantity`"
                     :model-value="String(row.quantity)"
                     :label="t('gradings.quantity')"
                     inputmode="numeric"
@@ -52,6 +53,7 @@ function fieldError(index: number, field: string): string {
                 />
                 <AppTextInput
                     :id="row.rowId + '-diameter'"
+                    :name="`rows.${index}.diameterCm`"
                     :model-value="row.diameterCm"
                     :label="t('gradings.diameter')"
                     inputmode="decimal"
@@ -62,6 +64,7 @@ function fieldError(index: number, field: string): string {
                 />
                 <AppTextInput
                     :id="row.rowId + '-length'"
+                    :name="`rows.${index}.lengthM`"
                     :model-value="row.lengthM"
                     :label="t('gradings.length')"
                     inputmode="decimal"
@@ -72,6 +75,7 @@ function fieldError(index: number, field: string): string {
                 />
                 <AppSelect
                     :id="row.rowId + '-grade'"
+                    :name="`rows.${index}.gradeCode`"
                     renderer="nice"
                     :disabled="disabled"
                     :model-value="row.gradeCode"

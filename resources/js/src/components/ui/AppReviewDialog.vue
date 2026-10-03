@@ -39,6 +39,7 @@ const { t } = useI18n()
             <AppTextarea
                 v-if="action === 'reject'"
                 :id="reasonId"
+                :maxlength="2000"
                 :model-value="reason"
                 :label="t(resource + '.reason')"
                 :error="reasonError ? t(reasonError) : undefined"

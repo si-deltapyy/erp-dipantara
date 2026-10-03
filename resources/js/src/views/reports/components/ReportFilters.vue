@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { isCalendarDate } from '@/core/domain/input-validation'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useSessionStore } from '@/stores/session'
@@ -15,6 +16,14 @@ const route = useRoute()
 const router = useRouter()
 const session = useSessionStore()
 const period = ref('')
+const periodError = ref('')
+function validatePeriod(): boolean {
+    periodError.value = isCalendarDate(`${period.value}-01`) ? '' : 'ui.validation.period'
+    return !periodError.value
+}
+watch(period, () => {
+    if (periodError.value) validatePeriod()
+})
 const search = ref('')
 const category = ref('')
 const buyerId = ref('')
@@ -36,6 +45,10 @@ watch(
     { immediate: true },
 )
 async function apply(): Promise<void> {
+    if (!validatePeriod()) {
+        document.getElementById('report-period')?.focus()
+        return
+    }
     await router.replace({
         query: {
             period: period.value,
@@ -56,7 +69,9 @@ async function apply(): Promise<void> {
                 id="report-period"
                 v-model="period"
                 type="month"
+                :error="periodError ? t(periodError) : undefined"
                 :label="t('production.period')"
+                @blur="validatePeriod"
             />
             <AppTextInput
                 id="report-search"

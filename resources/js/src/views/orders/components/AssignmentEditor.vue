@@ -48,6 +48,7 @@ function requestCancel(): void {
                 :selected-label="assignment?.mitraName"
                 :disabled="pending || uncertain || !permitted"
                 :error="errors.mitraId ? t(errors.mitraId) : ''"
+                name="mitraId"
                 @update:model-value="draft = { ...draft, mitraId: $event }"
             />
             <MasterLookup
@@ -58,6 +59,7 @@ function requestCancel(): void {
                 :selected-label="assignment?.graderName"
                 :disabled="pending || uncertain || !permitted"
                 :error="errors.graderId ? t(errors.graderId) : ''"
+                name="graderId"
                 @update:model-value="draft = { ...draft, graderId: $event }"
             />
             <MasterLookup
@@ -68,10 +70,12 @@ function requestCancel(): void {
                 :selected-label="assignment?.timberProductName"
                 :disabled="pending || uncertain || !permitted"
                 :error="errors.timberProductId ? t(errors.timberProductId) : ''"
+                name="timberProductId"
                 @update:model-value="draft = { ...draft, timberProductId: $event }"
             />
             <AppTextInput
                 id="assignment-quantity"
+                name="quantity"
                 inputmode="numeric"
                 min="1"
                 step="1"

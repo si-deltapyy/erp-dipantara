@@ -34,6 +34,7 @@ function change<K extends keyof PaymentInput>(key: K, value: PaymentInput[K]): v
                     :label="t('payments.sourceAccount')"
                     :disabled="disabled"
                     :error="errors.sourceAccountId ? t(errors.sourceAccountId) : ''"
+                    name="sourceAccountId"
                     @update:model-value="change('sourceAccountId', $event)"
                 />
                 <PaymentAccountLookup
@@ -45,6 +46,7 @@ function change<K extends keyof PaymentInput>(key: K, value: PaymentInput[K]): v
                     :label="t('payments.destinationAccount')"
                     :disabled="disabled"
                     :error="errors.destinationAccountId ? t(errors.destinationAccountId) : ''"
+                    name="destinationAccountId"
                     @update:model-value="change('destinationAccountId', $event)"
                 /></div
         ></AppPanel>
@@ -57,6 +59,7 @@ function change<K extends keyof PaymentInput>(key: K, value: PaymentInput[K]): v
                     :label="t('payments.paymentDate')"
                     :disabled="disabled"
                     :error="errors.paymentDate ? t(errors.paymentDate) : ''"
+                    name="paymentDate"
                     @update:model-value="change('paymentDate', $event)"
                 />
                 <AppTextInput
@@ -72,6 +75,7 @@ function change<K extends keyof PaymentInput>(key: K, value: PaymentInput[K]): v
                     :disabled="disabled"
                     :maxlength="20"
                     :error="errors[field] ? t(errors[field]) : ''"
+                    :name="field"
                     @update:model-value="change(field, $event)"
                 /></div
         ></AppPanel>
@@ -81,7 +85,9 @@ function change<K extends keyof PaymentInput>(key: K, value: PaymentInput[K]): v
                 :model-value="draft.notes ?? ''"
                 :label="t('payments.notes')"
                 :disabled="disabled"
-                :maxlength="2000"
+                :maxlength="255"
+                :error="errors.notes ? t(errors.notes) : undefined"
+                name="notes"
                 @update:model-value="change('notes', $event || null)"
             />
         </AppPanel>

@@ -1,3 +1,4 @@
+import { isCalendarDate, isRecordId, isLicensePlate } from './input-validation'
 import { deliveryRecordStatuses } from '@/core/types/delivery'
 import type { Delivery, DeliveryInput, DeliveryCreateInput } from '@/core/types/delivery'
 export function deliveryDraft(delivery?: Delivery): DeliveryInput {
@@ -17,7 +18,7 @@ export function validateDelivery(
 ): Partial<Record<keyof DeliveryInput, string>> {
     return {
         ...(!input.purchaseOrderId ? { purchaseOrderId: 'deliveries.required' } : {}),
-        ...(!input.deliveryDate ? { deliveryDate: 'deliveries.required' } : {}),
+        ...(!isCalendarDate(input.deliveryDate) ? { deliveryDate: 'ui.validation.date' } : {}),
         ...(!input.licensePlate.trim() || input.licensePlate.length > 20
             ? { licensePlate: 'deliveries.required' }
             : {}),
@@ -48,15 +49,13 @@ export function validateDeliveryCreate(
     const errors: Partial<Record<keyof DeliveryCreateInput, string>> = {}
     for (const field of Object.keys(input) as (keyof DeliveryCreateInput)[]) {
         if (field !== 'notes' && !input[field].trim()) errors[field] = 'deliveries.required'
-        else if (input[field].length > (field === 'notes' ? 2000 : 255))
-            errors[field] = 'deliveries.invalid'
+        else if (input[field].length > 255) errors[field] = 'ui.validation.textLength'
     }
-    if (
-        !/^\d{4}-\d{2}-\d{2}$/.test(input.deliveryDate) ||
-        !Number.isFinite(Date.parse(input.deliveryDate)) ||
-        new Date(input.deliveryDate).toISOString().slice(0, 10) !== input.deliveryDate
-    )
-        errors.deliveryDate = 'deliveries.invalid'
+    if (!isCalendarDate(input.deliveryDate)) errors.deliveryDate = 'ui.validation.date'
     if (!deliveryRecordStatuses.includes(input.status)) errors.status = 'deliveries.invalid'
+    for (const field of ['purchaseOrderId', 'mitraId', 'graderId'] as const)
+        if (input[field] && !isRecordId(input[field])) errors[field] = 'ui.validation.selection'
+    if (input.licensePlate.trim() && !errors.licensePlate && !isLicensePlate(input.licensePlate))
+        errors.licensePlate = 'ui.validation.plate'
     return errors
 }

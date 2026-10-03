@@ -50,6 +50,7 @@ function message(field: keyof OrderCreateInput): string | undefined {
             :label="t('orders.number')"
             :error="message('purchaseOrderId')"
             :disabled="pending || uncertain || !permitted"
+            :name="'purchaseOrderId'"
             @update:model-value="draft = { ...draft, purchaseOrderId: $event }"
         />
         <div class="grid gap-5 sm:grid-cols-2">
@@ -62,6 +63,7 @@ function message(field: keyof OrderCreateInput): string | undefined {
                 :model-value="draft[kind === 'mitra' ? 'mitraId' : 'graderId']"
                 :error="message(kind === 'mitra' ? 'mitraId' : 'graderId')"
                 :disabled="pending || uncertain || !permitted"
+                :name="kind === 'mitra' ? 'mitraId' : 'graderId'"
                 @update:model-value="
                     draft = { ...draft, [kind === 'mitra' ? 'mitraId' : 'graderId']: $event }
                 "
@@ -80,8 +82,11 @@ function message(field: keyof OrderCreateInput): string | undefined {
                 :model-value="draft[field]"
                 :error="message(field)"
                 :disabled="pending || uncertain || !permitted"
-                :maxlength="255"
+                :maxlength="field === 'buyerGraderPhone' ? 40 : 255"
+                :inputmode="field === 'buyerGraderPhone' ? 'tel' : undefined"
+                :hint="field === 'buyerGraderPhone' ? t('ui.validation.phoneHint') : undefined"
                 required
+                :name="field"
                 @update:model-value="draft = { ...draft, [field]: $event }"
             />
         </div>
@@ -89,9 +94,10 @@ function message(field: keyof OrderCreateInput): string | undefined {
             id="order-notes"
             :model-value="draft.notes ?? ''"
             :label="t('orders.notes')"
-            :maxlength="2000"
+            :maxlength="255"
             :error="message('notes')"
             :disabled="pending || uncertain || !permitted"
+            :name="'notes'"
             @update:model-value="draft = { ...draft, notes: $event }"
         />
         <div

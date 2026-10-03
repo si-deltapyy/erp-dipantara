@@ -34,6 +34,7 @@ function update(index: number, field: keyof InvoiceTerm, value: string): void {
             <legend class="px-2 font-semibold">{{ t('invoices.terms') }} {{ index + 1 }}</legend>
             <AppTextInput
                 :id="`term-label-${index}`"
+                :name="`terms.${index}.label`"
                 :label="t('invoices.label')"
                 :model-value="term.label"
                 :maxlength="255"
@@ -44,6 +45,7 @@ function update(index: number, field: keyof InvoiceTerm, value: string): void {
             />
             <AppTextInput
                 :id="`term-amount-${index}`"
+                :name="`terms.${index}.amount`"
                 :label="t('invoices.amount')"
                 :model-value="term.amount"
                 inputmode="decimal"
@@ -55,6 +57,7 @@ function update(index: number, field: keyof InvoiceTerm, value: string): void {
             />
             <AppTextInput
                 :id="`term-date-${index}`"
+                :name="`terms.${index}.dueDate`"
                 :label="t('invoices.dueDate')"
                 :model-value="term.dueDate ?? ''"
                 type="date"

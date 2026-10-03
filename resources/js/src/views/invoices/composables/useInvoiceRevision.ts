@@ -35,9 +35,12 @@ export function useInvoiceRevision(
         },
         validate: (draft) => ({
             ...(!draft.reason.trim() ? { reason: 'invoices.required' } : {}),
-            ...(validateInvoice({ ...baseline, terms: draft.terms }).terms
-                ? { terms: 'invoices.invalidTerms' }
-                : {}),
+            ...([...draft.reason].length > 255 ? { reason: 'ui.validation.textLength' } : {}),
+            ...Object.fromEntries(
+                Object.entries(validateInvoice({ ...baseline, terms: draft.terms })).filter(
+                    ([field]) => field === 'terms' || field.startsWith('terms.'),
+                ),
+            ),
         }),
         write: async (draft, signal, idempotencyKey) => {
             if (!permitted.value) throw new ApiError('forbidden')

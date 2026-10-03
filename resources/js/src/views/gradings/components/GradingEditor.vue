@@ -52,6 +52,7 @@ function message(field: keyof GradingCreateInput): string | undefined {
             :label="t('gradings.number')"
             :error="message('purchaseOrderId')"
             :disabled="pending || uncertain || !permitted"
+            :name="'purchaseOrderId'"
             @update:model-value="draft = { ...draft, purchaseOrderId: $event }"
         />
         <div class="grid gap-5 sm:grid-cols-2">
@@ -64,6 +65,7 @@ function message(field: keyof GradingCreateInput): string | undefined {
                 :model-value="draft[lookup.field]"
                 :error="message(lookup.field)"
                 :disabled="pending || uncertain || !permitted"
+                :name="lookup.field"
                 @update:model-value="draft = { ...draft, [lookup.field]: $event }"
             />
             <AppTextInput
@@ -74,6 +76,7 @@ function message(field: keyof GradingCreateInput): string | undefined {
                 :error="message('gradingDate')"
                 :disabled="pending || uncertain || !permitted"
                 required
+                :name="'gradingDate'"
                 @update:model-value="draft = { ...draft, gradingDate: $event }"
             />
         </div>
@@ -81,9 +84,10 @@ function message(field: keyof GradingCreateInput): string | undefined {
             id="grading-notes"
             :model-value="draft.notes ?? ''"
             :label="t('gradings.notes')"
-            :maxlength="2000"
+            :maxlength="255"
             :error="message('notes')"
             :disabled="pending || uncertain || !permitted"
+            :name="'notes'"
             @update:model-value="draft = { ...draft, notes: $event }"
         />
         <div

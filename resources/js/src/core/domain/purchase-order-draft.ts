@@ -1,3 +1,4 @@
+import { isCalendarDate, isRecordId, isNonnegativeInteger } from './input-validation'
 import type {
     PurchaseOrderInput,
     PurchaseOrderWriteInput,
@@ -30,12 +31,7 @@ export function validatePurchaseOrder(input: PurchaseOrderInput): Record<string,
     const invalid = 'purchase-orders.invalid'
     if (!input.buyerId) errors.buyerId = invalid
     if (!input.number.trim() || [...input.number].length > 255) errors.number = invalid
-    if (
-        !/^\d{4}-\d{2}-\d{2}$/.test(input.orderDate) ||
-        !Number.isFinite(Date.parse(input.orderDate)) ||
-        new Date(input.orderDate).toISOString().slice(0, 10) !== input.orderDate
-    )
-        errors.orderDate = invalid
+    if (!isCalendarDate(input.orderDate)) errors.orderDate = invalid
     if (input.notes && [...input.notes].length > 2000) errors.notes = invalid
     if (!input.lines.length) errors.lines = invalid
     input.lines.forEach((line, index) => {
@@ -71,24 +67,17 @@ export function validatePurchaseOrderWrite(
         'closingDate',
         'quantity',
     ] as const)
-        if (!input[field].trim()) errors[field] = 'purchase-orders.invalid'
+        if (!input[field].trim()) errors[field] = 'ui.validation.required'
     for (const field of ['orderDate', 'closingDate'] as const) {
-        if (
-            !/^\d{4}-\d{2}-\d{2}$/.test(input[field]) ||
-            !Number.isFinite(Date.parse(input[field])) ||
-            new Date(input[field]).toISOString().slice(0, 10) !== input[field]
-        )
-            errors[field] = 'purchase-orders.invalid'
+        if (!isCalendarDate(input[field])) errors[field] = 'ui.validation.date'
     }
-    if (
-        !/^\d+$/.test(input.quantity) ||
-        !Number.isSafeInteger(Number(input.quantity)) ||
-        Number(input.quantity) < 1
-    )
-        errors.quantity = 'purchase-orders.invalid'
-    if (input.totalAmount && !/^\d+$/.test(input.totalAmount))
-        errors.totalAmount = 'purchase-orders.invalid'
-    if (input.number.length > 255) errors.number = 'purchase-orders.invalid'
-    if (input.notes.length > 2000) errors.notes = 'purchase-orders.invalid'
+    if (!isNonnegativeInteger(input.quantity) || Number(input.quantity) < 1)
+        errors.quantity = 'ui.validation.quantity'
+    if (input.totalAmount.trim() && !isNonnegativeInteger(input.totalAmount.trim()))
+        errors.totalAmount = 'ui.validation.integer'
+    if (input.number.length > 255) errors.number = 'ui.validation.textLength'
+    if ([...input.notes].length > 255) errors.notes = 'ui.validation.textLength'
+    for (const field of ['buyerId', 'productId'] as const)
+        if (input[field] && !isRecordId(input[field])) errors[field] = 'ui.validation.selection'
     return errors
 }

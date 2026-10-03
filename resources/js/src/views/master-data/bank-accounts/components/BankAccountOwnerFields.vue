@@ -62,6 +62,7 @@ function fieldError(field: 'ownerType' | 'ownerId'): string | undefined {
             :model-value="modelValue.ownerType"
             :disabled="disabled || editing"
             :error="fieldError('ownerType')"
+            :name="'ownerType'"
             @update:model-value="changeType"
         />
         <p v-if="editing" class="text-sm text-muted">{{ t('bank-accounts.ownerImmutable') }}</p>
@@ -92,6 +93,7 @@ function fieldError(field: 'ownerType' | 'ownerId'): string | undefined {
                 :options="options"
                 :disabled="disabled || editing || loading"
                 :error="fieldError('ownerId')"
+                :name="'ownerId'"
                 @update:model-value="changeOwner"
             />
             <p v-if="loading" role="status" class="text-sm text-muted">

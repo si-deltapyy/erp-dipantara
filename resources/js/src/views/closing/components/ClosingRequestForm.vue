@@ -74,6 +74,8 @@ async function submit(): Promise<void> {
         <AppPanel :title="t('closings.notes')">
             <AppTextarea
                 id="closing-notes"
+                name="notes"
+                :maxlength="2000"
                 :label="t('closings.notes')"
                 :model-value="form.draft.notes ?? ''"
                 :disabled="form.pending || form.uncertain || !form.permitted"

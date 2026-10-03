@@ -5,8 +5,15 @@ export const documentSizeLimit = 5 * 1024 * 1024
 export const documentMimeTypes = ['application/pdf', 'image/jpeg', 'image/png'] as const
 
 export function validateDocumentFile(file: File, purpose: DocumentPurpose): void {
-    if (file.size < 1 || file.size > documentSizeLimit)
-        throw new ApiError('validation', { file: ['documents.invalidSize'] })
+    const limit = purpose === 'payment_proof' ? 2 * 1024 * 1024 : documentSizeLimit
+    if (file.size < 1 || file.size > limit)
+        throw new ApiError('validation', {
+            file: [
+                purpose === 'payment_proof'
+                    ? 'documents.invalidPaymentSize'
+                    : 'documents.invalidSize',
+            ],
+        })
     if (
         !documentMimeTypes.some((mime) => mime === file.type) ||
         (purpose === 'sakr' && file.type !== 'application/pdf')

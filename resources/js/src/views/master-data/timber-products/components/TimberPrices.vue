@@ -25,6 +25,7 @@ const { t } = useI18n()
                 :disabled="disabled"
                 inputmode="decimal"
                 aria-required="true"
+                :name="field"
                 @update:model-value="$emit('update', field, $event)"
             />
         </div>

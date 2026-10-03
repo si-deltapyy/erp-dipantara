@@ -1,3 +1,4 @@
+import { isPhoneNumber } from './input-validation'
 import type { MitraInput } from '@/core/types/mitra'
 
 export const mitraFieldLimits = { name: 255, phone: 40, address: 255, graderGroup: 255 }
@@ -10,6 +11,8 @@ export function validateMitra(input: MitraInput): MitraErrors {
         else if ([...input[field]].length > mitraFieldLimits[field])
             errors[field] = 'mitras.tooLong'
     }
+    if (input.phone.trim() && !errors.phone && !isPhoneNumber(input.phone))
+        errors.phone = 'ui.validation.phone'
     return errors
 }
 export function emptyMitra(): MitraInput {

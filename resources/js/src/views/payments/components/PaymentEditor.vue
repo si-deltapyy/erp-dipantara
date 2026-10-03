@@ -94,10 +94,10 @@ async function submit(): Promise<void> {
             pending-id=""
             :copy="{
                 title: 'payments.proof',
-                description: 'documents.hint',
+                description: 'documents.paymentHint',
                 file: 'payments.proofFile',
                 empty: 'documents.empty',
-                hint: 'documents.hint',
+                hint: 'documents.paymentHint',
             }"
             @select="proof.select"
             @upload="proof.upload"

@@ -9,6 +9,7 @@ import { usePaymentAccountLookup } from '../composables/usePaymentAccountLookup'
 const props = defineProps<{
     invoiceId: string
     ownerType: BankAccountOwnerType
+    name?: string
     id: string
     label: string
     modelValue: string
@@ -39,6 +40,7 @@ function choose(value: string): void {
     <div class="min-w-0 space-y-2">
         <AppSelect
             :id="id"
+            :name="name"
             :model-value="modelValue"
             :label="label"
             :options="[{ value: '', label: t('purchase-orders.choose') }, ...options]"

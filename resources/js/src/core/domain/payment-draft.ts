@@ -1,3 +1,4 @@
+import { isCalendarDate } from './input-validation'
 import type { Payment, PaymentInput } from '@/core/types/payment'
 import { moneyUnits, sumMoney } from './money-arithmetic'
 export function paymentDraft(payment?: Payment, invoiceId = ''): PaymentInput {
@@ -42,5 +43,7 @@ export function validatePayment(input: PaymentInput): Partial<Record<keyof Payme
         ) <= 0n
     )
         errors.cashAmount = 'payments.invalidAmount'
+    if (!isCalendarDate(input.paymentDate)) errors.paymentDate = 'ui.validation.date'
+    if (input.notes && [...input.notes].length > 255) errors.notes = 'ui.validation.textLength'
     return errors
 }

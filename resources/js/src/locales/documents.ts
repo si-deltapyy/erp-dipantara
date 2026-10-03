@@ -5,6 +5,8 @@ export default {
         description: 'Unggah bukti PO. Penyimpanan dokumen tidak mengubah status persetujuan PO.',
         file: 'Pilih dokumen PO',
         hint: 'PDF, JPEG, atau PNG. Maksimal 5 MiB per file.',
+        paymentHint: 'PDF, JPEG, atau PNG. Maksimal 2 MiB per file.',
+        invalidPaymentSize: 'Ukuran bukti pembayaran harus lebih dari 0 dan maksimal 2 MiB.',
         invalidSize: 'Ukuran file harus lebih dari 0 dan maksimal 5 MiB.',
         invalidType: 'Pilih file PDF, JPEG, atau PNG dengan isi yang sesuai.',
         uploadInvalid: 'File belum dapat diterima. Periksa file lalu pilih kembali.',

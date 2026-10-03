@@ -27,7 +27,9 @@ function fieldError(field: keyof GraderContactInput): string | undefined {
             :disabled="disabled"
             :maxlength="40"
             inputmode="tel"
+            :hint="t('ui.validation.phoneHint')"
             required
+            :name="'phone'"
             @update:model-value="update('phone', $event)"
         />
         <AppTextInput
@@ -38,6 +40,7 @@ function fieldError(field: keyof GraderContactInput): string | undefined {
             :disabled="disabled"
             :maxlength="255"
             required
+            :name="'graderGroup'"
             @update:model-value="update('graderGroup', $event)"
         />
     </div>

@@ -1,3 +1,4 @@
+import { isCalendarDate, isRecordId } from './input-validation'
 import type { GradingInput, GradingRow, GradingCreateInput } from '@/core/types/grading'
 import type { Assignment } from '@/core/types/assignment'
 import { isTimberDimension } from './timber-measurements'
@@ -29,12 +30,7 @@ export function gradingDraft(input?: GradingInput, assignment?: Assignment): Gra
 export function validateGrading(input: GradingInput): Record<string, string> {
     const errors: Record<string, string> = {}
     if (!input.assignmentId) errors.assignmentId = 'gradings.required'
-    if (
-        !/^\d{4}-\d{2}-\d{2}$/.test(input.gradingDate) ||
-        !Number.isFinite(Date.parse(input.gradingDate)) ||
-        new Date(input.gradingDate).toISOString().slice(0, 10) !== input.gradingDate
-    )
-        errors.gradingDate = 'gradings.invalid'
+    if (!isCalendarDate(input.gradingDate)) errors.gradingDate = 'gradings.invalid'
     if (!input.rows.length) errors.rows = 'gradings.required'
     input.rows.forEach((row, index) => {
         if (!Number.isSafeInteger(row.quantity) || row.quantity < 1)
@@ -69,12 +65,9 @@ export function validateGradingCreate(
         'gradingDate',
     ] as const)
         if (!input[field].trim()) errors[field] = 'gradings.required'
-    if (
-        !/^\d{4}-\d{2}-\d{2}$/.test(input.gradingDate) ||
-        !Number.isFinite(Date.parse(input.gradingDate)) ||
-        new Date(input.gradingDate).toISOString().slice(0, 10) !== input.gradingDate
-    )
-        errors.gradingDate = 'gradings.invalid'
-    if (input.notes.length > 2000) errors.notes = 'gradings.invalid'
+    if (!isCalendarDate(input.gradingDate)) errors.gradingDate = 'ui.validation.date'
+    if ([...input.notes].length > 255) errors.notes = 'ui.validation.textLength'
+    for (const field of ['purchaseOrderId', 'mitraId', 'graderId', 'productId'] as const)
+        if (input[field] && !isRecordId(input[field])) errors[field] = 'ui.validation.selection'
     return errors
 }

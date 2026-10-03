@@ -1,4 +1,4 @@
-import { inject, watch } from 'vue'
+import { inject } from 'vue'
 import { bankAccountsApiKey } from '@/api/bank-accounts-api'
 import type { BankAccount, BankAccountInput } from '@/core/types/bank-account'
 import {
@@ -39,15 +39,6 @@ export function useBankAccountForm(
             recovery.snapshot = { actorId, bankAccount, draft, idempotencyKey }
         },
         saved,
-    })
-    watch(form.draft, (current, previous) => {
-        form.errors.value = Object.fromEntries(
-            Object.entries(form.errors.value).filter(
-                ([field]) =>
-                    current[field as keyof BankAccountInput] ===
-                    previous[field as keyof BankAccountInput],
-            ),
-        )
     })
     return form
 }

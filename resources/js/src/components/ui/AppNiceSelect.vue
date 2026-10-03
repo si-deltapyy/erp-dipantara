@@ -24,6 +24,7 @@ function synchronizeAccessibility(): void {
     if (!instance) return
     const dropdown = instance.dropdown
     dropdown.id = `${props.id}-control`
+    dropdown.dataset.validationField = select.value?.name ?? ''
     dropdown.setAttribute('role', 'combobox')
     dropdown.setAttribute('aria-label', props.label)
     dropdown.setAttribute('aria-expanded', String(dropdown.classList.contains('open')))

@@ -34,6 +34,7 @@ function fieldError(field: BuyerField): string | undefined {
             :maxlength="255"
             autocomplete="organization"
             aria-required="true"
+            :name="'companyName'"
             @update:model-value="update('companyName', $event)"
         />
         <AppTextInput
@@ -45,6 +46,7 @@ function fieldError(field: BuyerField): string | undefined {
             :maxlength="255"
             autocomplete="name"
             aria-required="true"
+            :name="'contactName'"
             @update:model-value="update('contactName', $event)"
         />
         <AppTextInput
@@ -56,7 +58,9 @@ function fieldError(field: BuyerField): string | undefined {
             :disabled="disabled"
             :maxlength="40"
             inputmode="tel"
+            :hint="t('ui.validation.phoneHint')"
             autocomplete="tel"
+            :name="'phone'"
             @update:model-value="update('phone', $event)"
         />
         <AppTextarea
@@ -69,6 +73,7 @@ function fieldError(field: BuyerField): string | undefined {
             :disabled="disabled"
             :maxlength="255"
             autocomplete="street-address"
+            :name="'address'"
             @update:model-value="update('address', $event)"
         />
     </div>

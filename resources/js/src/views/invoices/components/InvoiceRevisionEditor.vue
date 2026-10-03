@@ -71,6 +71,7 @@ const { confirming, confirm, cancel } = useUnsavedChanges(
                 :maxlength="255"
                 :disabled="pending || uncertain || !permitted"
                 :error="errors.reason ? t(errors.reason) : ''"
+                name="reason"
                 @update:model-value="draft = { ...draft, reason: $event }"
             />
         </AppPanel>

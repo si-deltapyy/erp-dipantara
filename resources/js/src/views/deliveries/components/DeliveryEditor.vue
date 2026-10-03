@@ -56,6 +56,7 @@ function selectStatus(value: string): void {
             :label="t('deliveries.number')"
             :error="message('purchaseOrderId')"
             :disabled="pending || uncertain || !permitted"
+            :name="'purchaseOrderId'"
             @update:model-value="draft = { ...draft, purchaseOrderId: $event }"
         />
         <div class="grid gap-5 sm:grid-cols-2">
@@ -68,6 +69,7 @@ function selectStatus(value: string): void {
                 :model-value="draft[kind === 'mitra' ? 'mitraId' : 'graderId']"
                 :error="message(kind === 'mitra' ? 'mitraId' : 'graderId')"
                 :disabled="pending || uncertain || !permitted"
+                :name="kind === 'mitra' ? 'mitraId' : 'graderId'"
                 @update:model-value="
                     draft = { ...draft, [kind === 'mitra' ? 'mitraId' : 'graderId']: $event }
                 "
@@ -80,6 +82,7 @@ function selectStatus(value: string): void {
                 :error="message('deliveryDate')"
                 :disabled="pending || uncertain || !permitted"
                 required
+                :name="'deliveryDate'"
                 @update:model-value="draft = { ...draft, deliveryDate: $event }"
             />
             <AppTextInput
@@ -91,7 +94,9 @@ function selectStatus(value: string): void {
                 :error="message(field)"
                 :disabled="pending || uncertain || !permitted"
                 :maxlength="255"
+                :hint="field === 'licensePlate' ? t('ui.validation.plate') : undefined"
                 required
+                :name="field"
                 @update:model-value="draft = { ...draft, [field]: $event }"
             />
             <AppSelect
@@ -102,6 +107,7 @@ function selectStatus(value: string): void {
                 :options="statusOptions"
                 :error="message('status')"
                 :disabled="pending || uncertain || !permitted"
+                :name="'status'"
                 @update:model-value="selectStatus"
             />
         </div>
@@ -109,9 +115,10 @@ function selectStatus(value: string): void {
             id="delivery-notes"
             :model-value="draft.notes ?? ''"
             :label="t('deliveries.notes')"
-            :maxlength="2000"
+            :maxlength="255"
             :error="message('notes')"
             :disabled="pending || uncertain || !permitted"
+            :name="'notes'"
             @update:model-value="draft = { ...draft, notes: $event }"
         />
         <div

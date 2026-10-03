@@ -1,3 +1,4 @@
+import { isPhoneNumber } from './input-validation'
 import type { BuyerInput } from '@/core/types/buyer'
 
 export const buyerFieldLimits = { companyName: 255, contactName: 255, phone: 40, address: 255 }
@@ -10,6 +11,8 @@ export function validateBuyer(input: BuyerInput): BuyerErrors {
         else if ([...input[field]].length > buyerFieldLimits[field])
             errors[field] = 'buyers.tooLong'
     }
+    if (input.phone.trim() && !errors.phone && !isPhoneNumber(input.phone))
+        errors.phone = 'ui.validation.phone'
     return errors
 }
 export function emptyBuyer(): BuyerInput {

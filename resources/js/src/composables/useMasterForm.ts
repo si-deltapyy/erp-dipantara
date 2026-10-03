@@ -1,4 +1,5 @@
-import { computed, onScopeDispose, ref, shallowRef, watch } from 'vue'
+import { computed, onScopeDispose, provide, ref, shallowRef, watch } from 'vue'
+import { formValidationKey } from '@/core/types/form-validation'
 import type { ComputedRef, Ref, ShallowRef } from 'vue'
 import { useSessionStore } from '@/stores/session'
 import { useSession } from './useSession'
@@ -45,6 +46,33 @@ export function useMasterForm<Input extends object>(
     )
     let request: AbortController | undefined
     let lastPayload = snapshot ? JSON.stringify(snapshot.draft) : ''
+    const touched = new Set<string>()
+    const rejectedValues = new Map<string, string | undefined>()
+    function validateField(field: string): void {
+        const root = field.split('.')[0] ?? ''
+        if (!(root in draft.value) || pending.value || uncertain.value) return
+        if (
+            rejectedValues.has(field) &&
+            rejectedValues.get(field) === JSON.stringify(draft.value[root as keyof Input])
+        )
+            return
+        rejectedValues.delete(field)
+        touched.add(field)
+        const matches = (key: string): boolean => key === field || key.startsWith(field + '.')
+        errors.value = Object.fromEntries([
+            ...Object.entries(errors.value).filter(([key]) => !matches(key)),
+            ...Object.entries(options.validate(draft.value)).filter(([key]) => matches(key)),
+        ]) as Partial<Record<keyof Input, string>>
+    }
+    provide(formValidationKey, validateField)
+    watch(draft, (current, previous) => {
+        for (const field of Object.keys(current) as (keyof Input)[]) {
+            if (JSON.stringify(current[field]) === JSON.stringify(previous[field])) continue
+            for (const name of new Set([...touched, ...Object.keys(errors.value)])) {
+                if (name === field || name.startsWith(String(field) + '.')) validateField(name)
+            }
+        }
+    })
     async function report(cause: unknown): Promise<void> {
         const failure = normalizeApiError(cause)
         error.value = `${options.resource}.errors.${failure.kind}`
@@ -54,6 +82,11 @@ export function useMasterForm<Input extends object>(
                 messages[0] ?? `${options.resource}.invalid`,
             ]),
         ) as Partial<Record<keyof Input, string>>
+        rejectedValues.clear()
+        for (const field of Object.keys(failure.fieldErrors)) {
+            const root = field.split('.')[0] as keyof Input
+            rejectedValues.set(field, JSON.stringify(draft.value[root]))
+        }
         uncertain.value =
             uncertain.value || failure.kind === 'network' || failure.kind === 'unexpected'
         if (failure.kind === 'csrf' && store.user)
@@ -71,6 +104,7 @@ export function useMasterForm<Input extends object>(
         }
         if (uncertain.value && options.retrySafe === false) return
         errors.value = options.validate(draft.value)
+        for (const field of Object.keys(draft.value)) touched.add(field)
         if (Object.keys(errors.value).length) return
         const payload = JSON.stringify(draft.value)
         if (uncertain.value && lastPayload && lastPayload !== payload) return
@@ -98,6 +132,8 @@ export function useMasterForm<Input extends object>(
             request?.abort()
             draft.value = { ...options.initial }
             errors.value = {}
+            touched.clear()
+            rejectedValues.clear()
             error.value = ''
             pending.value = false
             uncertain.value = false

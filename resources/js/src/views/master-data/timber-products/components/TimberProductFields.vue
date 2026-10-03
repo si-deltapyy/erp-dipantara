@@ -39,6 +39,7 @@ function fieldError(field: keyof TimberProductCreateInput): string | undefined {
             :disabled="disabled"
             :maxlength="255"
             required
+            :name="field"
             @update:model-value="update(field, $event)"
         />
         <AppTextInput
@@ -47,11 +48,17 @@ function fieldError(field: keyof TimberProductCreateInput): string | undefined {
             :key="field"
             :model-value="modelValue[field]"
             :label="t(`timber-products.${field}`)"
-            :hint="field === 'volume' ? t('timber-products.manualVolume') : undefined"
+            :hint="
+                field === 'price'
+                    ? t('ui.validation.integerHint')
+                    : (field === 'volume' ? t('timber-products.manualVolume') + ' ' : '') +
+                      t('ui.validation.decimalHint')
+            "
             :error="fieldError(field)"
             :disabled="disabled"
             :required="field !== 'volume'"
             :inputmode="field === 'price' ? 'numeric' : 'decimal'"
+            :name="field"
             @update:model-value="update(field, $event)"
         />
     </div>
