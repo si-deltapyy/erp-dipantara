@@ -25,7 +25,17 @@ export const gradingRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/gradings/GradingFormPage.vue'),
         meta: {
             ...meta,
-            anyPermissions: ['gradings.create.all', 'gradings.create.assigned'],
+            featureUnavailable: false,
+            requiredPermissions: [
+                'gradings.read.all',
+                'gradings.create.all',
+                'purchase-orders.read.all',
+                'mitras.read.all',
+                'graders.read.all',
+                'timber-products.read.all',
+                'timber-prices.read.all',
+            ],
+            anyPermissions: [],
         },
     },
     {

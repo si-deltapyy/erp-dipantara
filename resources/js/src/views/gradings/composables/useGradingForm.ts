@@ -1,74 +1,48 @@
 import { computed, shallowRef } from 'vue'
-import type { ComputedRef, ShallowRef } from 'vue'
-import type { Grading, GradingInput } from '@/core/types/grading'
-import type { Assignment } from '@/core/types/assignment'
-import { gradingDraft, validateGrading } from '@/core/domain/grading-draft'
-import { canActOnGrading } from '@/core/domain/grading-policy'
-import { evaluateRecordAccess } from '@/core/domain/record-policy'
+import type { ComputedRef } from 'vue'
+import type { GradingCreateInput } from '@/core/types/grading'
+import { emptyGradingCreate, validateGradingCreate } from '@/core/domain/grading-draft'
 import { useMasterForm } from '@/composables/useMasterForm'
 import { useSessionStore } from '@/stores/session'
 import { useGradingRecoveryStore } from '@/stores/grading-recovery'
 import { useGradingApi } from './useGradingApi'
 import { ApiError } from '@/core/types/api-error'
-type GradingFormState = ReturnType<typeof useMasterForm<GradingInput>> & {
-    permitted: ComputedRef<boolean>
-    completed: ShallowRef<Grading | undefined>
-}
 export function useGradingForm(
-    grading: Grading | undefined,
-    assignment: Assignment,
-    saved: (grading: Grading) => void,
-): GradingFormState {
+    saved: (grading: { readonly id: string }) => void,
+): ReturnType<typeof useMasterForm<GradingCreateInput>> & { permitted: ComputedRef<boolean> } {
     const api = useGradingApi()
     const store = useSessionStore()
     const recovery = useGradingRecoveryStore()
-    const actorId = store.user?.id
-    const candidate = recovery.snapshot
-    const snapshot =
-        candidate &&
-        candidate.actorId === actorId &&
-        candidate.grading?.id === grading?.id &&
-        candidate.draft.assignmentId === assignment.id
-            ? candidate
-            : null
-    const baseline = snapshot?.grading ?? grading
+    const snapshot = recovery.snapshot?.actorId === store.user?.id ? recovery.snapshot : null
     recovery.$reset()
-    const completed = shallowRef<Grading>()
-    const permitted = computed(
-        () =>
-            store.user?.id === actorId &&
-            (baseline
-                ? canActOnGrading(store.user, baseline, 'update')
-                : assignment.allowedActions.includes('create-grading') &&
-                  evaluateRecordAccess(store.user, 'gradings.create', assignment) === 'allowed'),
+    const completed = shallowRef<{ readonly id: string }>()
+    const permitted = computed(() =>
+        [
+            'gradings.read.all',
+            'gradings.create.all',
+            'purchase-orders.read.all',
+            'mitras.read.all',
+            'graders.read.all',
+            'timber-products.read.all',
+            'timber-prices.read.all',
+        ].every((permission) => store.user?.permissions.includes(permission)),
     )
-    const form = useMasterForm<GradingInput>({
+    const form = useMasterForm<GradingCreateInput>({
         resource: 'gradings',
-        initial: gradingDraft(baseline, assignment),
+        retrySafe: false,
+        initial: emptyGradingCreate(),
         snapshot,
-        validate: validateGrading,
+        validate: validateGradingCreate,
         write: async (draft, signal, idempotencyKey) => {
             if (!permitted.value) throw new ApiError('forbidden')
-            const options = {
-                signal,
-                idempotencyKey,
-                snapshotGeneration: baseline?.snapshotGeneration ?? assignment.snapshotGeneration,
-            }
-            completed.value = baseline
-                ? await api.update(baseline.id, { ...draft, version: baseline.version }, options)
-                : await api.create(draft, options)
+            completed.value = await api.create(draft, { signal, idempotencyKey })
         },
-        recover: (draft, idempotencyKey, id) => {
-            recovery.snapshot = {
-                actorId: id,
-                grading: baseline,
-                draft: gradingDraft(draft),
-                idempotencyKey,
-            }
+        recover: (draft, idempotencyKey, actorId) => {
+            recovery.snapshot = { actorId, draft, idempotencyKey }
         },
         saved: () => {
             if (completed.value) saved(completed.value)
         },
     })
-    return { ...form, permitted, completed }
+    return { ...form, permitted }
 }

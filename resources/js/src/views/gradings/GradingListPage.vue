@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useSessionStore } from '@/stores/session'
 import { useI18n } from 'vue-i18n'
 import { useGradingList } from './composables/useGradingList'
 import AppButton from '@/components/ui/AppButton.vue'
@@ -9,18 +11,33 @@ import AppPagination from '@/components/ui/AppPagination.vue'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
 import AppState from '@/components/ui/AppState.vue'
 const { t } = useI18n()
+const session = useSessionStore()
+const canCreate = computed(() =>
+    [
+        'gradings.read.all',
+        'gradings.create.all',
+        'purchase-orders.read.all',
+        'mitras.read.all',
+        'graders.read.all',
+        'timber-products.read.all',
+        'timber-prices.read.all',
+    ].every((permission) => session.user?.permissions.includes(permission)),
+)
 const { response, search, searchRecords, loading, error, refresh, changePage } = useGradingList()
 </script>
 <template>
     <section class="space-y-6">
         <AppPageHeader :title="t('gradings.title')">
             <template #actions
-                ><AppButton disabled :title="t('ui.featureUnavailable')">{{
-                    t('gradings.add')
-                }}</AppButton></template
+                ><RouterLink
+                    v-if="canCreate"
+                    :to="{ name: 'grading-new' }"
+                    class="primary-button"
+                    >{{ t('gradings.add') }}</RouterLink
+                ></template
             >
         </AppPageHeader>
-        <p role="status" class="text-sm text-muted">{{ t('ui.transactionUnavailable') }}</p>
+        <p role="status" class="text-sm text-muted">{{ t('gradings.basicOnly') }}</p>
         <AppPanel :title="t('gradings.title')">
             <template #actions
                 ><AppButton variant="secondary" :pending="loading" @click="refresh">{{
