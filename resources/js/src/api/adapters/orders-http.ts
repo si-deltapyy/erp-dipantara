@@ -3,6 +3,7 @@ import type { AxiosInstance } from 'axios'
 import type { OrdersApi } from '@/core/types/order'
 import { createHttpClient } from '@/services/http-client'
 import { parsePage } from '@/api/contracts/response-parsers'
+import { parseOrderRecord } from '@/api/order-mapper'
 import { parseInteger } from '@/api/contracts/value-parsers'
 
 export function createHttpOrders(client: AxiosInstance = createHttpClient()): OrdersApi {
@@ -13,11 +14,12 @@ export function createHttpOrders(client: AxiosInstance = createHttpClient()): Or
         async list(query, signal) {
             const response = await client.get<unknown>('/api/v1/orders', {
                 signal,
-                params: { page: parseInteger(query.page, 'page') },
+                params: {
+                    page: parseInteger(query.page, 'page'),
+                    search: query.search.trim() || undefined,
+                },
             })
-            return parsePage(response.data, () => {
-                throw new ApiError('unexpected', {}, 'record.unconfirmed')
-            })
+            return parsePage(response.data, parseOrderRecord)
         },
         get: unavailable,
         create: unavailable,

@@ -1,4 +1,4 @@
-import type { Order, OrderInput, OrderQuery } from '@/core/types/order'
+import type { Order, OrderRecord, OrderInput, OrderQuery } from '@/core/types/order'
 import { orderStatuses } from '@/core/types/order'
 import { parseMetadata } from './contracts/response-parsers'
 import { parseTimestamp } from './contracts/timestamp-parser'
@@ -6,6 +6,7 @@ import { parseBuyerQuery } from './buyer-mapper'
 import {
     invalidContract,
     parseId,
+    parseNumericId,
     parseInteger,
     parseObject,
     parseString,
@@ -73,5 +74,33 @@ export function parseOrderQuery(query: OrderQuery): OrderQuery {
         ...parseBuyerQuery(query),
         ...(query.status ? { status: query.status } : {}),
         ...(query.purchaseOrderId ? { purchaseOrderId: parseId(query.purchaseOrderId) } : {}),
+    }
+}
+
+export function parseOrderRecord(value: unknown): OrderRecord {
+    const order = parseObject(value, 'order')
+    const preOrder = order.pre_order === null ? null : parseObject(order.pre_order, 'pre_order')
+    const buyer =
+        preOrder === null || preOrder.buyer === null
+            ? null
+            : parseObject(preOrder.buyer, 'pre_order.buyer')
+    const mitra = order.mitra === null ? null : parseObject(order.mitra, 'mitra')
+    const grader = order.grader === null ? null : parseObject(order.grader, 'grader')
+    const user =
+        grader === null || grader.user === null ? null : parseObject(grader.user, 'grader.user')
+    return {
+        id: parseNumericId(order.id),
+        number: parseString(order.order_number, 'order_number'),
+        orderDate: parseString(order.order_date, 'order_date'),
+        purchaseOrderNumber:
+            preOrder === null
+                ? null
+                : parseString(preOrder.pre_order_number, 'pre_order.pre_order_number'),
+        buyerName:
+            buyer === null ? null : parseString(buyer.company_name, 'pre_order.buyer.company_name'),
+        mitraName: mitra === null ? null : parseString(mitra.name, 'mitra.name'),
+        graderName: user === null ? null : parseString(user.name, 'grader.user.name'),
+        buyerGraderName: parseString(order.grader_buyer_name, 'grader_buyer_name'),
+        notes: order.note === null ? null : parseString(order.note, 'note'),
     }
 }
