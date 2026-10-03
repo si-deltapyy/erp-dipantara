@@ -28,13 +28,19 @@ export default {
         receiveDescription: 'Konfirmasi bahwa pengiriman telah diterima.',
 
         title: 'Pengiriman',
+        grader: 'Grader',
+        notes: 'Catatan',
+        buyerSakrNumber: 'Nomor SAKR ke Buyer',
+        companySakrNumber: 'Nomor SAKR ke Dipantara',
+        basicOnly:
+            'Pencatatan dasar tersedia. Detail, alokasi kayu, dan berkas SAKR belum tersedia.',
         filters: 'Filter pengiriman',
         results: 'Daftar pengiriman',
         shipmentContext: 'Informasi perjalanan',
         transitions: 'Tindak lanjut pengiriman',
         sakrMetadata: 'Identitas SAKR',
         section: 'Operasional',
-        subtitle: 'Alokasikan kayu yang telah disetujui ke pengiriman bertahap.',
+        subtitle: 'Catat perjalanan, kendaraan, status, dan nomor SAKR pengiriman.',
         add: 'Tambah pengiriman',
         edit: 'Edit pengiriman',
         detail: 'Detail pengiriman',
@@ -62,7 +68,7 @@ export default {
         documentsUnavailable: 'Dokumen dikelola pada tahap berikutnya.',
         required: 'Lengkapi field ini.',
         invalid: 'Periksa nilai field ini.',
-        save: 'Simpan draft',
+        save: 'Simpan pengiriman',
         cancel: 'Batal',
         refresh: 'Muat ulang',
         refreshStock: 'Muat ulang stok',
@@ -79,7 +85,7 @@ export default {
         discardTitle: 'Buang perubahan?',
         discardDescription: 'Perubahan yang belum disimpan akan hilang.',
         uncertain:
-            'Hasil permintaan belum diketahui. Ulangi permintaan yang sama untuk memastikan hasil tanpa menggandakan data.',
+            'Hasil penyimpanan belum diketahui. Kembali ke daftar dan periksa data sebelum mencoba lagi.',
         retryWrite: 'Ulangi permintaan',
         conflictHint:
             'Draft dipertahankan. Muat ulang stok. Jika versi pengiriman berubah, buka kembali detail terbaru sebelum mengedit.',

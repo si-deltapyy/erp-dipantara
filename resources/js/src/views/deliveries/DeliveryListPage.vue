@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useSessionStore } from '@/stores/session'
 import { useI18n } from 'vue-i18n'
 import { useDeliveryApi } from './composables/useDeliveryApi'
 import { useMasterList } from '@/composables/useMasterList'
@@ -10,6 +12,17 @@ import AppPageHeader from '@/components/ui/AppPageHeader.vue'
 import AppPanel from '@/components/ui/AppPanel.vue'
 import AppState from '@/components/ui/AppState.vue'
 const { t } = useI18n()
+const session = useSessionStore()
+const canCreate = computed(() =>
+    [
+        'deliveries.read.all',
+        'deliveries.create.all',
+        'purchase-orders.read.all',
+        'mitras.read.all',
+        'graders.read.all',
+        'timber-prices.read.all',
+    ].every((permission) => session.user?.permissions.includes(permission)),
+)
 const api = useDeliveryApi()
 const { response, search, searchRecords, loading, error, refresh, changePage } = useMasterList(
     api,
@@ -34,12 +47,15 @@ const { response, search, searchRecords, loading, error, refresh, changePage } =
     <section class="space-y-6">
         <AppPageHeader :title="t('deliveries.title')">
             <template #actions
-                ><AppButton disabled :title="t('ui.featureUnavailable')">{{
-                    t('deliveries.add')
-                }}</AppButton></template
+                ><RouterLink
+                    v-if="canCreate"
+                    :to="{ name: 'delivery-new' }"
+                    class="primary-button"
+                    >{{ t('deliveries.add') }}</RouterLink
+                ></template
             >
         </AppPageHeader>
-        <p role="status" class="text-sm text-muted">{{ t('ui.transactionUnavailable') }}</p>
+        <p role="status" class="text-sm text-muted">{{ t('deliveries.basicOnly') }}</p>
         <AppPanel :title="t('deliveries.title')">
             <template #actions
                 ><AppButton variant="secondary" :pending="loading" @click="refresh">{{

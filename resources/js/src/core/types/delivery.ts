@@ -80,6 +80,17 @@ export interface DeliveryRecord {
     readonly buyerSakrNumber: string
     readonly companySakrNumber: string
 }
+export interface DeliveryCreateInput {
+    readonly purchaseOrderId: string
+    readonly mitraId: string
+    readonly graderId: string
+    readonly deliveryDate: string
+    readonly licensePlate: string
+    readonly buyerSakrNumber: string
+    readonly companySakrNumber: string
+    readonly status: (typeof deliveryRecordStatuses)[number]
+    readonly notes: string
+}
 export interface DeliveriesApi {
     dispatch(id: string, input: WorkflowVersion, options: WorkflowWriteOptions): Promise<Delivery>
     receive(id: string, input: WorkflowVersion, options: WorkflowWriteOptions): Promise<Delivery>
@@ -89,7 +100,10 @@ export interface DeliveriesApi {
         query: AvailabilityQuery,
         signal: AbortSignal,
     ): Promise<PageResponse<AvailableTimber>>
-    create(input: DeliveryInput, options: WorkflowWriteOptions): Promise<Delivery>
+    create(
+        input: DeliveryCreateInput,
+        options: WorkflowWriteOptions,
+    ): Promise<{ readonly id: string }>
     update(
         id: string,
         input: DeliveryInput & { version: number },

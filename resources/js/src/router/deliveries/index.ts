@@ -19,7 +19,16 @@ export const deliveryRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/deliveries/DeliveryFormPage.vue'),
         meta: {
             ...meta,
-            anyPermissions: ['deliveries.create.all'],
+            featureUnavailable: false,
+            requiredPermissions: [
+                'deliveries.read.all',
+                'deliveries.create.all',
+                'purchase-orders.read.all',
+                'mitras.read.all',
+                'graders.read.all',
+                'timber-prices.read.all',
+            ],
+            anyPermissions: [],
         },
     },
     {
