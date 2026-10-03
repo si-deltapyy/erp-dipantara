@@ -7,12 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     protected $fillable = [
+        'pre_order_id',
         'order_number',
-        'buyer_id',
-        'product_id',
-        'quantity',
-        'total_price',
-        'status',
+        'order_date',
+        'mitra_id',
+        'grader_id',
+        'grader_buyer_name',
+        'grader_buyer_phone_number',
+        'note',
     ];
 
     function buyer()
@@ -29,4 +31,25 @@ class Order extends Model
     {
         return $this->hasMany(LogsOrder::class, 'order_id');
     }
+
+    function logsPayments()
+    {
+        return $this->hasMany(LogsPayment::class, 'order_id');
+    }
+
+    function preOrder()
+    {
+        return $this->belongsTo(PreOrders::class, 'pre_order_id');
+    }
+
+    function mitra()
+    {
+        return $this->belongsTo(Mitra::class, 'mitra_id');
+    }
+
+    function grader()
+    {
+        return $this->belongsTo(Grader::class, 'grader_id');
+    }
+
 }

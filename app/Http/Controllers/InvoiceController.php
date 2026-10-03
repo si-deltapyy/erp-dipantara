@@ -1,4 +1,4 @@
-<?
+<?php
 namespace App\Http\Controllers;
 
 use App\Models\Invoice;
@@ -9,20 +9,21 @@ class InvoiceController extends Controller
 {
     public function index(): JsonResponse
     {
-        $invoices = Invoice::with(['preOrder.buyer', 'logsPayments'])->get();
+        $invoices = Invoice::with(['rekening', 'transaction', 'BankAccount'])->get();
         return response()->json(['status' => 'success', 'data' => $invoices]);
     }
 
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'pre_order_id' => 'required|exists:pre_orders,id',
+            'transaction_id' => 'required|exists:transactions,id',
             'invoice_number' => 'required|string|unique:invoices,invoice_number',
-            'due_date' => 'required|date',
-            'amount' => 'required|numeric',
-            'pph_amount' => 'nullable|numeric', // Menampung kasus PPh dipotong Buyer
-            'rounding_amount' => 'nullable|numeric', // Kasus pembulatan nominal (ex: 1.564.900 jadi 1.565.000)
-            'status' => 'required|in:unpaid,paid,partial'
+            'invoice_date' => 'required|date',
+            'type_invoice' => 'required|string',
+            'rekening_id' => 'required|exists:rekenings,id',
+            'bank_account_number_id' => 'required|exists:bank_account_numbers,id',
+            'proff_of_payment' => 'nullable|string',
+            'note' => 'nullable|string'
         ]);
 
         $invoice = Invoice::create($validated);

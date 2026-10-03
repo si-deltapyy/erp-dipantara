@@ -6,6 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Invoice extends Model
 {
+    protected $fillable = [
+        'transaction_id',
+        'invoice_number',
+        'invoice_date',
+        'type_invoice',
+        'rekening_id',
+        'bank_account_number_id',
+        'proff_of_payment',
+        'note',
+    ];
+
     function Transaction()
     {
         return $this->belongsTo(Transaction::class, 'transaction_id');
@@ -18,6 +29,7 @@ class Invoice extends Model
 
     function BankAccount()
     {
-        return $this->belongsTo(BankAccountNumber::class, 'bank_account_id');
+        return $this->belongsTo(BankAccountNumber::class, 'bank_account_number_id');
     }
+    
 }
