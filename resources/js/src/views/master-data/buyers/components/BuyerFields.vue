@@ -67,7 +67,7 @@ function fieldError(field: BuyerField): string | undefined {
             aria-required="true"
             :error="fieldError('address')"
             :disabled="disabled"
-            :maxlength="1000"
+            :maxlength="255"
             autocomplete="street-address"
             @update:model-value="update('address', $event)"
         />

@@ -24,7 +24,7 @@ export default {
         required: 'Field ini wajib diisi.',
         tooLong: 'Isi melebihi batas karakter.',
         invalid: 'Periksa kembali nilai field ini.',
-        requiredHint: 'Nama Mitra wajib diisi.',
+        requiredHint: 'Semua field wajib diisi.',
         discardTitle: 'Buang perubahan?',
         discardDescription: 'Perubahan yang belum disimpan akan hilang.',
         retry: 'Ulangi penyimpanan',

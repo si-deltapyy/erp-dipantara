@@ -1,6 +1,6 @@
 import type { BuyerInput } from '@/core/types/buyer'
 
-export const buyerFieldLimits = { companyName: 255, contactName: 255, phone: 40, address: 1000 }
+export const buyerFieldLimits = { companyName: 255, contactName: 255, phone: 40, address: 255 }
 export type BuyerField = keyof BuyerInput
 export type BuyerErrors = Partial<Record<BuyerField, string>>
 export function validateBuyer(input: BuyerInput): BuyerErrors {
