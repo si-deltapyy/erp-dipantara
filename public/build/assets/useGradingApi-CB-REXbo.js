@@ -1,0 +1,1 @@
+import{G as i}from"./main-BIW7iw5S.js";import{i as n}from"./runtime-dom.esm-bundler-w52lyOrN.js";function a(){const r=n(i);if(!r)throw new Error("Purchase grading API is not configured");return r}export{a as u};
