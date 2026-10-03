@@ -1,4 +1,4 @@
-import { computed, onScopeDispose, ref, shallowRef } from 'vue'
+import { computed, onScopeDispose, ref, shallowRef, watch } from 'vue'
 import type { ComputedRef, Ref, ShallowRef } from 'vue'
 import { useSessionStore } from '@/stores/session'
 import { useSession } from './useSession'
@@ -19,6 +19,7 @@ interface FormSnapshot<Input> {
 }
 interface MasterFormOptions<Input> {
     readonly retrySafe?: boolean
+    readonly requiredPermission?: string
     readonly resource: string
     readonly initial: Input
     readonly snapshot: FormSnapshot<Input> | null
@@ -60,7 +61,14 @@ export function useMasterForm<Input extends object>(
         await session.handleRequestFailure(cause)
     }
     async function save(): Promise<void> {
-        if (pending.value) return
+        if (pending.value || !store.user) return
+        if (
+            options.requiredPermission &&
+            !store.user.permissions.includes(options.requiredPermission)
+        ) {
+            error.value = `${options.resource}.errors.forbidden`
+            return
+        }
         if (uncertain.value && options.retrySafe === false) return
         errors.value = options.validate(draft.value)
         if (Object.keys(errors.value).length) return
@@ -81,9 +89,20 @@ export function useMasterForm<Input extends object>(
         } catch (cause) {
             if (!active.signal.aborted && !isRequestCancelled(cause)) await report(cause)
         } finally {
-            pending.value = false
+            if (request === active) pending.value = false
         }
     }
+    watch(
+        () => store.user,
+        () => {
+            request?.abort()
+            draft.value = { ...options.initial }
+            errors.value = {}
+            error.value = ''
+            pending.value = false
+            uncertain.value = false
+        },
+    )
     onScopeDispose(() => request?.abort())
     return { draft, errors, error, pending, uncertain, dirty, save }
 }
