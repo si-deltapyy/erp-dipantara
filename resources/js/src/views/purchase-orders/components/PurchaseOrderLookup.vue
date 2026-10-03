@@ -32,6 +32,7 @@ function choose(value: string): void {
 <template>
     <div class="min-w-0 space-y-2">
         <AppSelect
+            renderer="nice"
             :id="id"
             :model-value="modelValue"
             :label="label"

@@ -95,6 +95,7 @@ function selectStatus(value: string): void {
                 @update:model-value="draft = { ...draft, [field]: $event }"
             />
             <AppSelect
+                renderer="nice"
                 id="delivery-status"
                 :label="t('deliveries.status')"
                 :model-value="draft.status"
