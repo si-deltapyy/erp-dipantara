@@ -32,9 +32,11 @@ const columns = computed<readonly TableColumn<PurchaseOrderRecord>[]>(() => [
             }}</span></template
         >
         <template #cell-number="{ row }"
-            ><span class="block max-w-48 whitespace-normal break-words">{{
-                row.number
-            }}</span></template
+            ><RouterLink
+                :to="{ name: 'purchase-order-detail', params: { id: row.id }, query: $route.query }"
+                class="block max-w-48 whitespace-normal break-words text-primary hover:underline"
+                >{{ row.number }}</RouterLink
+            ></template
         >
         <template #cell-status="{ row }"><PurchaseOrderStatus :status="row.status" /></template>
         <template #cell-totalAmount="{ row }">{{

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useSessionStore } from '@/stores/session'
 import { useI18n } from 'vue-i18n'
 import { usePurchaseOrderApi } from './composables/usePurchaseOrderApi'
 import { useMasterList } from '@/composables/useMasterList'
@@ -10,6 +12,16 @@ import PurchaseOrderTable from './components/PurchaseOrderTable.vue'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
 import AppState from '@/components/ui/AppState.vue'
 const { t } = useI18n()
+const session = useSessionStore()
+const canCreate = computed(() =>
+    [
+        'purchase-orders.read.all',
+        'purchase-orders.create.all',
+        'buyers.read.all',
+        'timber-products.read.all',
+        'timber-prices.read.all',
+    ].every((permission) => session.user?.permissions.includes(permission)),
+)
 const { response, search, searchRecords, loading, error, refresh, changePage } = useMasterList(
     usePurchaseOrderApi(),
     'purchase-orders',
@@ -25,12 +37,14 @@ const { response, search, searchRecords, loading, error, refresh, changePage } =
             :description="t('purchase-orders.subtitle')"
         >
             <template #actions
-                ><AppButton disabled :title="t('ui.featureUnavailable')">{{
-                    t('purchase-orders.add')
-                }}</AppButton></template
+                ><RouterLink
+                    v-if="canCreate"
+                    :to="{ name: 'purchase-order-new' }"
+                    class="primary-button"
+                    >{{ t('purchase-orders.add') }}</RouterLink
+                ></template
             >
         </AppPageHeader>
-        <p role="status" class="text-sm text-muted">{{ t('ui.transactionUnavailable') }}</p>
         <AppPanel :title="t('purchase-orders.title')">
             <template #actions
                 ><AppButton variant="secondary" :pending="loading" @click="refresh">{{

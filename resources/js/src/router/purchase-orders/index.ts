@@ -29,14 +29,27 @@ export const purchaseOrderRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/purchase-orders/PurchaseOrderFormPage.vue'),
         meta: {
             ...meta,
-            anyPermissions: ['purchase-orders.create.own', 'purchase-orders.create.all'],
+            featureUnavailable: false,
+            requiredPermissions: [
+                'purchase-orders.read.all',
+                'purchase-orders.create.all',
+                'buyers.read.all',
+                'timber-products.read.all',
+                'timber-prices.read.all',
+            ],
+            anyPermissions: [],
         },
     },
     {
         path: '/purchase-orders/:id',
         name: 'purchase-order-detail',
         component: () => import('@/views/purchase-orders/PurchaseOrderDetailPage.vue'),
-        meta,
+        meta: {
+            ...meta,
+            featureUnavailable: false,
+            requiredPermissions: ['purchase-orders.read.all'],
+            anyPermissions: [],
+        },
     },
     {
         path: '/purchase-orders/:id/edit',
@@ -44,7 +57,15 @@ export const purchaseOrderRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/purchase-orders/PurchaseOrderFormPage.vue'),
         meta: {
             ...meta,
-            anyPermissions: ['purchase-orders.update.own', 'purchase-orders.update.all'],
+            featureUnavailable: false,
+            requiredPermissions: [
+                'purchase-orders.read.all',
+                'purchase-orders.update.all',
+                'buyers.read.all',
+                'timber-products.read.all',
+                'timber-prices.read.all',
+            ],
+            anyPermissions: [],
         },
     },
 ]

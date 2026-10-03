@@ -2,14 +2,14 @@
 import { nextTick, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import type { PurchaseOrder } from '@/core/types/purchase-order'
+import type { PurchaseOrderDetail } from '@/core/types/purchase-order'
 import { useSessionStore } from '@/stores/session'
 import { usePurchaseOrderForm } from '../composables/usePurchaseOrderForm'
 import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
 import PurchaseOrderFields from './PurchaseOrderFields.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppConfirmDialog from '@/components/ui/AppConfirmDialog.vue'
-const props = defineProps<{ order?: PurchaseOrder }>()
+const props = defineProps<{ order?: PurchaseOrderDetail }>()
 const { t } = useI18n()
 const router = useRouter()
 const route = useRoute()
@@ -43,8 +43,8 @@ async function submit(): Promise<void> {
             v-model="draft"
             :errors="errors"
             :disabled="pending || uncertain || !permitted"
-            :buyer-name="order?.buyerName"
-            :timber-names="order?.lines.map((line) => line.timberProductName)"
+            :buyer-name="order?.buyerName ?? undefined"
+            :product-name="order?.productName ?? undefined"
         />
         <div
             v-if="error"
@@ -67,8 +67,8 @@ async function submit(): Promise<void> {
                 class="secondary-button"
                 >{{ t('purchase-orders.cancel') }}</RouterLink
             >
-            <AppButton type="submit" :pending="pending" :disabled="!permitted">{{
-                t(uncertain ? 'purchase-orders.retryWrite' : 'purchase-orders.save')
+            <AppButton type="submit" :pending="pending" :disabled="!permitted || uncertain">{{
+                t('purchase-orders.save')
             }}</AppButton>
         </div>
     </form>

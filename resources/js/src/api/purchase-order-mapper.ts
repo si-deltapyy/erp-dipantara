@@ -1,6 +1,7 @@
 import type {
     PurchaseOrder,
     PurchaseOrderRecord,
+    PurchaseOrderDetail,
     PurchaseOrderRejection,
     PurchaseOrderInput,
     PurchaseOrderUpdate,
@@ -191,5 +192,29 @@ export function parsePurchaseOrderRecord(value: unknown): PurchaseOrderRecord {
                 ? null
                 : parseNumericMoney(record.total_price, 'total_price'),
         status,
+    }
+}
+
+export function parsePurchaseOrderDetail(value: unknown): PurchaseOrderDetail {
+    const record = parseObject(value, 'purchaseOrder')
+    if (!Array.isArray(record.orders)) return invalidContract('orders')
+    return {
+        ...parsePurchaseOrderRecord(record),
+        buyerId: parseNumericId(record.buyer_id, 'buyer_id'),
+        productId: parseNumericId(record.product_id, 'product_id'),
+        notes: record.note === null ? null : parseString(record.note, 'note'),
+        orders: record.orders.map((value) => {
+            const order = parseObject(value, 'order')
+            const mitra = order.mitra === null ? null : parseObject(order.mitra, 'mitra')
+            const grader = order.grader === null ? null : parseObject(order.grader, 'grader')
+            return {
+                id: parseNumericId(order.id),
+                number: parseString(order.order_number, 'order_number'),
+                mitraName: mitra ? parseString(mitra.name, 'mitra.name') : null,
+                graderGroup: grader
+                    ? parseString(grader.grader_group, 'grader.grader_group')
+                    : null,
+            }
+        }),
     }
 }
