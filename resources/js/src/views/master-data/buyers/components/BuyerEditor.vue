@@ -55,8 +55,8 @@ async function submit(): Promise<void> {
                 <AppButton variant="secondary" :disabled="pending" @click="close">{{
                     t('buyers.cancel')
                 }}</AppButton>
-                <AppButton type="submit" :pending="pending">{{
-                    t(uncertain ? 'buyers.retry' : 'buyers.save')
+                <AppButton type="submit" :pending="pending" :disabled="uncertain">{{
+                    t('buyers.save')
                 }}</AppButton>
             </div>
         </form>

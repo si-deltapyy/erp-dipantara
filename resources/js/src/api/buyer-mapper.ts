@@ -29,8 +29,7 @@ function parseBuyerFields(record: Record<string, unknown>): BuyerInput {
     const field = (name: keyof BuyerInput): string => {
         const value = parseString(record[name], name)
         if ([...value].length > buyerFieldLimits[name]) return invalidContract(name)
-        if ((name === 'companyName' || name === 'contactName') && !value.trim())
-            return invalidContract(name)
+        if (!value.trim()) return invalidContract(name)
         return name === 'companyName' || name === 'contactName' ? value.trim() : value
     }
     return {

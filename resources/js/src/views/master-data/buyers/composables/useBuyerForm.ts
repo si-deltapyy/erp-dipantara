@@ -17,6 +17,7 @@ export function useBuyerForm(
     const snapshot = recovery.snapshot?.actorId === store.user?.id ? recovery.snapshot : null
     recovery.$reset()
     return useMasterForm<BuyerInput>({
+        retrySafe: false,
         resource: 'buyers',
         initial: buyer ? buyerDraft(buyer) : emptyBuyer(),
         snapshot,
