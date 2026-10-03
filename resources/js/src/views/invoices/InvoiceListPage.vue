@@ -21,6 +21,7 @@ const { response, search, searchRecords, loading, error, refresh, changePage } =
         compare: (left, right) =>
             left.invoiceDate.localeCompare(right.invoiceDate) || left.id.localeCompare(right.id),
     },
+    'invoices.read.all',
 )
 </script>
 <template>

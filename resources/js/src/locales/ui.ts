@@ -1,5 +1,6 @@
 export default {
     ui: {
+        scopeUnavailable: 'Daftar untuk akses pribadi atau penugasan belum tersedia.',
         recordUnavailable:
             'Data tersedia, tetapi rincian transaksi belum dapat ditampilkan. Fitur ini masih menunggu penyesuaian.',
         transactionUnavailable: 'Detail dan pemrosesan transaksi belum tersedia.',
@@ -15,7 +16,7 @@ export default {
         next: 'Berikutnya',
         page: 'Halaman {page} dari {pages}',
         pagination: 'Navigasi halaman',
-        loading: 'Memuatâ€¦',
+        loading: 'MemuatÃ¢â‚¬Â¦',
         empty: 'Belum ada data yang sesuai.',
         error: 'Data belum dapat dimuat.',
         retry: 'Coba lagi',

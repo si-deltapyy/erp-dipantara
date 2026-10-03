@@ -27,6 +27,7 @@ const { response, search, searchRecords, loading, error, refresh, changePage } =
         compare: (left, right) =>
             left.deliveryDate.localeCompare(right.deliveryDate) || left.id.localeCompare(right.id),
     },
+    'deliveries.read.all',
 )
 </script>
 <template>

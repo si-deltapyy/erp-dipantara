@@ -13,6 +13,9 @@ const { t } = useI18n()
 const { response, search, searchRecords, loading, error, refresh, changePage } = useMasterList(
     useOrderApi(),
     'orders',
+    undefined,
+    undefined,
+    'orders.read.all',
 )
 </script>
 <template>
