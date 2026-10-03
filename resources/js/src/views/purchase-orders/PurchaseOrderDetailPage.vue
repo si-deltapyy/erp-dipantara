@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { integrationPermissions } from '@/core/constants/business-permissions'
+import { canAccess } from '@/core/domain/access-policy'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSessionStore } from '@/stores/session'
@@ -15,12 +17,7 @@ const { t } = useI18n()
 const session = useSessionStore()
 const { order, loading, error, refresh } = usePurchaseOrderDetail()
 const canEdit = computed(() =>
-    [
-        'purchase-orders.update.all',
-        'buyers.read.all',
-        'timber-products.read.all',
-        'timber-prices.read.all',
-    ].every((permission) => session.user?.permissions.includes(permission)),
+    canAccess(session.user, integrationPermissions['purchase-orders.update']),
 )
 const columns = computed<readonly TableColumn<PurchaseOrderDetail['orders'][number]>[]>(() => [
     { key: 'number', label: t('orders.number') },

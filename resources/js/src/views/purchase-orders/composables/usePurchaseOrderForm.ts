@@ -1,3 +1,5 @@
+import { integrationPermissions } from '@/core/constants/business-permissions'
+import { canAccess } from '@/core/domain/access-policy'
 import { computed, shallowRef } from 'vue'
 import type { ComputedRef } from 'vue'
 import type { PurchaseOrderDetail, PurchaseOrderWriteInput } from '@/core/types/purchase-order'
@@ -25,13 +27,10 @@ export function usePurchaseOrderForm(
     recovery.$reset()
     const completed = shallowRef<{ readonly id: string }>()
     const permitted = computed(() =>
-        [
-            'purchase-orders.read.all',
-            order ? 'purchase-orders.update.all' : 'purchase-orders.create.all',
-            'buyers.read.all',
-            'timber-products.read.all',
-            'timber-prices.read.all',
-        ].every((permission) => store.user?.permissions.includes(permission)),
+        canAccess(
+            store.user,
+            integrationPermissions[order ? 'purchase-orders.update' : 'purchase-orders.create'],
+        ),
     )
     const form = useMasterForm<PurchaseOrderWriteInput>({
         resource: 'purchase-orders',

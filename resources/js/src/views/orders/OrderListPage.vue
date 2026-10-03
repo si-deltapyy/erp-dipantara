@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { integrationPermissions } from '@/core/constants/business-permissions'
+import { canAccess } from '@/core/domain/access-policy'
+
 import { computed } from 'vue'
 import { useSessionStore } from '@/stores/session'
 import { useI18n } from 'vue-i18n'
@@ -13,16 +16,7 @@ import AppTextInput from '@/components/ui/AppTextInput.vue'
 import AppState from '@/components/ui/AppState.vue'
 const { t } = useI18n()
 const session = useSessionStore()
-const canCreate = computed(() =>
-    [
-        'orders.read.all',
-        'orders.create.all',
-        'purchase-orders.read.all',
-        'mitras.read.all',
-        'graders.read.all',
-        'timber-prices.read.all',
-    ].every((permission) => session.user?.permissions.includes(permission)),
-)
+const canCreate = computed(() => canAccess(session.user, integrationPermissions['orders.create']))
 const { response, search, searchRecords, loading, error, refresh, changePage } = useMasterList(
     useOrderApi(),
     'orders',

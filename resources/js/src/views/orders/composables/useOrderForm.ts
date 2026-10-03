@@ -1,3 +1,5 @@
+import { integrationPermissions } from '@/core/constants/business-permissions'
+import { canAccess } from '@/core/domain/access-policy'
 import { computed, shallowRef } from 'vue'
 import type { ComputedRef } from 'vue'
 import type { OrderCreateInput } from '@/core/types/order'
@@ -16,16 +18,7 @@ export function useOrderForm(
     const snapshot = recovery.snapshot?.actorId === store.user?.id ? recovery.snapshot : null
     recovery.$reset()
     const completed = shallowRef<{ readonly id: string }>()
-    const permitted = computed(() =>
-        [
-            'orders.read.all',
-            'orders.create.all',
-            'purchase-orders.read.all',
-            'mitras.read.all',
-            'graders.read.all',
-            'timber-prices.read.all',
-        ].every((permission) => store.user?.permissions.includes(permission)),
-    )
+    const permitted = computed(() => canAccess(store.user, integrationPermissions['orders.create']))
     const form = useMasterForm<OrderCreateInput>({
         resource: 'orders',
         retrySafe: false,

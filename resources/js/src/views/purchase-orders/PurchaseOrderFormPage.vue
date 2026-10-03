@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { integrationPermissions } from '@/core/constants/business-permissions'
+import { canAccess } from '@/core/domain/access-policy'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -14,13 +16,12 @@ const { order, loading, error, refresh } = usePurchaseOrderDetail()
 const editing = computed(() => typeof route.params.id === 'string')
 const permitted = computed(
     () =>
-        [
-            'purchase-orders.read.all',
-            editing.value ? 'purchase-orders.update.all' : 'purchase-orders.create.all',
-            'buyers.read.all',
-            'timber-products.read.all',
-            'timber-prices.read.all',
-        ].every((permission) => session.user?.permissions.includes(permission)) &&
+        canAccess(
+            session.user,
+            integrationPermissions[
+                editing.value ? 'purchase-orders.update' : 'purchase-orders.create'
+            ],
+        ) &&
         (!editing.value || !!order.value),
 )
 </script>

@@ -17,7 +17,7 @@ export function useTimberProductList(): ReturnType<typeof useMasterList<TimberPr
             compare: (left, right) =>
                 left.createdAt.localeCompare(right.createdAt) || left.id.localeCompare(right.id),
         },
-        'timber-prices.read.all',
+        ['timber-products.read.all', 'timber-prices.read.all'],
     )
     return { ...list, searchTimberProducts: list.searchRecords }
 }

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { integrationPermissions } from '@/core/constants/business-permissions'
+import { canAccess } from '@/core/domain/access-policy'
+import { useSessionStore } from '@/stores/session'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { OrderRecord } from '@/core/types/order'
@@ -6,6 +9,8 @@ import type { TableColumn } from '@/core/types/table'
 import AppTable from '@/components/ui/AppTable.vue'
 defineProps<{ orders: readonly OrderRecord[] }>()
 const { t } = useI18n()
+const session = useSessionStore()
+const canOpen = computed(() => canAccess(session.user, integrationPermissions['orders.read']))
 const columns = computed<readonly TableColumn<OrderRecord>[]>(() => [
     { key: 'buyerName', label: t('orders.buyer') },
     { key: 'number', label: t('orders.orderNumber') },
@@ -39,12 +44,14 @@ const columns = computed<readonly TableColumn<OrderRecord>[]>(() => [
                 row[field] ?? t('ui.unavailableValue')
             }}</span>
         </template>
-        <template #cell-number="{ row }"
-            ><RouterLink
+        <template #cell-number="{ row }">
+            <RouterLink
+                v-if="canOpen"
                 :to="{ name: 'order-detail', params: { id: row.id }, query: $route.query }"
                 class="text-primary hover:underline"
                 >{{ row.number }}</RouterLink
-            ></template
-        >
+            >
+            <span v-else>{{ row.number }}</span>
+        </template>
     </AppTable>
 </template>

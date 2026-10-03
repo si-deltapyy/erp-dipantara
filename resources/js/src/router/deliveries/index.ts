@@ -1,3 +1,4 @@
+import { integrationPermissions } from '@/core/constants/business-permissions'
 import type { RouteRecordRaw } from 'vue-router'
 import { accessRules } from '../access-rules'
 const meta = {
@@ -20,14 +21,7 @@ export const deliveryRoutes: RouteRecordRaw[] = [
         meta: {
             ...meta,
             featureUnavailable: false,
-            requiredPermissions: [
-                'deliveries.read.all',
-                'deliveries.create.all',
-                'purchase-orders.read.all',
-                'mitras.read.all',
-                'graders.read.all',
-                'timber-prices.read.all',
-            ],
+            requiredPermissions: [...integrationPermissions['deliveries.create']],
             anyPermissions: [],
         },
     },

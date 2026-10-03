@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { integrationPermissions } from '@/core/constants/business-permissions'
+import { canAccess } from '@/core/domain/access-policy'
+
 import { computed } from 'vue'
 import { useSessionStore } from '@/stores/session'
 import { useI18n } from 'vue-i18n'
@@ -14,14 +17,7 @@ import AppState from '@/components/ui/AppState.vue'
 const { t } = useI18n()
 const session = useSessionStore()
 const canCreate = computed(() =>
-    [
-        'deliveries.read.all',
-        'deliveries.create.all',
-        'purchase-orders.read.all',
-        'mitras.read.all',
-        'graders.read.all',
-        'timber-prices.read.all',
-    ].every((permission) => session.user?.permissions.includes(permission)),
+    canAccess(session.user, integrationPermissions['deliveries.create']),
 )
 const api = useDeliveryApi()
 const { response, search, searchRecords, loading, error, refresh, changePage } = useMasterList(

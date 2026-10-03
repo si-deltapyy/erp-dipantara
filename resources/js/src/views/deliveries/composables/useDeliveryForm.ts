@@ -1,3 +1,5 @@
+import { integrationPermissions } from '@/core/constants/business-permissions'
+import { canAccess } from '@/core/domain/access-policy'
 import { computed, shallowRef } from 'vue'
 import type { ComputedRef } from 'vue'
 import type { DeliveryCreateInput } from '@/core/types/delivery'
@@ -17,14 +19,7 @@ export function useDeliveryForm(
     recovery.$reset()
     const completed = shallowRef<{ readonly id: string }>()
     const permitted = computed(() =>
-        [
-            'deliveries.read.all',
-            'deliveries.create.all',
-            'purchase-orders.read.all',
-            'mitras.read.all',
-            'graders.read.all',
-            'timber-prices.read.all',
-        ].every((permission) => store.user?.permissions.includes(permission)),
+        canAccess(store.user, integrationPermissions['deliveries.create']),
     )
     const form = useMasterForm<DeliveryCreateInput>({
         resource: 'deliveries',

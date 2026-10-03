@@ -1,3 +1,4 @@
+import { integrationPermissions } from '@/core/constants/business-permissions'
 import type { RouteRecordRaw } from 'vue-router'
 import { accessRules } from '../access-rules'
 const meta = {
@@ -30,13 +31,7 @@ export const purchaseOrderRoutes: RouteRecordRaw[] = [
         meta: {
             ...meta,
             featureUnavailable: false,
-            requiredPermissions: [
-                'purchase-orders.read.all',
-                'purchase-orders.create.all',
-                'buyers.read.all',
-                'timber-products.read.all',
-                'timber-prices.read.all',
-            ],
+            requiredPermissions: [...integrationPermissions['purchase-orders.create']],
             anyPermissions: [],
         },
     },
@@ -47,7 +42,7 @@ export const purchaseOrderRoutes: RouteRecordRaw[] = [
         meta: {
             ...meta,
             featureUnavailable: false,
-            requiredPermissions: ['purchase-orders.read.all'],
+            requiredPermissions: [...integrationPermissions['purchase-orders.read']],
             anyPermissions: [],
         },
     },
@@ -58,13 +53,7 @@ export const purchaseOrderRoutes: RouteRecordRaw[] = [
         meta: {
             ...meta,
             featureUnavailable: false,
-            requiredPermissions: [
-                'purchase-orders.read.all',
-                'purchase-orders.update.all',
-                'buyers.read.all',
-                'timber-products.read.all',
-                'timber-prices.read.all',
-            ],
+            requiredPermissions: [...integrationPermissions['purchase-orders.update']],
             anyPermissions: [],
         },
     },

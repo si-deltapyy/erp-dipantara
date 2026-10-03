@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { integrationPermissions } from '@/core/constants/business-permissions'
+import { canAccess } from '@/core/domain/access-policy'
 import { computed } from 'vue'
 import { useSessionStore } from '@/stores/session'
 import { useI18n } from 'vue-i18n'
@@ -14,20 +16,14 @@ import AppState from '@/components/ui/AppState.vue'
 const { t } = useI18n()
 const session = useSessionStore()
 const canCreate = computed(() =>
-    [
-        'purchase-orders.read.all',
-        'purchase-orders.create.all',
-        'buyers.read.all',
-        'timber-products.read.all',
-        'timber-prices.read.all',
-    ].every((permission) => session.user?.permissions.includes(permission)),
+    canAccess(session.user, integrationPermissions['purchase-orders.create']),
 )
 const { response, search, searchRecords, loading, error, refresh, changePage } = useMasterList(
     usePurchaseOrderApi(),
     'purchase-orders',
     undefined,
     undefined,
-    'purchase-orders.read.all',
+    integrationPermissions['purchase-orders.read'],
 )
 </script>
 <template>

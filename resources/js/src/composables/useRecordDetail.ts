@@ -20,6 +20,7 @@ export function useRecordDetail<T>(
     resource: string,
     observeChanges = true,
     identity?: () => string | undefined,
+    requiredPermissions: readonly string[] = [`${resource}.read.all`],
 ): RecordDetailState<T> {
     const route = useRoute()
     const session = useSession()
@@ -34,7 +35,13 @@ export function useRecordDetail<T>(
         record.value = undefined
         loading.value = false
         error.value = ''
-        if (!store.user || typeof id !== 'string') return
+        if (!store.user || typeof id !== 'string' || !id) return
+        if (
+            !requiredPermissions.every((permission) => store.user?.permissions.includes(permission))
+        ) {
+            error.value = 'ui.scopeUnavailable'
+            return
+        }
         const request = new AbortController()
         active = request
         loading.value = true

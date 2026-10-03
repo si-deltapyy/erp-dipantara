@@ -1,3 +1,4 @@
+import { integrationPermissions } from '@/core/constants/business-permissions'
 import type { RouteRecordRaw } from 'vue-router'
 import { accessRules } from '../access-rules'
 const meta = {
@@ -26,15 +27,7 @@ export const gradingRoutes: RouteRecordRaw[] = [
         meta: {
             ...meta,
             featureUnavailable: false,
-            requiredPermissions: [
-                'gradings.read.all',
-                'gradings.create.all',
-                'purchase-orders.read.all',
-                'mitras.read.all',
-                'graders.read.all',
-                'timber-products.read.all',
-                'timber-prices.read.all',
-            ],
+            requiredPermissions: [...integrationPermissions['gradings.create']],
             anyPermissions: [],
         },
     },

@@ -1,3 +1,5 @@
+import { integrationPermissions } from '@/core/constants/business-permissions'
+import { canAccess } from '@/core/domain/access-policy'
 import { computed, shallowRef } from 'vue'
 import type { ComputedRef } from 'vue'
 import type { GradingCreateInput } from '@/core/types/grading'
@@ -17,15 +19,7 @@ export function useGradingForm(
     recovery.$reset()
     const completed = shallowRef<{ readonly id: string }>()
     const permitted = computed(() =>
-        [
-            'gradings.read.all',
-            'gradings.create.all',
-            'purchase-orders.read.all',
-            'mitras.read.all',
-            'graders.read.all',
-            'timber-products.read.all',
-            'timber-prices.read.all',
-        ].every((permission) => store.user?.permissions.includes(permission)),
+        canAccess(store.user, integrationPermissions['gradings.create']),
     )
     const form = useMasterForm<GradingCreateInput>({
         resource: 'gradings',
