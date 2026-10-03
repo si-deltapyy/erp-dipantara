@@ -1,4 +1,8 @@
 import reports from './reports'
+import auth from './auth'
+import workspace from './workspace'
+import overview from './dashboard-overview'
+import ui from './ui'
 import dashboard from './dashboard'
 import production from './production'
 import closings from './closings'
@@ -25,6 +29,10 @@ export const i18n = createI18n({
     messages: {
         id: {
             ...id,
+            ...auth,
+            ...workspace,
+            ...overview,
+            ...ui,
             ...reports,
             ...dashboard,
             ...production,

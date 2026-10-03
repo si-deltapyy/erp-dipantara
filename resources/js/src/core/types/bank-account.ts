@@ -9,6 +9,16 @@ export interface BankAccountInput {
     readonly ownerType: BankAccountOwnerType
     readonly ownerId: string | null
 }
+export interface BankAccountRecord {
+    readonly id: OpaqueId
+    readonly source: 'bank-account-numbers' | 'rekenings'
+    readonly bankName: string
+    readonly accountNumber: string
+    readonly accountHolder: string
+    readonly mitraId?: OpaqueId
+    readonly createdAt: string
+    readonly updatedAt: string
+}
 export interface BankAccount extends BankAccountInput, RecordMetadata {
     readonly snapshotGeneration?: string
     readonly id: OpaqueId
@@ -33,7 +43,7 @@ export interface BankAccountWriteOptions {
     readonly idempotencyKey: string
 }
 export interface BankAccountsApi {
-    list(query: BankAccountQuery, signal: AbortSignal): Promise<PageResponse<BankAccount>>
+    list(query: BankAccountQuery, signal: AbortSignal): Promise<readonly BankAccountRecord[]>
     lookup(query: BankAccountQuery, signal: AbortSignal): Promise<PageResponse<BankAccountLookup>>
     get(id: string, signal: AbortSignal): Promise<BankAccount>
     create(input: BankAccountInput, options: BankAccountWriteOptions): Promise<BankAccount>

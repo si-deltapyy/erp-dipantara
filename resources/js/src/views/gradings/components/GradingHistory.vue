@@ -5,6 +5,8 @@ import { useGradingApi } from '../composables/useGradingApi'
 import { useMasterList } from '@/composables/useMasterList'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppPagination from '@/components/ui/AppPagination.vue'
+import AppPanel from '@/components/ui/AppPanel.vue'
+import AppState from '@/components/ui/AppState.vue'
 const props = defineProps<{ grading: Grading }>()
 const { t } = useI18n()
 const api = useGradingApi()
@@ -18,18 +20,18 @@ const { response, query, loading, error, refresh, changePage } = useMasterList(
 )
 </script>
 <template>
-    <section :aria-label="t('gradings.assignmentHistory')" class="panel space-y-4">
-        <h2 class="text-lg font-bold">{{ t('gradings.assignmentHistory') }}</h2>
+    <AppPanel :title="t('gradings.assignmentHistory')" class="min-w-0 space-y-4">
         <p v-if="loading" role="status">{{ t('gradings.loading') }}</p>
         <div v-else-if="error" role="alert">
             <p>{{ t(error) }}</p>
             <AppButton @click="refresh">{{ t('gradings.refresh') }}</AppButton>
         </div>
         <template v-else-if="response">
+            <AppState v-if="!response.data.length" kind="empty" :message="t('gradings.empty')" />
             <article
                 v-for="record in response.data"
                 :key="record.id"
-                class="space-y-2 rounded-md border border-slate-200 p-4"
+                class="space-y-3 break-words border-t border-line py-4"
             >
                 <p>
                     {{ record.gradingDate }} / {{ t('gradings.statuses.' + record.status) }} /
@@ -44,11 +46,12 @@ const { response, query, loading, error, refresh, changePage } = useMasterList(
                 >
             </article>
             <AppPagination
+                numbered
                 :page="query.page"
                 :page-size="response.meta.perPage"
                 :total="response.meta.total"
                 @update:page="changePage"
             />
         </template>
-    </section>
+    </AppPanel>
 </template>

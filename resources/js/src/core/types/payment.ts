@@ -1,4 +1,4 @@
-import type { PageResponse, RecordMetadata } from './contracts'
+import type { RecordMetadata } from './contracts'
 import type { MasterListQuery } from './master-list'
 import type { WorkflowVersion, WorkflowWriteOptions, WorkflowRejection } from './workflow'
 export interface PaymentInput {
@@ -36,7 +36,7 @@ export interface PaymentQuery extends MasterListQuery {
     readonly status?: Payment['status']
 }
 export interface PaymentsApi {
-    list(query: PaymentQuery, signal: AbortSignal): Promise<PageResponse<Payment>>
+    list(query: PaymentQuery, signal: AbortSignal): Promise<readonly Payment[]>
     get(id: string, signal: AbortSignal): Promise<Payment>
     create(input: PaymentInput, options: WorkflowWriteOptions): Promise<Payment>
     update(

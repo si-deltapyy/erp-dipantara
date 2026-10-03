@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import AppPanel from '@/components/ui/AppPanel.vue'
+
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useInvoiceVersions } from '../composables/useInvoiceVersions'
@@ -21,8 +23,7 @@ const invoice = computed(() =>
 )
 </script>
 <template>
-    <section class="panel space-y-4">
-        <h2 class="text-lg font-semibold">{{ t('invoices.history') }}</h2>
+    <AppPanel :title="t('invoices.history')" class="min-w-0 space-y-5 break-words">
         <p v-if="loading" role="status">{{ t('invoices.loading') }}</p>
         <div v-else-if="error" role="alert">
             <p>{{ t(error) }}</p>
@@ -32,11 +33,12 @@ const invoice = computed(() =>
             <AppSelect
                 id="invoice-version"
                 v-model="selected"
+                renderer="nice"
                 :options="options"
                 :label="t('invoices.version')"
             />
             <template v-if="invoice">
-                <p class="font-bold">
+                <p class="mt-1 text-xl font-semibold tabular-nums">
                     {{ t('invoices.totalAmount') }}: {{ formatMoney(invoice.totalAmount) }}
                 </p>
                 <p v-if="invoice.revisionReason">
@@ -48,12 +50,12 @@ const invoice = computed(() =>
                         {{ term.dueDate ?? t('invoices.noDueDate') }}
                     </li>
                 </ul>
-                <InvoiceDocument
-                    v-if="invoice.revisionNumber !== revisionNumber"
-                    :key="invoice.revisionNumber"
-                    :invoice="invoice"
-                />
             </template>
         </template>
-    </section>
+    </AppPanel>
+    <InvoiceDocument
+        v-if="!loading && !error && invoice && invoice.revisionNumber !== revisionNumber"
+        :key="invoice.revisionNumber"
+        :invoice="invoice"
+    />
 </template>

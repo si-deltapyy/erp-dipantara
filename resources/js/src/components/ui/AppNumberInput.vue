@@ -25,7 +25,7 @@ function update(event: Event): void {
             :disabled="disabled"
             :aria-invalid="!!error"
             :aria-describedby="error ? id + '-error' : undefined"
-            class="min-h-11 w-full rounded-md border border-line px-3 py-2 focus:border-primary focus:ring-primary disabled:bg-canvas"
+            class="wf-form-input min-h-11 w-full rounded-md border border-line px-3 py-2 focus:border-primary focus:ring-primary disabled:bg-canvas"
             @input="update"
         />
     </AppFormField>

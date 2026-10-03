@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import type { Order } from '@/core/types/order'
 import type { TableColumn } from '@/core/types/table'
 import AppTable from '@/components/ui/AppTable.vue'
+import OrderStatus from './OrderStatus.vue'
 defineProps<{ orders: readonly Order[] }>()
 const { t } = useI18n()
 const columns = computed<readonly TableColumn<Order>[]>(() => [
@@ -31,7 +32,7 @@ const columns = computed<readonly TableColumn<Order>[]>(() => [
                 row.purchaseOrderNumber
             }}</span></template
         >
-        <template #cell-status="{ row }">{{ t('orders.statuses.' + row.status) }}</template>
+        <template #cell-status="{ row }"><OrderStatus :status="row.status" /></template>
         <template #cell-notes>{{ t('orders.dpUnavailable') }}</template>
         <template #cell-allowedActions="{ row }"
             ><RouterLink

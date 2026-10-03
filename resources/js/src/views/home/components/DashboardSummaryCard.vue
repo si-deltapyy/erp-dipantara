@@ -1,18 +1,26 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
-defineProps<{ title: string; value: string; caption: string; targetPath: string }>()
-const { t } = useI18n()
+import { RouterLink } from 'vue-router'
+import AppIcon from '@/components/ui/AppIcon.vue'
+withDefaults(
+    defineProps<{
+        title: string
+        value: string
+        caption: string
+        targetPath?: string
+        icon?: 'document' | 'truck' | 'box' | 'wallet'
+    }>(),
+    { icon: 'document' },
+)
 </script>
 <template>
-    <RouterLink
+    <component
+        :is="targetPath ? RouterLink : 'article'"
         :to="targetPath"
-        class="panel block min-w-0 space-y-4 transition-shadow hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+        class="panel wf-summary-card block min-w-0"
     >
         <h2 class="text-sm font-semibold text-muted">{{ title }}</h2>
-        <p class="break-words text-2xl font-bold tracking-tight">{{ value }}</p>
-        <p class="text-xs text-muted">{{ caption }}</p>
-        <p class="text-sm font-semibold text-primary">
-            {{ t('dashboard.openList') }} <span aria-hidden="true">&rarr;</span>
-        </p>
-    </RouterLink>
+        <span class="wf-summary-icon"><AppIcon :name="icon" :size="32" /></span>
+        <p class="mt-3 break-words text-3xl font-semibold tracking-tight">{{ value }}</p>
+        <p class="mt-2 text-xs text-muted">{{ caption }}</p>
+    </component>
 </template>

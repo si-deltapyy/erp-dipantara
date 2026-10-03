@@ -14,6 +14,8 @@ import { useSessionStore } from '@/stores/session'
 import { canActOnOrder } from '@/core/domain/order-policy'
 import { useOrderDetail } from './composables/useOrderDetail'
 import AppButton from '@/components/ui/AppButton.vue'
+import AppPageHeader from '@/components/ui/AppPageHeader.vue'
+import OrderStatus from './components/OrderStatus.vue'
 const { t } = useI18n()
 const session = useSessionStore()
 const { order, loading, error, refresh } = useOrderDetail()
@@ -33,13 +35,16 @@ function closeReview(): void {
 const editable = computed(() => !!order.value && canActOnOrder(session.user, order.value, 'update'))
 </script>
 <template>
-    <section class="mx-auto max-w-5xl space-y-6">
-        <header class="flex flex-wrap items-center justify-between gap-4">
-            <h1 class="text-2xl font-bold">{{ t('orders.detail') }}</h1>
-            <RouterLink :to="{ name: 'orders', query: $route.query }" class="secondary-button">{{
-                t('orders.back')
-            }}</RouterLink>
-        </header>
+    <section class="space-y-6">
+        <AppPageHeader :title="t('orders.detail')">
+            <template #actions>
+                <RouterLink
+                    :to="{ name: 'orders', query: $route.query }"
+                    class="secondary-button"
+                    >{{ t('orders.back') }}</RouterLink
+                >
+            </template>
+        </AppPageHeader>
         <p v-if="loading" role="status">{{ t('orders.loading') }}</p>
         <div v-else-if="error" class="panel space-y-3" role="alert">
             <p>{{ t(error) }}</p>
@@ -47,9 +52,15 @@ const editable = computed(() => !!order.value && canActOnOrder(session.user, ord
         </div>
         <template v-else-if="order">
             <div class="panel space-y-4">
-                <h2 class="text-xl font-semibold">{{ order.purchaseOrderNumber }}</h2>
-                <p>{{ order.buyerName }}</p>
-                <p>{{ t('orders.statuses.' + order.status) }}</p>
+                <div class="flex flex-wrap items-start justify-between gap-4">
+                    <div class="min-w-0">
+                        <h2 class="break-words text-xl font-semibold">
+                            {{ order.purchaseOrderNumber }}
+                        </h2>
+                        <p class="mt-1 break-words text-muted">{{ order.buyerName }}</p>
+                    </div>
+                    <OrderStatus :status="order.status" />
+                </div>
 
                 <p class="whitespace-pre-wrap break-words">{{ order.notes }}</p>
                 <p v-if="order.rejectionReason">

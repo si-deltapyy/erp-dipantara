@@ -28,8 +28,8 @@ function fieldError(field: TimberProductField): string | undefined {
 }
 </script>
 <template>
-    <div class="space-y-5">
-        <p class="text-sm text-muted">{{ t('timber-products.requiredHint') }}</p>
+    <div class="grid gap-6 sm:grid-cols-2">
+        <p class="text-sm text-muted sm:col-span-2">{{ t('timber-products.requiredHint') }}</p>
         <AppTextInput
             v-for="field in ['name', 'gradeCode'] as const"
             :id="`timber-product-${field}`"
@@ -43,6 +43,7 @@ function fieldError(field: TimberProductField): string | undefined {
             @update:model-value="update(field, $event)"
         />
         <TimberDimensions
+            class="sm:col-span-2"
             :specification="modelValue"
             :disabled="disabled"
             :field-error="fieldError"
@@ -51,6 +52,7 @@ function fieldError(field: TimberProductField): string | undefined {
             @update="update"
         />
         <TimberPrices
+            class="sm:col-span-2"
             :prices="modelValue"
             :disabled="disabled"
             :field-error="fieldError"

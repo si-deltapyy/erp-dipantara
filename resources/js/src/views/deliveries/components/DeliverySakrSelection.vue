@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import AppPanel from '@/components/ui/AppPanel.vue'
+
 import { reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { DeliveryDocument } from '@/core/types/delivery'
@@ -18,9 +20,11 @@ const list = reactive(
 )
 </script>
 <template>
-    <section class="space-y-4">
-        <h2 class="text-lg font-semibold">{{ t('deliveries.sakr') }}</h2>
-        <p class="text-sm text-muted">{{ t('deliveries.sakrHint') }}</p>
+    <AppPanel
+        :title="t('deliveries.sakr')"
+        :description="t('deliveries.sakrHint')"
+        class="space-y-5"
+    >
         <p v-if="list.loading" role="status">{{ t('documents.loading') }}</p>
         <div v-else-if="list.error" role="alert">
             <p>{{ t(list.error) }}</p>
@@ -45,5 +49,5 @@ const list = reactive(
         >
             {{ t(error || 'deliveries.invalidDocument') }}
         </p>
-    </section>
+    </AppPanel>
 </template>

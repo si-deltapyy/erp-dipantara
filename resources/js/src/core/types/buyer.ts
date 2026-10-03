@@ -7,6 +7,11 @@ export interface BuyerInput {
     readonly phone: string
     readonly address: string
 }
+export interface BuyerRecord extends BuyerInput {
+    readonly id: OpaqueId
+    readonly createdAt: string
+    readonly updatedAt: string
+}
 export interface Buyer extends BuyerInput, RecordMetadata {
     readonly snapshotGeneration?: string
     readonly id: OpaqueId
@@ -27,7 +32,7 @@ export interface BuyerWriteOptions {
     readonly idempotencyKey: string
 }
 export interface BuyersApi {
-    list(query: BuyerQuery, signal: AbortSignal): Promise<PageResponse<Buyer>>
+    list(query: BuyerQuery, signal: AbortSignal): Promise<readonly BuyerRecord[]>
     lookup(query: BuyerQuery, signal: AbortSignal): Promise<PageResponse<BuyerLookup>>
     get(id: string, signal: AbortSignal): Promise<Buyer>
     create(input: BuyerInput, options: BuyerWriteOptions): Promise<Buyer>

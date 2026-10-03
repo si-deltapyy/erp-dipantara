@@ -78,6 +78,8 @@
     "file": "assets/ClosingEligibilityPanel.vue_vue_type_script_setup_true_lang-BW03aXOc.js",
     "name": "ClosingEligibilityPanel.vue_vue_type_script_setup_true_lang",
     "imports": [
+      "_AppPanel.vue_vue_type_script_setup_true_lang-DwrJYsaR.js",
+      "_AppStatusBadge.vue_vue_type_script_setup_true_lang-BzpXhoK5.js",
       "resources/js/src/main.ts",
       "_useRecordDetail-B3jy86yU.js",
       "_useClosingApi-BaXVWVac.js",
@@ -89,6 +91,7 @@
     "file": "assets/DashboardTransactionList.vue_vue_type_script_setup_true_lang-C0EkJOQp.js",
     "name": "DashboardTransactionList.vue_vue_type_script_setup_true_lang",
     "imports": [
+      "_document-file-DWhKiViQ.js",
       "resources/js/src/main.ts",
       "_runtime-dom.esm-bundler-w52lyOrN.js"
     ]
@@ -124,6 +127,7 @@
     "file": "assets/InvoiceSettlement.vue_vue_type_script_setup_true_lang-BkYgSCww.js",
     "name": "InvoiceSettlement.vue_vue_type_script_setup_true_lang",
     "imports": [
+      "_AppPanel.vue_vue_type_script_setup_true_lang-DwrJYsaR.js",
       "resources/js/src/main.ts",
       "_useRecordDetail-B3jy86yU.js",
       "_useInvoiceApi-wbHJQiHq.js",
@@ -173,6 +177,7 @@
     "file": "assets/ReportFilters.vue_vue_type_script_setup_true_lang-Bxj06m3l.js",
     "name": "ReportFilters.vue_vue_type_script_setup_true_lang",
     "imports": [
+      "_AppPanel.vue_vue_type_script_setup_true_lang-DwrJYsaR.js",
       "resources/js/src/main.ts",
       "_useDocumentContent-DPWK0N4P.js",
       "_runtime-dom.esm-bundler-w52lyOrN.js",
@@ -191,6 +196,10 @@
   "_invoice-policy-C79VCUe1.js": {
     "file": "assets/invoice-policy-C79VCUe1.js",
     "name": "invoice-policy"
+  },
+  "_money-arithmetic-y3ppp-0l.js": {
+    "file": "assets/money-arithmetic-y3ppp-0l.js",
+    "name": "money-arithmetic"
   },
   "_money-fXP-qxx4.js": {
     "file": "assets/money-fXP-qxx4.js",
@@ -254,6 +263,7 @@
     "file": "assets/useDocumentContent-DPWK0N4P.js",
     "name": "useDocumentContent",
     "imports": [
+      "_document-file-DWhKiViQ.js",
       "resources/js/src/main.ts",
       "_useDocumentsApi-S3QUxya2.js",
       "_runtime-dom.esm-bundler-w52lyOrN.js"

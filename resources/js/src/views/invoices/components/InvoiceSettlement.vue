@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import AppPanel from '@/components/ui/AppPanel.vue'
+
 import { useI18n } from 'vue-i18n'
 import { useRecordDetail } from '@/composables/useRecordDetail'
 import { useInvoiceApi } from '../composables/useInvoiceApi'
@@ -20,8 +22,7 @@ const {
 )
 </script>
 <template>
-    <section class="panel space-y-4">
-        <h2 class="text-lg font-semibold">{{ t('invoices.settlementSummary') }}</h2>
+    <AppPanel :title="t('invoices.settlementSummary')" class="min-w-0 space-y-5 break-words">
         <p v-if="loading" role="status">{{ t('invoices.loading') }}</p>
         <div v-else-if="error" role="alert">
             <p>{{ t(error) }}</p>
@@ -34,7 +35,9 @@ const {
                 <dl class="grid gap-4 sm:grid-cols-3">
                     <div>
                         <dt>{{ t('invoices.approvedCredit') }}</dt>
-                        <dd class="font-bold">{{ formatMoney(settlement.approvedCredit) }}</dd>
+                        <dd class="mt-1 text-xl font-semibold tabular-nums">
+                            {{ formatMoney(settlement.approvedCredit) }}
+                        </dd>
                     </div>
                     <div>
                         <dt>{{ t('invoices.outstandingAmount') }}</dt>
@@ -66,5 +69,5 @@ const {
                 </ul>
             </template>
         </template>
-    </section>
+    </AppPanel>
 </template>

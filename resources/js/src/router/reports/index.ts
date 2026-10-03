@@ -5,6 +5,7 @@ export const reportRoutes: RouteRecordRaw[] = [
         name: 'purchase-price-report',
         component: () => import('@/views/reports/PurchasePriceReportPage.vue'),
         meta: {
+            featureUnavailable: true,
             titleKey: 'reports.prices',
             requiresAuth: true,
             requiredPermissions: ['reports.read.all', 'timber-prices.read.all'],
@@ -15,6 +16,7 @@ export const reportRoutes: RouteRecordRaw[] = [
         name: 'production-report',
         component: () => import('@/views/reports/ProductionReportPage.vue'),
         meta: {
+            featureUnavailable: true,
             titleKey: 'production.title',
             requiresAuth: true,
             anyPermissions: ['reports.read.all', 'reports.read.assigned'],

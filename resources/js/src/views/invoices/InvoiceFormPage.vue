@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import AppPageHeader from '@/components/ui/AppPageHeader.vue'
+import AppState from '@/components/ui/AppState.vue'
+
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -8,7 +11,6 @@ import { useRecordDetail } from '@/composables/useRecordDetail'
 import { useInvoiceApi } from './composables/useInvoiceApi'
 import InvoiceRevisionEditor from './components/InvoiceRevisionEditor.vue'
 import InvoiceEditor from './components/InvoiceEditor.vue'
-import AppButton from '@/components/ui/AppButton.vue'
 const { t } = useI18n()
 const route = useRoute()
 const session = useSessionStore()
@@ -28,15 +30,13 @@ const permitted = computed(() =>
 )
 </script>
 <template>
-    <section class="mx-auto max-w-4xl space-y-6">
-        <h1 class="text-2xl font-bold">
-            {{ t(revising ? 'invoices.revise' : editing ? 'invoices.edit' : 'invoices.add') }}
-        </h1>
-        <p v-if="loading" role="status">{{ t('invoices.loading') }}</p>
-        <div v-else-if="error" role="alert" class="panel space-y-3">
-            <p>{{ t(error) }}</p>
-            <AppButton @click="refresh">{{ t('invoices.refresh') }}</AppButton>
-        </div>
+    <section class="min-w-0 space-y-6">
+        <AppPageHeader
+            :title="t(revising ? 'invoices.revise' : editing ? 'invoices.edit' : 'invoices.add')"
+            :description="t(revising ? 'invoices.revisionHint' : 'invoices.subtitle')"
+        />
+        <AppState v-if="loading" kind="loading" :message="t('invoices.loading')" />
+        <AppState v-else-if="error" kind="error" :message="t(error)" @retry="refresh" />
         <InvoiceRevisionEditor
             v-else-if="permitted && revising && invoice"
             :key="invoice.id"

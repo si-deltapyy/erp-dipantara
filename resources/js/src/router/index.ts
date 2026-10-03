@@ -60,17 +60,18 @@ routes.push({
 })
 
 export const router = createRouter({
-    history: createWebHistory('/'),
+    history: createWebHistory('/dipantara/'),
     routes,
     scrollBehavior: () => ({ top: 0 }),
 })
 
 router.afterEach((route) => {
-    document.title = `${i18n.global.t(route.meta.titleKey ?? 'brand.name')} Â· WoodFlow`
+    document.title = `${i18n.global.t(route.meta.titleKey ?? 'brand.name')} · WoodFlow`
 })
 
 declare module 'vue-router' {
     interface RouteMeta {
+        featureUnavailable?: boolean
         titleKey: string
         layout?: 'auth' | 'app'
         requiresAuth?: boolean

@@ -18,6 +18,7 @@ interface FormSnapshot<Input> {
     readonly idempotencyKey: string
 }
 interface MasterFormOptions<Input> {
+    readonly retrySafe?: boolean
     readonly resource: string
     readonly initial: Input
     readonly snapshot: FormSnapshot<Input> | null
@@ -60,6 +61,7 @@ export function useMasterForm<Input extends object>(
     }
     async function save(): Promise<void> {
         if (pending.value) return
+        if (uncertain.value && options.retrySafe === false) return
         errors.value = options.validate(draft.value)
         if (Object.keys(errors.value).length) return
         const payload = JSON.stringify(draft.value)

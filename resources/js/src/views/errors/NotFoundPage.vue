@@ -4,7 +4,7 @@ const { t } = useI18n()
 </script>
 
 <template>
-    <section class="panel mx-auto my-12 max-w-xl text-center">
+    <section class="py-4 text-center">
         <p class="text-5xl font-bold text-primary">404</p>
         <h1 class="mt-6 text-2xl font-bold">{{ t('notFound.title') }}</h1>
         <p class="mt-3 text-muted">{{ t('notFound.description') }}</p>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import AppPanel from '@/components/ui/AppPanel.vue'
+
 import { computed, nextTick, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -78,40 +80,44 @@ async function submit(): Promise<void> {
 }
 </script>
 <template>
-    <form ref="formElement" class="panel space-y-6" novalidate @submit.prevent="submit">
-        <ApprovedPurchaseOrderLookup
-            v-if="!delivery"
-            id="delivery-po"
-            :model-value="draft.purchaseOrderId"
-            :label="t('deliveries.number')"
-            :error="errors.purchaseOrderId ? t(errors.purchaseOrderId) : ''"
-            :disabled="disabled"
-            @update:model-value="selectParent"
-        />
-        <p v-else>{{ t('deliveries.number') }}: {{ delivery.purchaseOrderNumber }}</p>
-        <div class="grid gap-4 sm:grid-cols-2">
-            <AppTextInput
-                id="delivery-date"
-                type="date"
-                :model-value="draft.deliveryDate"
-                :label="t('deliveries.deliveryDate')"
-                :error="errors.deliveryDate ? t(errors.deliveryDate) : ''"
+    <form ref="formElement" class="min-w-0 space-y-6" novalidate @submit.prevent="submit">
+        <AppPanel :title="t('deliveries.shipmentContext')" class="space-y-5">
+            <ApprovedPurchaseOrderLookup
+                v-if="!delivery"
+                id="delivery-po"
+                :model-value="draft.purchaseOrderId"
+                :label="t('deliveries.number')"
+                :error="errors.purchaseOrderId ? t(errors.purchaseOrderId) : ''"
                 :disabled="disabled"
-                @update:model-value="update('deliveryDate', $event)"
+                @update:model-value="selectParent"
             />
-            <AppTextInput
-                id="delivery-plate"
-                :model-value="draft.licensePlate"
-                :label="t('deliveries.licensePlate')"
-                :maxlength="20"
-                :error="errors.licensePlate ? t(errors.licensePlate) : ''"
-                :disabled="disabled"
-                @update:model-value="update('licensePlate', $event)"
-            />
-        </div>
-        <section class="space-y-4">
-            <h2 class="text-lg font-semibold">{{ t('deliveries.allocation') }}</h2>
-            <p class="text-sm text-muted">{{ t('deliveries.stockHint') }}</p>
+            <p v-else>{{ t('deliveries.number') }}: {{ delivery.purchaseOrderNumber }}</p>
+            <div class="grid gap-4 sm:grid-cols-2">
+                <AppTextInput
+                    id="delivery-date"
+                    type="date"
+                    :model-value="draft.deliveryDate"
+                    :label="t('deliveries.deliveryDate')"
+                    :error="errors.deliveryDate ? t(errors.deliveryDate) : ''"
+                    :disabled="disabled"
+                    @update:model-value="update('deliveryDate', $event)"
+                />
+                <AppTextInput
+                    id="delivery-plate"
+                    :model-value="draft.licensePlate"
+                    :label="t('deliveries.licensePlate')"
+                    :maxlength="20"
+                    :error="errors.licensePlate ? t(errors.licensePlate) : ''"
+                    :disabled="disabled"
+                    @update:model-value="update('licensePlate', $event)"
+                />
+            </div>
+        </AppPanel>
+        <AppPanel
+            :title="t('deliveries.allocation')"
+            :description="t('deliveries.stockHint')"
+            class="min-w-0 space-y-4"
+        >
             <AppButton
                 variant="secondary"
                 :disabled="disabled || !draft.purchaseOrderId"
@@ -132,7 +138,13 @@ async function submit(): Promise<void> {
                 />
                 <p v-else>{{ t('deliveries.emptyStock') }}</p></template
             >
-            <AppPagination :page="page" :page-size="20" :total="total" @update:page="changePage" />
+            <AppPagination
+                numbered
+                :page="page"
+                :page-size="20"
+                :total="total"
+                @update:page="changePage"
+            />
             <p class="text-sm">
                 {{ t('deliveries.selected', { count: draft.allocations.length }) }}
             </p>
@@ -143,7 +155,7 @@ async function submit(): Promise<void> {
             >
                 {{ t(errors.allocations || errors.availabilityToken || '') }}
             </p>
-        </section>
+        </AppPanel>
         <DeliverySakrSelection
             v-if="delivery"
             :delivery-id="delivery.id"
@@ -155,13 +167,13 @@ async function submit(): Promise<void> {
         <div
             v-if="error"
             role="alert"
-            class="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+            class="break-words rounded-md border border-line p-4 text-sm text-danger"
         >
             <p>{{ t(error) }}</p>
             <p v-if="error === 'deliveries.errors.conflict'">{{ t('deliveries.conflictHint') }}</p>
             <p v-if="uncertain">{{ t('deliveries.uncertain') }}</p>
         </div>
-        <div class="flex flex-wrap justify-end gap-3">
+        <div class="wf-form-actions">
             <RouterLink
                 :to="{
                     name: delivery ? 'delivery-detail' : 'deliveries',

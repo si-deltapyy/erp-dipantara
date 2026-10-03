@@ -1,6 +1,11 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { accessRules } from '../access-rules'
-const meta = { titleKey: 'closings.title', requiresAuth: true, ...accessRules.closings }
+const meta = {
+    featureUnavailable: true,
+    titleKey: 'closings.title',
+    requiresAuth: true,
+    ...accessRules.closings,
+}
 export const closingRoutes: RouteRecordRaw[] = [
     {
         path: '/closings',

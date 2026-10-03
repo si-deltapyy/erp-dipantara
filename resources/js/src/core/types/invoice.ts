@@ -1,6 +1,6 @@
 import type { PurchaseOrderInvoiceSummary } from './invoice-summary'
 import type { InvoiceSettlement } from './invoice-settlement'
-import type { PageResponse, RecordMetadata } from './contracts'
+import type { RecordMetadata } from './contracts'
 import type { WorkflowVersion, WorkflowWriteOptions } from './workflow'
 import type { MasterListQuery } from './master-list'
 export interface InvoiceTerm {
@@ -63,5 +63,5 @@ export interface InvoicesApi {
     ): Promise<Invoice>
     issue(id: string, input: InvoiceVersion, options: WorkflowWriteOptions): Promise<Invoice>
     subscribe(listener: () => void): () => void
-    list(query: InvoiceQuery, signal: AbortSignal): Promise<PageResponse<Invoice>>
+    list(query: InvoiceQuery, signal: AbortSignal): Promise<readonly Invoice[]>
 }

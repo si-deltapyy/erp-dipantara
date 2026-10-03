@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import AppPageHeader from '@/components/ui/AppPageHeader.vue'
+import AppState from '@/components/ui/AppState.vue'
+
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -10,7 +13,6 @@ import { usePaymentApi } from './composables/usePaymentApi'
 import { useInvoiceApi } from '@/views/invoices/composables/useInvoiceApi'
 import InvoiceSettlement from '@/views/invoices/components/InvoiceSettlement.vue'
 import PaymentEditor from './components/PaymentEditor.vue'
-import AppButton from '@/components/ui/AppButton.vue'
 const { t } = useI18n()
 const route = useRoute()
 const session = useSessionStore()
@@ -47,13 +49,22 @@ async function refreshAll(): Promise<void> {
 }
 </script>
 <template>
-    <section class="mx-auto max-w-4xl space-y-6">
-        <h1 class="text-2xl font-bold">{{ t(editing ? 'payments.edit' : 'payments.start') }}</h1>
-        <p v-if="loading || invoiceLoading" role="status">{{ t('payments.loading') }}</p>
-        <div v-else-if="error || invoiceError" role="alert" class="panel space-y-3">
-            <p>{{ t(error || invoiceError) }}</p>
-            <AppButton @click="refreshAll">{{ t('payments.refresh') }}</AppButton>
-        </div>
+    <section class="min-w-0 space-y-6">
+        <AppPageHeader
+            :title="t(editing ? 'payments.edit' : 'payments.start')"
+            :description="t('payments.subtitle')"
+        />
+        <AppState
+            v-if="loading || invoiceLoading"
+            kind="loading"
+            :message="t('payments.loading')"
+        />
+        <AppState
+            v-else-if="error || invoiceError"
+            kind="error"
+            :message="t(error || invoiceError)"
+            @retry="refreshAll"
+        />
         <PaymentEditor
             v-else-if="permitted && invoice"
             :key="payment?.id ?? invoice.id"

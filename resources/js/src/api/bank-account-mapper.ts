@@ -1,6 +1,7 @@
 import { parseTimestamp } from './contracts/timestamp-parser'
 import type {
     BankAccount,
+    BankAccountRecord,
     BankAccountInput,
     BankAccountUpdate,
     BankAccountOwnerType,
@@ -12,6 +13,7 @@ import { parseMasterQuery } from './contracts/master-parsers'
 import {
     invalidContract,
     parseId,
+    parseNumericId,
     parseInteger,
     parseObject,
     parseString,
@@ -96,4 +98,23 @@ export { parseMasterLookup as parseBankAccountLookup } from './contracts/master-
 export function parseBankAccountListQuery(query: BankAccountQuery): BankAccountQuery {
     requireKeys(parseObject(query, 'query'), ['page', 'perPage', 'search', 'sort'], 'query')
     return parseMasterQuery(query)
+}
+
+export function parseBankAccountRecord(
+    value: unknown,
+    source: BankAccountRecord['source'],
+): BankAccountRecord {
+    const account = parseObject(value, 'account')
+    return {
+        id: parseNumericId(account.id),
+        source,
+        bankName: parseString(account.bank_name, 'bank_name'),
+        accountNumber: parseString(account.account_number, 'account_number'),
+        accountHolder: parseString(account.account_holder_name, 'account_holder_name'),
+        ...(source === 'rekenings'
+            ? { mitraId: parseNumericId(account.mitra_id, 'mitra_id') }
+            : {}),
+        createdAt: parseTimestamp(account.created_at, 'created_at'),
+        updatedAt: parseTimestamp(account.updated_at, 'updated_at'),
+    }
 }

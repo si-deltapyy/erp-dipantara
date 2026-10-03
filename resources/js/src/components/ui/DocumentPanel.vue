@@ -3,6 +3,7 @@ import { useId } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { DocumentReference } from '@/core/types/document'
 import AppButton from './AppButton.vue'
+import AppPanel from './AppPanel.vue'
 const props = defineProps<{
     accept?: string
     copy?: { title: string; description: string; file: string; empty: string; hint: string }
@@ -39,9 +40,11 @@ function select(event: Event): void {
 }
 </script>
 <template>
-    <section class="panel space-y-4" :aria-label="t(copy?.title ?? 'documents.title')">
-        <h2 class="text-lg font-semibold">{{ t(copy?.title ?? 'documents.title') }}</h2>
-        <p class="text-sm text-muted">{{ t(copy?.description ?? 'documents.description') }}</p>
+    <AppPanel
+        :title="t(copy?.title ?? 'documents.title')"
+        :description="t(copy?.description ?? 'documents.description')"
+        class="space-y-4"
+    >
         <div v-if="canUpload" class="space-y-3">
             <label :for="fileId" class="block font-semibold">{{
                 t(copy?.file ?? 'documents.file')
@@ -50,7 +53,7 @@ function select(event: Event): void {
                 :id="fileId"
                 type="file"
                 :accept="accept ?? 'application/pdf,image/jpeg,image/png'"
-                class="block w-full min-w-0 rounded border border-line p-2"
+                class="wf-file-input block w-full min-w-0 rounded border border-line p-2"
                 :disabled="pending || uncertain"
                 :aria-describedby="fileId + '-hint' + (fileError ? ' ' + fileId + '-error' : '')"
                 :aria-invalid="!!fileError"
@@ -60,7 +63,7 @@ function select(event: Event): void {
                 {{ t(copy?.hint ?? 'documents.hint') }}
             </p>
             <p v-if="selectedName" class="break-all">{{ selectedName }}</p>
-            <p v-if="fileError" :id="fileId + '-error'" role="alert" class="text-red-700">
+            <p v-if="fileError" :id="fileId + '-error'" role="alert" class="text-danger">
                 {{ t(fileError) }}
             </p>
             <p v-if="uploadError" role="alert">{{ t(uploadError) }}</p>
@@ -140,5 +143,5 @@ function select(event: Event): void {
         </template>
         <p v-if="pendingId" role="status">{{ t('documents.fetching') }}</p>
         <p v-if="contentError" role="alert">{{ t(contentError) }}</p>
-    </section>
+    </AppPanel>
 </template>

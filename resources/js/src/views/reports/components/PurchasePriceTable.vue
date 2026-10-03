@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import AppState from '@/components/ui/AppState.vue'
+import AppStatusBadge from '@/components/ui/AppStatusBadge.vue'
+
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { PurchasePriceRow } from '@/core/types/purchase-price-report'
@@ -21,7 +24,7 @@ const columns = computed<readonly TableColumn<PurchasePriceRow>[]>(() => [
 ])
 </script>
 <template>
-    <p v-if="!rows.length" role="status">{{ t('production.empty') }}</p>
+    <AppState v-if="!rows.length" kind="empty" :message="t('production.empty')" />
     <AppTable
         v-else
         :rows="rows"
@@ -31,7 +34,21 @@ const columns = computed<readonly TableColumn<PurchasePriceRow>[]>(() => [
         "
         :caption="t('reports.prices')"
     >
-        <template #cell-volumeM3="{ row }">{{ formatVolume(row.volumeM3) }}</template>
+        <template #cell-mitraName="{ row }"
+            ><span class="block max-w-64 whitespace-normal break-words">{{
+                row.mitraName
+            }}</span></template
+        >
+        <template #cell-timberProductName="{ row }"
+            ><span class="block max-w-64 whitespace-normal break-words">{{
+                row.timberProductName
+            }}</span></template
+        >
+        <template #cell-volumeM3="{ row }"
+            ><span class="block text-right tabular-nums">{{
+                formatVolume(row.volumeM3)
+            }}</span></template
+        >
         <template #cell-unitPrice="{ row }">{{
             row.unitPrice === null
                 ? t('reports.unavailable')
@@ -43,7 +60,9 @@ const columns = computed<readonly TableColumn<PurchasePriceRow>[]>(() => [
                 : formatPurchaseOrderMoney(row.totalAmount)
         }}</template>
         <template #cell-sourceStatus="{ row }"
-            ><span>{{ t('reports.' + row.sourceStatus) }}</span
+            ><AppStatusBadge
+                :tone="row.sourceStatus === 'missing_snapshot' ? 'warning' : 'neutral'"
+                >{{ t('reports.' + row.sourceStatus) }}</AppStatusBadge
             ><span v-if="row.priceBasis && row.priceAsOf" class="block"
                 >{{ t('reports.' + row.priceBasis) }} / {{ row.priceAsOf }}</span
             ></template

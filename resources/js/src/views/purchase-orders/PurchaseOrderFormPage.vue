@@ -7,6 +7,7 @@ import { canActOnPurchaseOrder, canCreatePurchaseOrder } from '@/core/domain/pur
 import { usePurchaseOrderDetail } from './composables/usePurchaseOrderDetail'
 import PurchaseOrderEditor from './components/PurchaseOrderEditor.vue'
 import AppButton from '@/components/ui/AppButton.vue'
+import AppPageHeader from '@/components/ui/AppPageHeader.vue'
 const { t } = useI18n()
 const route = useRoute()
 const session = useSessionStore()
@@ -20,9 +21,15 @@ const permitted = computed(() =>
 </script>
 <template>
     <section class="mx-auto max-w-4xl space-y-6">
-        <h1 class="text-2xl font-bold">
-            {{ t(editing ? 'purchase-orders.edit' : 'purchase-orders.add') }}
-        </h1>
+        <AppPageHeader :title="t(editing ? 'purchase-orders.edit' : 'purchase-orders.add')"
+            ><template #actions
+                ><RouterLink
+                    :to="{ name: 'purchase-orders', query: $route.query }"
+                    class="secondary-button"
+                    >{{ t('purchase-orders.back') }}</RouterLink
+                ></template
+            ></AppPageHeader
+        >
         <p v-if="loading" role="status">{{ t('purchase-orders.loading') }}</p>
         <div v-else-if="error" role="alert" class="panel space-y-3">
             <p>{{ t(error) }}</p>

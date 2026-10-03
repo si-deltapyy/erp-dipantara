@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import AppPageHeader from '@/components/ui/AppPageHeader.vue'
+import AppPanel from '@/components/ui/AppPanel.vue'
+import AppState from '@/components/ui/AppState.vue'
+import AppStatusBadge from '@/components/ui/AppStatusBadge.vue'
+
 import { reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import { useClosingReview } from './composables/useClosingReview'
@@ -33,22 +38,33 @@ function closeReview(): void {
 }
 </script>
 <template>
-    <section class="space-y-6">
-        <header class="flex flex-wrap items-center justify-between gap-3">
-            <h1 class="text-2xl font-bold">{{ t('closings.detail') }}</h1>
-            <RouterLink :to="{ name: 'closings', query: $route.query }" class="secondary-button">{{
-                t('closings.back')
-            }}</RouterLink>
-        </header>
-        <p v-if="loading" role="status">{{ t('closings.loading') }}</p>
-        <div v-else-if="error" class="panel space-y-3" role="alert">
-            <p>{{ t(error) }}</p>
-            <AppButton @click="refresh">{{ t('closings.refresh') }}</AppButton>
-        </div>
+    <section class="min-w-0 space-y-6">
+        <AppPageHeader :title="t('closings.detail')"
+            ><template #actions>
+                <RouterLink
+                    :to="{ name: 'closings', query: $route.query }"
+                    class="secondary-button"
+                    >{{ t('closings.back') }}</RouterLink
+                >
+            </template></AppPageHeader
+        >
+        <AppState v-if="loading" kind="loading" :message="t('closings.loading')" />
+        <AppState v-else-if="error" kind="error" :message="t(error)" @retry="refresh" />
         <template v-else-if="closing">
-            <div class="panel space-y-4">
-                <h2 class="break-words text-lg font-semibold">{{ closing.purchaseOrderNumber }}</h2>
-                <p>{{ t('closings.statuses.' + closing.status) }}</p>
+            <AppPanel :title="closing.purchaseOrderNumber" class="space-y-5 break-words">
+                <AppStatusBadge
+                    :tone="
+                        closing.status === 'approved'
+                            ? 'success'
+                            : closing.status === 'rejected'
+                              ? 'danger'
+                              : 'warning'
+                    "
+                    >{{ t('closings.statuses.' + closing.status) }}</AppStatusBadge
+                >
+                <p v-if="closing.status === 'approved'" role="status" class="text-sm text-muted">
+                    {{ t('closings.reasons.purchase_order_closed') }}
+                </p>
                 <p class="break-words">{{ closing.notes ?? t('closings.noNotes') }}</p>
                 <p v-if="closing.rejectionReason" class="break-words">
                     {{ closing.rejectionReason }}
@@ -63,22 +79,24 @@ function closeReview(): void {
                     class="secondary-button"
                     >{{ t('closings.openPurchaseOrder') }}</RouterLink
                 >
-            </div>
-            <div class="flex flex-wrap gap-3">
-                <AppButton
-                    v-if="review.canApprove"
-                    :disabled="review.pending"
-                    @click="review.open('approve')"
-                    >{{ t('closings.approve') }}</AppButton
-                >
-                <AppButton
-                    v-if="review.canReject"
-                    variant="secondary"
-                    :disabled="review.pending"
-                    @click="review.open('reject')"
-                    >{{ t('closings.reject') }}</AppButton
-                >
-            </div>
+            </AppPanel>
+            <AppPanel v-if="review.canApprove || review.canReject" :title="t('closings.review')"
+                ><div class="flex flex-wrap gap-3">
+                    <AppButton
+                        v-if="review.canApprove"
+                        :disabled="review.pending"
+                        @click="review.open('approve')"
+                        >{{ t('closings.approve') }}</AppButton
+                    >
+                    <AppButton
+                        v-if="review.canReject"
+                        variant="secondary"
+                        :disabled="review.pending"
+                        @click="review.open('reject')"
+                        >{{ t('closings.reject') }}</AppButton
+                    >
+                </div></AppPanel
+            >
             <ClosingEligibilityPanel
                 :key="closing.version"
                 :purchase-order-id="closing.purchaseOrderId"

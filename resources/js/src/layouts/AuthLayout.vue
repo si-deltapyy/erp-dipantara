@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import AppBrand from '@/components/layout/AppBrand.vue'
+import { useI18n } from 'vue-i18n'
+import WorkspaceBrand from '@/components/layout/WorkspaceBrand.vue'
+const { t } = useI18n()
 </script>
+
 <template>
-    <main class="flex min-h-dvh items-center justify-center px-4 py-10">
-        <div class="w-full max-w-lg space-y-8">
-            <AppBrand />
-            <div class="panel"><RouterView /></div>
+    <main class="woodflow-theme wf-auth">
+        <div class="wf-auth-container">
+            <WorkspaceBrand />
+            <div class="panel wf-auth-panel"><RouterView /></div>
+            <p class="wf-auth-footer">{{ t('shell.footer') }}</p>
         </div>
     </main>
 </template>

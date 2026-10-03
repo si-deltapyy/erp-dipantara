@@ -1,0 +1,229 @@
+@import './woodflow-tokens.css';
+@import './woodflow-shell.css';
+@import './woodflow-dashboard.css';
+@import './woodflow-controls.css';
+@import './vristo-components.css';
+@import './woodflow-select.css';
+@import './woodflow-motion.css';
+@import './woodflow-metrics.css';
+@import './woodflow-pagination.css';
+@import './woodflow-pages.css';
+
+@font-face {
+    font-family: 'Plus Jakarta Sans';
+    src: url('../fonts/plus-jakarta-sans-latin.woff2') format('woff2');
+    font-style: normal;
+    font-weight: 200 800;
+    font-display: swap;
+}
+
+.woodflow-theme {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--wf-ink);
+    background: var(--wf-canvas);
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+    scrollbar-color: var(--wf-border) transparent;
+    caret-color: var(--wf-primary);
+    accent-color: var(--wf-primary);
+}
+
+.woodflow-theme ::selection {
+    background: var(--wf-tan);
+    color: var(--wf-secondary-foreground);
+}
+.woodflow-theme :where(button, a, input, select):focus-visible {
+    outline: 2px solid var(--wf-ring);
+    outline-offset: 4px;
+}
+.woodflow-theme :where(button, input, select) {
+    font: inherit;
+}
+.woodflow-theme button {
+    cursor: pointer;
+    transition:
+        background-color 300ms ease,
+        border-color 300ms ease,
+        box-shadow 300ms ease;
+}
+.woodflow-theme button:disabled {
+    cursor: not-allowed;
+}
+.woodflow-theme h1,
+.woodflow-theme h2,
+.woodflow-theme h3 {
+    text-wrap: balance;
+}
+.woodflow-theme input::placeholder {
+    color: var(--wf-muted-foreground);
+    opacity: 1;
+}
+.woodflow-theme input,
+.woodflow-theme select {
+    border-radius: var(--wf-radius);
+}
+.woodflow-theme .wf-icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--wf-radius);
+    color: inherit;
+}
+.woodflow-theme .wf-icon-button:hover {
+    background: var(--wf-cream);
+}
+.woodflow-theme .wf-panel {
+    position: relative;
+    min-width: 0;
+    background: var(--wf-surface);
+    overflow: visible;
+}
+.woodflow-theme .wf-panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 0 20px;
+}
+.woodflow-theme .wf-panel-heading h2 {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: normal;
+}
+.woodflow-theme .wf-panel-heading p {
+    margin-top: calc(var(--wf-spacing) * 2);
+    font-size: 12px;
+    color: var(--wf-muted-foreground);
+}
+.woodflow-theme .wf-panel-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 0 0;
+    border-top: 1px solid var(--wf-line);
+    color: var(--wf-muted-foreground);
+    font-size: 12px;
+}
+.woodflow-theme .wf-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 9px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.woodflow-theme .wf-badge::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    background: currentColor;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.woodflow-theme .wf-badge--neutral {
+    background: var(--wf-muted);
+    color: var(--wf-muted-foreground);
+}
+.woodflow-theme .wf-badge--success {
+    background: var(--wf-success-light);
+    color: var(--wf-success);
+}
+.woodflow-theme .wf-badge--warning {
+    background: var(--wf-warning-light);
+    color: var(--wf-warning);
+}
+.woodflow-theme .wf-badge--danger {
+    background: var(--wf-danger-light);
+    color: var(--wf-danger);
+}
+.woodflow-theme .wf-badge--info {
+    background: var(--wf-info-light);
+    color: var(--wf-info);
+}
+.woodflow-theme .wf-empty {
+    padding: 24px;
+    color: var(--wf-muted-foreground);
+}
+.woodflow-theme .wf-drawer {
+    position: fixed;
+    inset: 0 0 0 auto;
+    margin: 0;
+    width: min(460px, 94vw);
+    height: 100dvh;
+    max-height: none;
+    max-width: none;
+    padding: 0;
+    border: 0;
+    background: var(--wf-popover);
+    color: var(--wf-popover-foreground);
+    font: inherit;
+}
+.woodflow-theme .wf-drawer::backdrop {
+    background: rgb(var(--wf-shadow-color) / 45%);
+}
+.woodflow-theme .wf-drawer--left {
+    inset: 0 auto 0 0;
+    width: min(300px, 90vw);
+}
+.woodflow-theme .wf-drawer-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--wf-line);
+}
+.woodflow-theme .wf-drawer-heading h2 {
+    font-weight: 700;
+    font-size: 16px;
+}
+.woodflow-theme .wf-work-detail {
+    padding: 28px;
+}
+.woodflow-theme .wf-work-detail h3 {
+    font-size: 27px;
+    font-weight: 700;
+    margin-top: 20px;
+}
+.woodflow-theme .wf-work-detail > p {
+    color: var(--wf-muted-foreground);
+}
+.woodflow-theme .wf-work-detail dl {
+    margin: 28px 0;
+}
+.woodflow-theme .wf-work-detail dl > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--wf-line);
+}
+.woodflow-theme .wf-work-detail dt {
+    color: var(--wf-muted-foreground);
+}
+.woodflow-theme .wf-work-detail dd {
+    font-weight: 600;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+.woodflow-theme .wf-detail-notice {
+    padding: 16px;
+    background: var(--wf-cream);
+    border-radius: var(--wf-radius);
+    margin-bottom: 24px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .woodflow-theme *,
+    .woodflow-theme *::before,
+    .woodflow-theme *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+    }
+}

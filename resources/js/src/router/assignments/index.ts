@@ -1,6 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { accessRules } from '../access-rules'
 const meta = {
+    featureUnavailable: true,
     titleKey: 'assignments.assignedTitle',
     requiresAuth: true,
     ...accessRules.assignments,

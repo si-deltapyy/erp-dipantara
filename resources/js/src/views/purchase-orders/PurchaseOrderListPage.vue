@@ -1,140 +1,50 @@
 <script setup lang="ts">
-import { useSessionStore } from '@/stores/session'
-import { hasBusinessPermission } from '@/core/domain/record-policy'
 import { useI18n } from 'vue-i18n'
-import { purchaseOrderStatuses } from '@/core/types/purchase-order'
-import { usePurchaseOrderList } from './composables/usePurchaseOrderList'
-import PurchaseOrderTable from './components/PurchaseOrderTable.vue'
+import { usePurchaseOrderApi } from './composables/usePurchaseOrderApi'
+import { useMasterList } from '@/composables/useMasterList'
 import AppButton from '@/components/ui/AppButton.vue'
-import AppTextInput from '@/components/ui/AppTextInput.vue'
-import AppSelect from '@/components/ui/AppSelect.vue'
 import AppPagination from '@/components/ui/AppPagination.vue'
-import PurchaseOrderLookup from './components/PurchaseOrderLookup.vue'
+import AppPageHeader from '@/components/ui/AppPageHeader.vue'
+import AppPanel from '@/components/ui/AppPanel.vue'
+import AppState from '@/components/ui/AppState.vue'
 const { t } = useI18n()
-const session = useSessionStore()
-const {
-    response,
-    query,
-    search,
-    status,
-    buyerId,
-    mitraId,
-    graderId,
-    sort,
-    loading,
-    error,
-    refresh,
-    changePage,
-    applyFilters,
-    canCreate,
-    canReview,
-} = usePurchaseOrderList()
+const { response, loading, error, refresh, changePage } = useMasterList(
+    usePurchaseOrderApi(),
+    'purchase-orders',
+)
 </script>
 <template>
     <section class="space-y-6">
-        <header class="flex flex-wrap items-start justify-between gap-4">
-            <div>
-                <p class="text-sm font-semibold text-primary">{{ t('purchase-orders.section') }}</p>
-                <h1 class="mt-1 text-2xl font-bold">
-                    {{
-                        t(
-                            $route.name === 'buyer-history'
-                                ? 'purchase-orders.history'
-                                : 'purchase-orders.title',
-                        )
-                    }}
-                </h1>
-                <p class="mt-2 text-sm text-muted">{{ t('purchase-orders.subtitle') }}</p>
-            </div>
-            <RouterLink
-                v-if="canCreate"
-                :to="{ name: 'purchase-order-new', query: $route.query }"
-                class="primary-button"
-                >{{ t('purchase-orders.add') }}</RouterLink
-            >
-        </header>
-        <RouterLink
-            v-if="canReview"
-            :to="{
-                name: 'purchase-orders',
-                query: { ...$route.query, status: 'submitted', page: undefined },
-            }"
-            class="secondary-button"
-            >{{ t('purchase-orders.reviewQueue') }}</RouterLink
+        <AppPageHeader
+            :title="t('purchase-orders.title')"
+            :description="t('purchase-orders.subtitle')"
         >
-        <div class="panel space-y-5">
-            <form class="space-y-4" @submit.prevent="applyFilters">
-                <div class="grid gap-4 lg:grid-cols-2">
-                    <AppTextInput
-                        id="po-search"
-                        v-model="search"
-                        :label="t('purchase-orders.search')"
-                        :maxlength="200"
-                    />
-                    <AppSelect
-                        id="po-status"
-                        v-model="status"
-                        :label="t('purchase-orders.status')"
-                        :options="[
-                            { value: '', label: t('purchase-orders.allStatuses') },
-                            ...purchaseOrderStatuses.map((value) => ({
-                                value,
-                                label: t('purchase-orders.statuses.' + value),
-                            })),
-                        ]"
-                    />
-                    <PurchaseOrderLookup
-                        id="po-filter-buyer"
-                        v-model="buyerId"
-                        kind="buyer"
-                        :label="t('purchase-orders.buyerFilter')"
-                    />
-                    <PurchaseOrderLookup
-                        v-if="hasBusinessPermission(session.user, 'mitras.lookup')"
-                        id="po-filter-mitra"
-                        v-model="mitraId"
-                        kind="mitra"
-                        :label="t('mitras.title')"
-                    />
-                    <PurchaseOrderLookup
-                        v-if="hasBusinessPermission(session.user, 'graders.lookup')"
-                        id="po-filter-grader"
-                        v-model="graderId"
-                        kind="grader"
-                        :label="t('graders.title')"
-                    />
-                    <AppSelect
-                        id="po-sort"
-                        v-model="sort"
-                        :label="t('purchase-orders.sort')"
-                        :options="[
-                            { value: '-createdAt', label: t('purchase-orders.newest') },
-                            { value: 'createdAt', label: t('purchase-orders.oldest') },
-                        ]"
-                    />
-                </div>
-                <div class="flex flex-wrap gap-3">
-                    <AppButton type="submit">{{ t('purchase-orders.apply') }}</AppButton
-                    ><AppButton variant="secondary" :pending="loading" @click="refresh">{{
-                        t('purchase-orders.refresh')
-                    }}</AppButton>
-                </div>
-            </form>
-            <p v-if="loading" role="status">{{ t('purchase-orders.loading') }}</p>
-            <p v-else-if="error" role="alert" class="text-red-700">{{ t(error) }}</p>
-            <template v-else-if="response">
-                <p class="text-sm text-muted">
-                    {{ t('purchase-orders.total', { count: response.meta.total }) }}
-                </p>
-                <p v-if="!response.data.length" role="status">{{ t('purchase-orders.empty') }}</p>
-                <PurchaseOrderTable v-else :orders="response.data" />
-                <AppPagination
-                    :page="query.page"
+            <template #actions
+                ><AppButton disabled :title="t('ui.featureUnavailable')">{{
+                    t('purchase-orders.add')
+                }}</AppButton></template
+            >
+        </AppPageHeader>
+        <p role="status" class="text-sm text-muted">{{ t('ui.transactionUnavailable') }}</p>
+        <AppPanel :title="t('purchase-orders.title')">
+            <template #actions
+                ><AppButton variant="secondary" :pending="loading" @click="refresh">{{
+                    t('purchase-orders.refresh')
+                }}</AppButton></template
+            >
+            <AppState v-if="loading" kind="loading" />
+            <AppState v-else-if="error" kind="error" :message="t(error)" @retry="refresh" />
+            <AppState v-else-if="response" kind="empty" :message="t('purchase-orders.empty')" />
+            <template #footer
+                ><AppPagination
+                    v-if="response && !error"
+                    numbered
+                    :disabled="loading"
+                    :page="response.meta.page"
                     :page-size="response.meta.perPage"
                     :total="response.meta.total"
                     @update:page="changePage"
-                />
-            </template>
-        </div>
+            /></template>
+        </AppPanel>
     </section>
 </template>

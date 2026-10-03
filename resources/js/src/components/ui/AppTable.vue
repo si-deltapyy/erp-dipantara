@@ -25,12 +25,12 @@ function changeSort(key: string): void {
     <AppState v-else-if="!rows.length" kind="empty" />
     <div
         v-else
-        class="max-w-full overflow-x-auto rounded-md border border-line"
+        class="table-responsive max-w-full overflow-x-auto rounded-md border border-line"
         tabindex="0"
         role="region"
         :aria-label="caption"
     >
-        <table class="w-full text-left text-sm">
+        <table class="table-hover w-full text-left text-sm">
             <caption class="sr-only">
                 {{
                     caption

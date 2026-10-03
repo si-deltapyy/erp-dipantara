@@ -22,10 +22,11 @@ function fieldError(field: BuyerField): string | undefined {
 }
 </script>
 <template>
-    <div class="space-y-4">
-        <p class="text-sm text-muted">{{ t('buyers.requiredHint') }}</p>
+    <div class="grid gap-5 sm:grid-cols-2">
+        <p class="text-sm text-muted sm:col-span-2">{{ t('buyers.requiredHint') }}</p>
         <AppTextInput
             id="buyer-company"
+            class="sm:col-span-2"
             :model-value="modelValue.companyName"
             :label="t('buyers.companyName')"
             :error="fieldError('companyName')"
@@ -60,6 +61,7 @@ function fieldError(field: BuyerField): string | undefined {
         />
         <AppTextarea
             id="buyer-address"
+            class="sm:col-span-2"
             :model-value="modelValue.address"
             :label="t('buyers.address')"
             :hint="t('buyers.optional')"

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import AppPanel from '@/components/ui/AppPanel.vue'
+
 import { computed, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Invoice } from '@/core/types/invoice'
@@ -30,7 +32,11 @@ const content = reactive(
 )
 </script>
 <template>
-    <section v-if="permitted && invoice.documentId" class="panel space-y-3">
+    <AppPanel
+        v-if="permitted && invoice.documentId"
+        :title="t('invoices.document')"
+        class="space-y-4 break-words"
+    >
         <p class="text-sm text-muted">{{ t('invoices.demoDocument') }}</p>
         <p v-if="list.loading" role="status">{{ t('invoices.loading') }}</p>
         <div v-else-if="list.error" role="alert">
@@ -48,8 +54,14 @@ const content = reactive(
                 >{{ t('invoices.download') }}</AppButton
             >
         </div>
+        <div v-else-if="!list.loading && !list.error" class="space-y-3">
+            <p role="status">{{ t('invoices.documentUnavailable') }}</p>
+            <AppButton variant="secondary" @click="list.refresh">{{
+                t('invoices.refresh')
+            }}</AppButton>
+        </div>
         <p v-if="content.error" role="alert">{{ t(content.error) }}</p>
-    </section>
+    </AppPanel>
     <DocumentPreview
         :preview="content.preview"
         :error="content.error"

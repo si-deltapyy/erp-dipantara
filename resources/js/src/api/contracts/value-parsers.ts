@@ -32,6 +32,24 @@ export function parseId(value: unknown, path = 'id'): OpaqueId {
     if (!id.length || id.length > 100) return invalidContract(path)
     return id as OpaqueId
 }
+export function parseNumericId(value: unknown, path = 'id'): OpaqueId {
+    return parseId(String(parseInteger(value, path)), path)
+}
+export function parseNumericDecimal(value: unknown, path: string): DecimalString {
+    if (
+        typeof value !== 'number' ||
+        !Number.isFinite(value) ||
+        Math.abs(value) > Number.MAX_SAFE_INTEGER
+    )
+        return invalidContract(path)
+    return parseDecimal(String(value), path)
+}
+export function parseNumericMoney(value: unknown, path: string): MoneyString {
+    const decimal = parseNumericDecimal(value, path)
+    const [whole, fraction = ''] = decimal.split('.')
+    if (fraction.length > 2) return invalidContract(path)
+    return parseMoney(`${whole}.${fraction.padEnd(2, '0')}`, path)
+}
 export function parseDecimal(value: unknown, path = 'amount'): DecimalString {
     const decimal = parseString(value, path)
     if (!/^-?\d+(\.\d{1,6})?$/.test(decimal)) return invalidContract(path)

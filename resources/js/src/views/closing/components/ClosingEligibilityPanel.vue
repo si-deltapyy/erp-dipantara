@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import AppPanel from '@/components/ui/AppPanel.vue'
+import AppStatusBadge from '@/components/ui/AppStatusBadge.vue'
+import AppState from '@/components/ui/AppState.vue'
+
 import { useI18n } from 'vue-i18n'
 import { useSessionStore } from '@/stores/session'
 import { hasBusinessPermission } from '@/core/domain/record-policy'
@@ -23,27 +27,34 @@ const {
 )
 </script>
 <template>
-    <section class="panel space-y-4" aria-labelledby="closing-eligibility-title">
-        <h2 id="closing-eligibility-title" class="text-lg font-semibold">
-            {{ t('closings.eligibility') }}
-        </h2>
+    <AppPanel :title="t('closings.eligibility')" class="min-w-0 space-y-5 break-words">
         <p class="text-sm text-muted">{{ t('closings.assumption') }}</p>
-        <p v-if="loading" role="status">{{ t('closings.loading') }}</p>
+        <AppState v-if="loading" kind="loading" :message="t('closings.loading')" />
         <div v-else-if="error" role="alert" class="space-y-3">
             <p>{{ t(error) }}</p>
             <AppButton @click="refresh">{{ t('closings.refresh') }}</AppButton>
         </div>
         <template v-else-if="eligibility">
-            <p class="font-semibold" role="status">
-                {{
-                    t(
+            <p role="status">
+                <AppStatusBadge
+                    :tone="
                         eligibility.reasons.includes('purchase_order_closed')
-                            ? 'closings.closed'
+                            ? 'neutral'
                             : eligibility.eligible
-                              ? 'closings.eligible'
-                              : 'closings.blocked',
-                    )
-                }}
+                              ? 'success'
+                              : 'warning'
+                    "
+                >
+                    {{
+                        t(
+                            eligibility.reasons.includes('purchase_order_closed')
+                                ? 'closings.closed'
+                                : eligibility.eligible
+                                  ? 'closings.eligible'
+                                  : 'closings.blocked',
+                        )
+                    }}
+                </AppStatusBadge>
             </p>
             <p class="break-words text-sm text-muted">
                 {{ t('closings.evaluatedAt', { date: eligibility.evaluatedAt }) }}
@@ -53,10 +64,12 @@ const {
                     {{ t('closings.reasons.' + reason) }}
                 </li>
             </ul>
-            <dl class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <dl
+                class="grid grid-cols-1 gap-5 border-y border-line py-5 sm:grid-cols-2 xl:grid-cols-4"
+            >
                 <div v-for="(quantity, kind) in eligibility.quantities" :key="kind">
                     <dt class="text-sm text-muted">{{ t('closings.quantities.' + kind) }}</dt>
-                    <dd class="text-lg font-semibold">
+                    <dd class="mt-1 break-words text-xl font-semibold tabular-nums">
                         {{ t('closings.quantity', { count: quantity }) }}
                     </dd>
                 </div>
@@ -97,5 +110,5 @@ const {
                 >
             </div>
         </template>
-    </section>
+    </AppPanel>
 </template>

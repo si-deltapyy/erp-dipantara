@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import AppPanel from '@/components/ui/AppPanel.vue'
+
 import { computed, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Payment } from '@/core/types/payment'
@@ -30,8 +32,11 @@ const content = reactive(
 )
 </script>
 <template>
-    <section v-if="permitted && payment.proofDocumentId" class="panel space-y-3">
-        <p class="text-sm text-muted">{{ t('payments.proof') }}</p>
+    <AppPanel
+        v-if="permitted && payment.proofDocumentId"
+        :title="t('payments.proof')"
+        class="space-y-4 break-words"
+    >
         <p v-if="list.loading" role="status">{{ t('payments.loading') }}</p>
         <div v-else-if="list.error" role="alert">
             <p>{{ t(list.error) }}</p>
@@ -48,8 +53,14 @@ const content = reactive(
                 >{{ t('payments.download') }}</AppButton
             >
         </div>
+        <div v-else-if="!list.loading && !list.error" class="space-y-3">
+            <p role="status">{{ t('payments.proofUnavailable') }}</p>
+            <AppButton variant="secondary" @click="list.refresh">{{
+                t('payments.refresh')
+            }}</AppButton>
+        </div>
         <p v-if="content.error" role="alert">{{ t(content.error) }}</p>
-    </section>
+    </AppPanel>
     <DocumentPreview
         :preview="content.preview"
         :error="content.error"

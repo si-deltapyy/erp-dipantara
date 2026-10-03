@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import AppPanel from '@/components/ui/AppPanel.vue'
+import AppStatusBadge from '@/components/ui/AppStatusBadge.vue'
+
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -37,35 +40,50 @@ async function submit(): Promise<void> {
 }
 </script>
 <template>
-    <form class="panel space-y-5" @submit.prevent="confirmingRequest = true">
-        <p>{{ t('closings.requestDescription') }}</p>
-        <p class="font-semibold">
-            {{ t(form.eligibility.eligible ? 'closings.eligible' : 'closings.blocked') }}
-        </p>
-        <ul v-if="form.eligibility.reasons.length" class="list-disc space-y-2 pl-5">
-            <li v-for="reason in form.eligibility.reasons" :key="reason">
-                {{ t('closings.reasons.' + reason) }}
-            </li>
-        </ul>
-        <div class="grid gap-4 lg:grid-cols-2">
-            <InvoiceBalancePanel
-                v-for="direction in ['receivable', 'payable'] as const"
-                :key="direction"
-                :direction="direction"
-                :balance="form.eligibility.summary[direction]"
+    <form class="min-w-0 space-y-6" @submit.prevent="confirmingRequest = true">
+        <AppPanel :title="t('closings.eligibility')" class="space-y-5 break-words">
+            <AppStatusBadge :tone="form.eligibility.eligible ? 'success' : 'warning'">{{
+                t(form.eligibility.eligible ? 'closings.eligible' : 'closings.blocked')
+            }}</AppStatusBadge>
+            <p class="text-sm text-muted">
+                {{ t('closings.evaluatedAt', { date: form.eligibility.evaluatedAt }) }}
+            </p>
+            <ul v-if="form.eligibility.reasons.length" class="list-disc space-y-2 pl-5">
+                <li v-for="reason in form.eligibility.reasons" :key="reason">
+                    {{ t('closings.reasons.' + reason) }}
+                </li>
+            </ul>
+            <dl class="grid gap-5 border-y border-line py-5 sm:grid-cols-2 xl:grid-cols-4">
+                <div v-for="(quantity, kind) in form.eligibility.quantities" :key="kind">
+                    <dt class="text-sm text-muted">{{ t('closings.quantities.' + kind) }}</dt>
+                    <dd class="mt-1 text-lg font-semibold tabular-nums">
+                        {{ t('closings.quantity', { count: quantity }) }}
+                    </dd>
+                </div>
+            </dl>
+            <p>{{ t('closings.openWork', { count: form.eligibility.openWorkCount }) }}</p>
+            <div class="grid gap-4 lg:grid-cols-2">
+                <InvoiceBalancePanel
+                    v-for="direction in ['receivable', 'payable'] as const"
+                    :key="direction"
+                    :direction="direction"
+                    :balance="form.eligibility.summary[direction]"
+                />
+            </div>
+        </AppPanel>
+        <AppPanel :title="t('closings.notes')">
+            <AppTextarea
+                id="closing-notes"
+                :label="t('closings.notes')"
+                :model-value="form.draft.notes ?? ''"
+                :disabled="form.pending || form.uncertain || !form.permitted"
+                :error="form.errors.notes ? t(form.errors.notes) : ''"
+                @update:model-value="setNotes"
             />
-        </div>
-        <AppTextarea
-            id="closing-notes"
-            :label="t('closings.notes')"
-            :model-value="form.draft.notes ?? ''"
-            :disabled="form.pending || form.uncertain || !form.permitted"
-            :error="form.errors.notes ? t(form.errors.notes) : ''"
-            @update:model-value="setNotes"
-        />
+        </AppPanel>
         <p v-if="form.error" role="alert">{{ t(form.error) }}</p>
         <p v-if="form.uncertain" role="status">{{ t('closings.uncertain') }}</p>
-        <div class="flex flex-wrap gap-3">
+        <div class="wf-form-actions">
             <AppButton
                 variant="secondary"
                 :pending="form.refreshing"

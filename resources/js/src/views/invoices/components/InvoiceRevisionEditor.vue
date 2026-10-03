@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import AppPanel from '@/components/ui/AppPanel.vue'
+
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -35,38 +37,46 @@ const { confirming, confirm, cancel } = useUnsavedChanges(
 )
 </script>
 <template>
-    <form class="panel space-y-5" @submit.prevent="save">
-        <p>{{ t('invoices.revisionHint') }}</p>
-        <dl class="grid gap-4 sm:grid-cols-2">
-            <div>
-                <dt>{{ t('invoices.previousTotal') }}</dt>
-                <dd class="font-bold">{{ formatMoney(invoice.totalAmount) }}</dd>
-            </div>
-            <div>
-                <dt>{{ t('invoices.proposedTotal') }}</dt>
-                <dd class="font-bold">
-                    {{ total ? formatMoney(total) : t('invoices.invalidTerms') }}
-                </dd>
-            </div>
-        </dl>
+    <form class="min-w-0 space-y-6" @submit.prevent="save">
+        <AppPanel
+            :title="t('invoices.revisionComparison')"
+            :description="t('invoices.revisionHint')"
+        >
+            <dl class="grid gap-4 sm:grid-cols-2">
+                <div>
+                    <dt>{{ t('invoices.previousTotal') }}</dt>
+                    <dd class="mt-2 break-words text-xl font-semibold tabular-nums">
+                        {{ formatMoney(invoice.totalAmount) }}
+                    </dd>
+                </div>
+                <div>
+                    <dt>{{ t('invoices.proposedTotal') }}</dt>
+                    <dd class="mt-2 break-words text-xl font-semibold tabular-nums">
+                        {{ total ? formatMoney(total) : t('invoices.invalidTerms') }}
+                    </dd>
+                </div>
+            </dl></AppPanel
+        >
         <InvoiceTerms
             :terms="draft.terms"
             :errors="errors"
             :disabled="pending || uncertain || !permitted"
             @change="draft = { ...draft, terms: $event }"
         />
-        <AppTextInput
-            id="invoice-reason"
-            :label="t('invoices.revisionReason')"
-            :model-value="draft.reason"
-            :maxlength="255"
-            :disabled="pending || uncertain || !permitted"
-            :error="errors.reason ? t(errors.reason) : ''"
-            @update:model-value="draft = { ...draft, reason: $event }"
-        />
+        <AppPanel :title="t('invoices.revisionReason')">
+            <AppTextInput
+                id="invoice-reason"
+                :label="t('invoices.revisionReason')"
+                :model-value="draft.reason"
+                :maxlength="255"
+                :disabled="pending || uncertain || !permitted"
+                :error="errors.reason ? t(errors.reason) : ''"
+                @update:model-value="draft = { ...draft, reason: $event }"
+            />
+        </AppPanel>
         <p v-if="error" role="alert">{{ t(error) }}</p>
         <p v-if="uncertain" role="status">{{ t('invoices.uncertain') }}</p>
-        <div class="flex flex-wrap justify-end gap-3">
+        <div class="wf-form-actions">
             <RouterLink
                 :to="{ name: 'invoice-detail', params: { id: invoice.id } }"
                 class="secondary-button"

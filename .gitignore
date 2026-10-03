@@ -51,3 +51,4 @@ AGENTS.md
 /vitest.config.ts
 /playwright.config.ts
 /phpunit.xml
+/.dashboard-preview/

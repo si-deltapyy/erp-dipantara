@@ -32,11 +32,11 @@ function update(direction: DeliveryDocument['direction'], patch: Partial<Deliver
 }
 </script>
 <template>
-    <div class="space-y-5">
+    <div class="grid min-w-0 gap-6 xl:grid-cols-2">
         <fieldset
             v-for="direction in directions"
             :key="direction"
-            class="space-y-3 rounded-md border border-line p-4"
+            class="min-w-0 space-y-4 border-t border-line pt-4"
             :disabled="disabled"
         >
             <legend class="px-2 font-semibold">
@@ -44,6 +44,7 @@ function update(direction: DeliveryDocument['direction'], patch: Partial<Deliver
             </legend>
             <AppSelect
                 :id="direction + '-file'"
+                renderer="nice"
                 :label="t('deliveries.sakrFile')"
                 :model-value="field(direction).documentId"
                 :disabled="disabled"

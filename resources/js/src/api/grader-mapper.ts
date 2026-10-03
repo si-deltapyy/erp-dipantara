@@ -1,5 +1,6 @@
 import type {
     Grader,
+    GraderRecord,
     GraderInput,
     GraderUpdate,
     GraderProvisionInput,
@@ -16,6 +17,7 @@ import { parseTimestamp } from './contracts/timestamp-parser'
 import {
     invalidContract,
     parseId,
+    parseNumericId,
     parseInteger,
     parseObject,
     parseString,
@@ -98,3 +100,19 @@ export {
     parseMasterLookup as parseGraderLookup,
     parseMasterQuery as parseGraderQuery,
 } from './contracts/master-parsers'
+
+export function parseGraderRecord(value: unknown): GraderRecord {
+    const grader = parseObject(value, 'grader')
+    const user = parseObject(grader.user, 'user')
+    const userId = parseNumericId(grader.user_id, 'user_id')
+    if (parseNumericId(user.id, 'user.id') !== userId) return invalidContract('user.id')
+    return {
+        id: parseNumericId(grader.id),
+        userId,
+        name: parseString(user.name, 'user.name'),
+        phone: parseString(grader.phone_number, 'phone_number'),
+        graderGroup: parseString(grader.grader_group, 'grader_group'),
+        createdAt: parseTimestamp(grader.created_at, 'created_at'),
+        updatedAt: parseTimestamp(grader.updated_at, 'updated_at'),
+    }
+}

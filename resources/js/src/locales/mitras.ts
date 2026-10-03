@@ -1,5 +1,6 @@
 export default {
     mitras: {
+        graderGroup: 'Grup Grader',
         title: 'Master Mitra',
         subtitle: 'Kelola mitra pemasok kayu untuk transaksi Order.',
         section: 'Master data',
@@ -28,7 +29,8 @@ export default {
         discardDescription: 'Perubahan yang belum disimpan akan hilang.',
         retry: 'Ulangi penyimpanan',
         uncertain:
-            'Hasil penyimpanan belum diketahui. Ulangi permintaan yang sama untuk memastikan hasilnya tanpa membuat data ganda.',
+            'Hasil penyimpanan belum diketahui. Tutup form dan muat ulang daftar untuk memeriksa hasilnya sebelum membuat catatan baru.',
+        updateUnavailable: 'Ubah data Mitra belum tersedia.',
         conflictHint:
             'Data telah berubah. Tutup form lalu buka kembali untuk memuat versi terbaru. Draft Anda belum disimpan.',
         errors: {

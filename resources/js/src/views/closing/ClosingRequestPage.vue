@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import AppPageHeader from '@/components/ui/AppPageHeader.vue'
+import AppState from '@/components/ui/AppState.vue'
+
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useRecordDetail } from '@/composables/useRecordDetail'
 import { useClosingApi } from './composables/useClosingApi'
 import ClosingRequestForm from './components/ClosingRequestForm.vue'
-import AppButton from '@/components/ui/AppButton.vue'
 const route = useRoute()
 const { t } = useI18n()
 const api = useClosingApi()
@@ -17,13 +19,13 @@ const { record, loading, error, refresh } = useRecordDetail(
 )
 </script>
 <template>
-    <section class="mx-auto max-w-4xl space-y-6">
-        <h1 class="text-2xl font-bold">{{ t('closings.request') }}</h1>
-        <p v-if="loading" role="status">{{ t('closings.loading') }}</p>
-        <div v-else-if="error" class="panel space-y-3" role="alert">
-            <p>{{ t(error) }}</p>
-            <AppButton @click="refresh">{{ t('closings.refresh') }}</AppButton>
-        </div>
+    <section class="min-w-0 space-y-6">
+        <AppPageHeader
+            :title="t('closings.request')"
+            :description="t('closings.requestDescription')"
+        />
+        <AppState v-if="loading" kind="loading" :message="t('closings.loading')" />
+        <AppState v-else-if="error" kind="error" :message="t(error)" @retry="refresh" />
         <ClosingRequestForm
             v-else-if="record"
             :key="record.purchaseOrderId"
