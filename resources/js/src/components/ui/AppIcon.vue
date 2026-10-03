@@ -23,6 +23,8 @@ withDefaults(
             | 'clock'
             | 'arrow-up'
             | 'arrow-down'
+            | 'invoice-in'
+            | 'invoice-out'
         size?: number
     }>(),
     { size: 20 },
@@ -50,6 +52,8 @@ const paths = {
     clock: 'M12 8v5l3 2m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0',
     'arrow-up': 'M12 19V5m-6 6 6-6 6 6',
     'arrow-down': 'M12 5v14m-6-6 6 6 6-6',
+    'invoice-in': 'M14 3H5v18h14V8Zm0 0v5h5M12 10v8m-3-3 3 3 3-3',
+    'invoice-out': 'M14 3H5v18h14V8Zm0 0v5h5M12 18v-8m-3 3 3-3 3 3',
 }
 </script>
 

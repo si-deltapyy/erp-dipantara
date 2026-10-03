@@ -8,10 +8,19 @@
 .woodflow-theme .wf-pagination-controls .wf-button {
     gap: 6px;
     border: 0;
-    min-width: 44px;
+    min-width: 32px;
+    min-height: 32px;
+    height: 32px;
+    padding: 4px 8px;
+    font-size: 12px;
+    line-height: 20px;
     background: var(--wf-card);
     color: var(--wf-foreground);
     box-shadow: none;
+}
+.woodflow-theme .wf-pagination-controls .wf-pagination-number {
+    width: 32px;
+    padding-inline: 0;
 }
 .woodflow-theme .wf-pagination-controls .wf-button:not(:disabled):hover {
     background: var(--wf-muted);
@@ -22,7 +31,14 @@
 .woodflow-theme .wf-pagination .wf-button[aria-current='page'] {
     background: var(--wf-primary);
     color: var(--wf-primary-foreground);
-    box-shadow: 0 4px 8px -4px var(--wf-primary);
+    box-shadow: none;
+}
+@media (pointer: coarse) {
+    .woodflow-theme .wf-pagination-controls .wf-button {
+        min-width: 44px;
+        min-height: 44px;
+        height: 44px;
+    }
 }
 .woodflow-theme .wf-panel-footer {
     flex-wrap: wrap;

@@ -9,7 +9,7 @@
     border-radius: var(--wf-radius);
     font-size: 14px;
     font-weight: 600;
-    box-shadow: 0 10px 20px -10px var(--wf-primary);
+    box-shadow: none;
 }
 .woodflow-theme .wf-button[data-variant='primary'] {
     background: var(--wf-primary);

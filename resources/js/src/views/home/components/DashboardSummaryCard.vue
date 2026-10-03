@@ -7,7 +7,7 @@ withDefaults(
         value: string
         caption: string
         targetPath?: string
-        icon?: 'document' | 'truck' | 'box' | 'wallet'
+        icon?: InstanceType<typeof AppIcon>['$props']['name']
     }>(),
     { icon: 'document' },
 )
