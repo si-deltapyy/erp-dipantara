@@ -32,6 +32,7 @@ const columns = computed<readonly TableColumn<OrderRecord>[]>(() => [
                 'graderName',
                 'notes',
             ] as const"
+            :key="field"
             #[`cell-${field}`]="{ row }"
         >
             <span class="block max-w-64 whitespace-normal break-words">{{
