@@ -18,6 +18,11 @@ const route = useRoute()
 const store = useSessionStore()
 const formElement = ref<HTMLFormElement>()
 const saved = ref(false)
+const lookups = [
+    { kind: 'mitra', field: 'mitraId' },
+    { kind: 'grader', field: 'graderId' },
+    { kind: 'timber', field: 'productId' },
+] as const
 const { draft, errors, error, pending, uncertain, dirty, permitted, save } = useGradingForm(() => {
     saved.value = true
     void router.replace({
@@ -51,32 +56,15 @@ function message(field: keyof GradingCreateInput): string | undefined {
         />
         <div class="grid gap-5 sm:grid-cols-2">
             <MasterLookup
-                v-for="kind in ['mitra', 'grader', 'timber'] as const"
-                :id="`grading-${kind}`"
-                :key="kind"
-                :kind="kind"
-                :label="t(`gradings.${kind}`)"
-                :model-value="
-                    draft[
-                        kind === 'mitra' ? 'mitraId' : kind === 'grader' ? 'graderId' : 'productId'
-                    ]
-                "
-                :error="
-                    message(
-                        kind === 'mitra' ? 'mitraId' : kind === 'grader' ? 'graderId' : 'productId',
-                    )
-                "
+                v-for="lookup in lookups"
+                :id="`grading-${lookup.kind}`"
+                :key="lookup.field"
+                :kind="lookup.kind"
+                :label="t(`gradings.${lookup.kind}`)"
+                :model-value="draft[lookup.field]"
+                :error="message(lookup.field)"
                 :disabled="pending || uncertain || !permitted"
-                @update:model-value="
-                    draft = {
-                        ...draft,
-                        [kind === 'mitra'
-                            ? 'mitraId'
-                            : kind === 'grader'
-                              ? 'graderId'
-                              : 'productId']: $event,
-                    }
-                "
+                @update:model-value="draft = { ...draft, [lookup.field]: $event }"
             />
             <AppTextInput
                 id="grading-date"
