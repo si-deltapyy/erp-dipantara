@@ -9,7 +9,7 @@ import { useSessionStore } from '@/stores/session'
 import { useUnsavedChanges } from '@/composables/useUnsavedChanges'
 import { useDeliveryForm } from '../composables/useDeliveryForm'
 import { useDeliveryAvailability } from '../composables/useDeliveryAvailability'
-import ApprovedPurchaseOrderLookup from '@/views/orders/components/ApprovedPurchaseOrderLookup.vue'
+import PurchaseOrderLookup from '@/views/purchase-orders/components/PurchaseOrderLookup.vue'
 import DeliverySakrSelection from './DeliverySakrSelection.vue'
 import DeliveryAllocationFields from './DeliveryAllocationFields.vue'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
@@ -82,7 +82,7 @@ async function submit(): Promise<void> {
 <template>
     <form ref="formElement" class="min-w-0 space-y-6" novalidate @submit.prevent="submit">
         <AppPanel :title="t('deliveries.shipmentContext')" class="space-y-5">
-            <ApprovedPurchaseOrderLookup
+            <PurchaseOrderLookup
                 v-if="!delivery"
                 id="delivery-po"
                 :model-value="draft.purchaseOrderId"

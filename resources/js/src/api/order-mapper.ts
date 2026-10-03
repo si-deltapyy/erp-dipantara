@@ -1,4 +1,4 @@
-import type { Order, OrderRecord, OrderInput, OrderQuery } from '@/core/types/order'
+import type { Order, OrderRecord, OrderDetail, OrderInput, OrderQuery } from '@/core/types/order'
 import { orderStatuses } from '@/core/types/order'
 import { parseMetadata } from './contracts/response-parsers'
 import { parseTimestamp } from './contracts/timestamp-parser'
@@ -102,5 +102,25 @@ export function parseOrderRecord(value: unknown): OrderRecord {
         graderName: user === null ? null : parseString(user.name, 'grader.user.name'),
         buyerGraderName: parseString(order.grader_buyer_name, 'grader_buyer_name'),
         notes: order.note === null ? null : parseString(order.note, 'note'),
+    }
+}
+
+export function parseOrderDetail(value: unknown): OrderDetail {
+    const order = parseObject(value, 'order')
+    const parent = order.pre_order === null ? null : parseObject(order.pre_order, 'pre_order')
+    const status = parent?.pre_order_status ?? null
+    if (
+        status !== null &&
+        status !== 'pending' &&
+        status !== 'on_process' &&
+        status !== 'delivered' &&
+        status !== 'completed'
+    )
+        return invalidContract('pre_order_status')
+    return {
+        ...parseOrderRecord(order),
+        purchaseOrderId: parseNumericId(order.pre_order_id, 'pre_order_id'),
+        buyerGraderPhone: parseString(order.grader_buyer_phone_number, 'grader_buyer_phone_number'),
+        purchaseOrderStatus: status,
     }
 }

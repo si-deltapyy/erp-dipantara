@@ -19,14 +19,28 @@ export const orderRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/orders/OrderFormPage.vue'),
         meta: {
             ...meta,
-            anyPermissions: ['orders.create.all'],
+            featureUnavailable: false,
+            requiredPermissions: [
+                'orders.read.all',
+                'orders.create.all',
+                'purchase-orders.read.all',
+                'mitras.read.all',
+                'graders.read.all',
+                'timber-prices.read.all',
+            ],
+            anyPermissions: [],
         },
     },
     {
         path: '/orders/:id',
         name: 'order-detail',
         component: () => import('@/views/orders/OrderDetailPage.vue'),
-        meta,
+        meta: {
+            ...meta,
+            featureUnavailable: false,
+            requiredPermissions: ['orders.read.all', 'timber-prices.read.all'],
+            anyPermissions: [],
+        },
     },
     {
         path: '/orders/:id/edit',

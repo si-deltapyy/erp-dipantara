@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useSessionStore } from '@/stores/session'
 import { useI18n } from 'vue-i18n'
 import { useOrderApi } from './composables/useOrderApi'
 import { useMasterList } from '@/composables/useMasterList'
@@ -10,6 +12,17 @@ import OrderTable from './components/OrderTable.vue'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
 import AppState from '@/components/ui/AppState.vue'
 const { t } = useI18n()
+const session = useSessionStore()
+const canCreate = computed(() =>
+    [
+        'orders.read.all',
+        'orders.create.all',
+        'purchase-orders.read.all',
+        'mitras.read.all',
+        'graders.read.all',
+        'timber-prices.read.all',
+    ].every((permission) => session.user?.permissions.includes(permission)),
+)
 const { response, search, searchRecords, loading, error, refresh, changePage } = useMasterList(
     useOrderApi(),
     'orders',
@@ -22,12 +35,11 @@ const { response, search, searchRecords, loading, error, refresh, changePage } =
     <section class="space-y-6">
         <AppPageHeader :title="t('orders.title')" :description="t('orders.subtitle')">
             <template #actions
-                ><AppButton disabled :title="t('ui.featureUnavailable')">{{
+                ><RouterLink v-if="canCreate" :to="{ name: 'order-new' }" class="primary-button">{{
                     t('orders.add')
-                }}</AppButton></template
+                }}</RouterLink></template
             >
         </AppPageHeader>
-        <p role="status" class="text-sm text-muted">{{ t('ui.transactionUnavailable') }}</p>
         <AppPanel :title="t('orders.title')">
             <template #actions
                 ><AppButton variant="secondary" :pending="loading" @click="refresh">{{

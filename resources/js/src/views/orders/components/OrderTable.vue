@@ -39,5 +39,12 @@ const columns = computed<readonly TableColumn<OrderRecord>[]>(() => [
                 row[field] ?? t('ui.unavailableValue')
             }}</span>
         </template>
+        <template #cell-number="{ row }"
+            ><RouterLink
+                :to="{ name: 'order-detail', params: { id: row.id }, query: $route.query }"
+                class="text-primary hover:underline"
+                >{{ row.number }}</RouterLink
+            ></template
+        >
     </AppTable>
 </template>

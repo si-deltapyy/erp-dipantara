@@ -1,6 +1,6 @@
 import type { ReviewSnapshot } from '@/core/types/workflow'
 import { defineStore } from 'pinia'
-import type { Order, OrderInput } from '@/core/types/order'
+import type { Order, OrderCreateInput } from '@/core/types/order'
 export const useOrderRecoveryStore = defineStore('order-recovery', {
     state: (): {
         review: ReviewSnapshot<Order> | null
@@ -8,7 +8,7 @@ export const useOrderRecoveryStore = defineStore('order-recovery', {
         snapshot: {
             actorId: string
             order?: Order
-            draft: OrderInput
+            draft: OrderCreateInput
             idempotencyKey: string
         } | null
     } => ({ snapshot: null, review: null, submission: null }),

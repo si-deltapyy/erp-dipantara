@@ -1,67 +1,47 @@
-import type { ComputedRef, ShallowRef } from 'vue'
 import { computed, shallowRef } from 'vue'
-import type { Order, OrderInput } from '@/core/types/order'
-import { orderDraft, validateOrder } from '@/core/domain/order-draft'
+import type { ComputedRef } from 'vue'
+import type { OrderCreateInput } from '@/core/types/order'
+import { emptyOrderCreate, validateOrderCreate } from '@/core/domain/order-draft'
 import { useMasterForm } from '@/composables/useMasterForm'
 import { useSessionStore } from '@/stores/session'
 import { useOrderRecoveryStore } from '@/stores/order-recovery'
 import { useOrderApi } from './useOrderApi'
-import { canActOnOrder, canCreateOrder } from '@/core/domain/order-policy'
 import { ApiError } from '@/core/types/api-error'
-
-type OrderFormState = ReturnType<typeof useMasterForm<OrderInput>> & {
-    permitted: ComputedRef<boolean>
-    completed: ShallowRef<Order | undefined>
-}
-
 export function useOrderForm(
-    order: Order | undefined,
-    saved: (order: Order) => void,
-): OrderFormState {
+    saved: (order: { readonly id: string }) => void,
+): ReturnType<typeof useMasterForm<OrderCreateInput>> & { permitted: ComputedRef<boolean> } {
     const api = useOrderApi()
     const store = useSessionStore()
     const recovery = useOrderRecoveryStore()
-    const actorId = store.user?.id
-    const candidate = recovery.snapshot
-    const snapshot =
-        candidate && candidate.actorId === actorId && candidate.order?.id === order?.id
-            ? candidate
-            : null
-    const baseline = snapshot?.order ?? order
+    const snapshot = recovery.snapshot?.actorId === store.user?.id ? recovery.snapshot : null
     recovery.$reset()
-    const completed = shallowRef<Order>()
-    const permitted = computed(
-        () =>
-            store.user?.id === actorId &&
-            (baseline ? canActOnOrder(store.user, baseline, 'update') : canCreateOrder(store.user)),
+    const completed = shallowRef<{ readonly id: string }>()
+    const permitted = computed(() =>
+        [
+            'orders.read.all',
+            'orders.create.all',
+            'purchase-orders.read.all',
+            'mitras.read.all',
+            'graders.read.all',
+            'timber-prices.read.all',
+        ].every((permission) => store.user?.permissions.includes(permission)),
     )
-    const form = useMasterForm<OrderInput>({
+    const form = useMasterForm<OrderCreateInput>({
         resource: 'orders',
-        initial: orderDraft(baseline),
+        retrySafe: false,
+        initial: emptyOrderCreate(),
         snapshot,
-        validate: validateOrder,
+        validate: validateOrderCreate,
         write: async (draft, signal, idempotencyKey) => {
             if (!permitted.value) throw new ApiError('forbidden')
-            const options = {
-                signal,
-                idempotencyKey,
-                snapshotGeneration: baseline?.snapshotGeneration,
-            }
-            completed.value = baseline
-                ? await api.update(baseline.id, { ...draft, version: baseline.version }, options)
-                : await api.create(draft, options)
+            completed.value = await api.create(draft, { signal, idempotencyKey })
         },
-        recover: (draft, idempotencyKey, id) => {
-            recovery.snapshot = {
-                actorId: id,
-                order: baseline,
-                draft: orderDraft(draft),
-                idempotencyKey,
-            }
+        recover: (draft, idempotencyKey, actorId) => {
+            recovery.snapshot = { actorId, draft, idempotencyKey }
         },
         saved: () => {
             if (completed.value) saved(completed.value)
         },
     })
-    return { ...form, permitted, completed }
+    return { ...form, permitted }
 }
