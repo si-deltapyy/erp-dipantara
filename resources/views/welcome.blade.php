@@ -88,11 +88,11 @@
                 <div class="hidden md:flex items-center space-x-4">
                     @if (Route::has('login'))
                         @auth
-                            <a href="/app" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-accent to-amber-700 text-white font-semibold hover:shadow-lg hover:shadow-brand-accent/30 hover:-translate-y-0.5 transition-all duration-200">
+                            <a href="{{ route('app') }}" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-accent to-amber-700 text-white font-semibold hover:shadow-lg hover:shadow-brand-accent/30 hover:-translate-y-0.5 transition-all duration-200">
                                 Dashboard ERP &rarr;
                             </a>
                         @else
-                            <a href="/auth/login" class="px-5 py-2.5 rounded-xl text-emerald-200 font-medium hover:text-white hover:bg-white/5 transition duration-200">
+                            <a href="{{ route('app') }}" class="px-5 py-2.5 rounded-xl text-emerald-200 font-medium hover:text-white hover:bg-white/5 transition duration-200">
                                 Log in
                             </a>
                             @if (Route::has('register'))
@@ -122,9 +122,9 @@
             <a href="#faq" @click="mobileMenu = false" class="block text-emerald-100 py-2">FAQ</a>
             <div class="pt-4 border-t border-emerald-900/50 flex flex-col space-y-2">
                 @auth
-                    <a href="{{ url('/dashboard') }}" class="w-full text-center py-2.5 rounded-xl bg-brand-accent text-white font-semibold">Dashboard ERP</a>
+                    <a href="{{ route('app') }}" class="w-full text-center py-2.5 rounded-xl bg-brand-accent text-white font-semibold">Dashboard ERP</a>
                 @else
-                    <a href="{{ route('login') }}" class="w-full text-center py-2.5 rounded-xl border border-emerald-700 text-emerald-100">Log in</a>
+                    <a href="{{ route('app') }}" class="w-full text-center py-2.5 rounded-xl border border-emerald-700 text-emerald-100">Log in</a>
                 @endauth
             </div>
         </div>
@@ -159,11 +159,11 @@
                     <!-- CTA Buttons -->
                     <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
                         @auth
-                            <a href="{{ url('/dashboard') }}" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-brand-accent to-amber-700 text-white font-bold text-base shadow-xl shadow-brand-accent/20 hover:scale-105 transition-all duration-300 text-center">
+                            <a href="{{ route('app') }}" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-brand-accent to-amber-700 text-white font-bold text-base shadow-xl shadow-brand-accent/20 hover:scale-105 transition-all duration-300 text-center">
                                 Masuk ke Dashboard &rarr;
                             </a>
                         @else
-                            <a href="{{ route('login') }}" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-brand-accent to-amber-700 text-white font-bold text-base shadow-xl shadow-brand-accent/20 hover:scale-105 transition-all duration-300 text-center">
+                            <a href="{{ route('app') }}" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-brand-accent to-amber-700 text-white font-bold text-base shadow-xl shadow-brand-accent/20 hover:scale-105 transition-all duration-300 text-center">
                                 Mulai Operasional
                             </a>
                         @endauth
