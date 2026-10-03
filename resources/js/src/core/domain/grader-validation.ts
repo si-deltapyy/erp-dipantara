@@ -1,4 +1,4 @@
-import type { GraderInput } from '@/core/types/grader'
+import type { GraderInput, GraderContactInput } from '@/core/types/grader'
 
 export const graderFieldLimits = { name: 255, email: 254, phone: 40, address: 1000 }
 export type GraderField = keyof GraderInput
@@ -22,4 +22,16 @@ export function emptyGrader(): GraderInput {
 }
 export function graderDraft(input: GraderInput): GraderInput {
     return { name: input.name, email: input.email, phone: input.phone, address: input.address }
+}
+
+export function validateGraderContact(
+    input: GraderContactInput,
+): Partial<Record<keyof GraderContactInput, string>> {
+    const errors: Partial<Record<keyof GraderContactInput, string>> = {}
+    for (const field of ['phone', 'graderGroup'] as const) {
+        if (!input[field].trim()) errors[field] = 'graders.required'
+        else if (input[field].length > (field === 'phone' ? 40 : 255))
+            errors[field] = 'graders.tooLong'
+    }
+    return errors
 }

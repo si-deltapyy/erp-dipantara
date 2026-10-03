@@ -11,6 +11,10 @@ export type GraderProvisioningStatus = 'not_provisioned' | 'pending_activation' 
 export interface GraderProvisionInput {
     readonly version: number
 }
+export interface GraderContactInput {
+    readonly phone: string
+    readonly graderGroup: string
+}
 export interface GraderRecord {
     readonly id: OpaqueId
     readonly userId: OpaqueId
@@ -44,9 +48,9 @@ export interface GraderWriteOptions {
 export interface GradersApi {
     list(query: GraderQuery, signal: AbortSignal): Promise<readonly GraderRecord[]>
     lookup(query: GraderQuery, signal: AbortSignal): Promise<PageResponse<GraderLookup>>
-    get(id: string, signal: AbortSignal): Promise<Grader>
+    get(id: string, signal: AbortSignal): Promise<GraderRecord>
     create(input: GraderInput, options: GraderWriteOptions): Promise<Grader>
-    update(id: string, input: GraderUpdate, options: GraderWriteOptions): Promise<Grader>
+    update(id: string, input: GraderContactInput, options: GraderWriteOptions): Promise<void>
     provision(id: string, input: GraderProvisionInput, options: GraderWriteOptions): Promise<Grader>
     subscribe(listener: () => void): () => void
 }
