@@ -11,6 +11,17 @@ export interface TimberProductInput extends TimberSpecification {
     readonly purchasePrice: string
     readonly salePrice: string
 }
+export interface TimberProductCreateInput {
+    readonly name: string
+    readonly type: string
+    readonly grade: string
+    readonly dimensionLength: string
+    readonly dimensionWidth: string
+    readonly dimensionHeight: string
+    readonly dimensionDiameter: string
+    readonly volume: string
+    readonly price: string
+}
 export interface TimberProductRecord {
     readonly id: OpaqueId
     readonly name: string
@@ -55,7 +66,10 @@ export interface TimberProductsApi {
         signal: AbortSignal,
     ): Promise<PageResponse<TimberProductLookup>>
     get(id: string, signal: AbortSignal): Promise<TimberProduct>
-    create(input: TimberProductInput, options: TimberProductWriteOptions): Promise<TimberProduct>
+    create(
+        input: TimberProductCreateInput,
+        options: TimberProductWriteOptions,
+    ): Promise<TimberProductRecord>
     update(
         id: string,
         input: TimberProductUpdate,

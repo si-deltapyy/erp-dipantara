@@ -18,6 +18,8 @@ import {
     parseId,
     parseNumericId,
     parseNumericDecimal,
+    parseDecimal,
+    parseMoney,
     parseNumericMoney,
     parseInteger,
     parseObject,
@@ -110,13 +112,22 @@ export function parseTimberProductRecord(value: unknown): TimberProductRecord {
         name: parseString(product.name, 'name'),
         type: parseString(product.type, 'type'),
         grade: parseString(product.grade, 'grade'),
-        dimensionLength: parseNumericDecimal(product.dimension_length, 'dimension_length'),
-        dimensionWidth: parseNumericDecimal(product.dimension_width, 'dimension_width'),
-        dimensionHeight: parseNumericDecimal(product.dimension_height, 'dimension_height'),
-        dimensionDiameter: parseNumericDecimal(product.dimension_diameter, 'dimension_diameter'),
-        volume: product.volume === null ? null : parseNumericDecimal(product.volume, 'volume'),
-        price: parseNumericMoney(product.price, 'price'),
+        dimensionLength: parseProductDecimal(product.dimension_length, 'dimension_length'),
+        dimensionWidth: parseProductDecimal(product.dimension_width, 'dimension_width'),
+        dimensionHeight: parseProductDecimal(product.dimension_height, 'dimension_height'),
+        dimensionDiameter: parseProductDecimal(product.dimension_diameter, 'dimension_diameter'),
+        volume: product.volume === null ? null : parseProductDecimal(product.volume, 'volume'),
+        price:
+            typeof product.price === 'string'
+                ? parseMoney(canonicalDecimal(product.price, 2), 'price')
+                : parseNumericMoney(product.price, 'price'),
         createdAt: parseTimestamp(product.created_at, 'created_at'),
         updatedAt: parseTimestamp(product.updated_at, 'updated_at'),
     }
+}
+
+function parseProductDecimal(value: unknown, field: string): string {
+    return typeof value === 'string'
+        ? parseDecimal(value, field)
+        : parseNumericDecimal(value, field)
 }

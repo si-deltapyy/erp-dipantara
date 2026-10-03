@@ -1,37 +1,36 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import type { TimberProductInput } from '@/core/types/timber-product'
-import type {
-    TimberProductErrors,
-    TimberProductField,
-} from '@/core/domain/timber-product-validation'
+import type { TimberProductCreateInput } from '@/core/types/timber-product'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
-import TimberDimensions from './TimberDimensions.vue'
-import TimberPrices from './TimberPrices.vue'
 const props = defineProps<{
-    modelValue: TimberProductInput
-    errors: TimberProductErrors
+    modelValue: TimberProductCreateInput
+    errors: Partial<Record<keyof TimberProductCreateInput, string>>
     disabled: boolean
-    volume: string | null
-    simulation: boolean
 }>()
-const emit = defineEmits<{ 'update:modelValue': [value: TimberProductInput] }>()
+const emit = defineEmits<{ 'update:modelValue': [value: TimberProductCreateInput] }>()
 const { t, te } = useI18n()
-function update(field: TimberProductField, value: string): void {
+const textFields = ['name', 'type', 'grade'] as const
+const numericFields = [
+    'dimensionLength',
+    'dimensionWidth',
+    'dimensionHeight',
+    'dimensionDiameter',
+    'volume',
+    'price',
+] as const
+function update(field: keyof TimberProductCreateInput, value: string): void {
     emit('update:modelValue', { ...props.modelValue, [field]: value })
 }
-function fieldError(field: TimberProductField): string | undefined {
-    const message = props.errors[field]
-    if (!message) return undefined
-    if (te(message)) return t(message)
-    return message === 'contract.invalid' ? t('timber-products.invalid') : message
+function fieldError(field: keyof TimberProductCreateInput): string | undefined {
+    const error = props.errors[field]
+    return error && te(error) ? t(error) : error
 }
 </script>
 <template>
-    <div class="grid gap-6 sm:grid-cols-2">
+    <div class="grid gap-5 sm:grid-cols-2">
         <p class="text-sm text-muted sm:col-span-2">{{ t('timber-products.requiredHint') }}</p>
         <AppTextInput
-            v-for="field in ['name', 'gradeCode'] as const"
+            v-for="field in textFields"
             :id="`timber-product-${field}`"
             :key="field"
             :model-value="modelValue[field]"
@@ -39,24 +38,21 @@ function fieldError(field: TimberProductField): string | undefined {
             :error="fieldError(field)"
             :disabled="disabled"
             :maxlength="255"
-            aria-required="true"
+            required
             @update:model-value="update(field, $event)"
         />
-        <TimberDimensions
-            class="sm:col-span-2"
-            :specification="modelValue"
+        <AppTextInput
+            v-for="field in numericFields"
+            :id="`timber-product-${field}`"
+            :key="field"
+            :model-value="modelValue[field]"
+            :label="t(`timber-products.${field}`)"
+            :hint="field === 'volume' ? t('timber-products.manualVolume') : undefined"
+            :error="fieldError(field)"
             :disabled="disabled"
-            :field-error="fieldError"
-            :volume="volume"
-            :simulation="simulation"
-            @update="update"
-        />
-        <TimberPrices
-            class="sm:col-span-2"
-            :prices="modelValue"
-            :disabled="disabled"
-            :field-error="fieldError"
-            @update="update"
+            :required="field !== 'volume'"
+            :inputmode="field === 'price' ? 'numeric' : 'decimal'"
+            @update:model-value="update(field, $event)"
         />
     </div>
 </template>

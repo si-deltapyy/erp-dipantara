@@ -9,7 +9,9 @@ export default {
         dimensionHeight: 'Tinggi',
         dimensionDiameter: 'Diameter',
         volume: 'Volume',
-        price: 'Harga',
+        price: 'Harga (IDR)',
+        integerPrice: 'Gunakan harga dalam rupiah bulat tanpa pemisah ribuan.',
+        manualVolume: 'Opsional. Diisi manual, tidak dihitung dari dimensi.',
         title: 'Master Kayu',
         subtitle: 'Kelola jenis, mutu, ukuran, dan harga referensi kayu.',
         section: 'Master data',
@@ -44,12 +46,12 @@ export default {
         required: 'Field ini wajib diisi.',
         tooLong: 'Isi melebihi batas karakter.',
         invalid: 'Periksa kembali nilai field ini.',
-        requiredHint: 'Semua field wajib diisi. Volume dihitung per satu batang.',
+        requiredHint: 'Semua field selain volume wajib diisi. Gunakan titik untuk desimal.',
         discardTitle: 'Buang perubahan?',
         discardDescription: 'Perubahan yang belum disimpan akan hilang.',
         retry: 'Ulangi penyimpanan',
         uncertain:
-            'Hasil penyimpanan belum diketahui. Ulangi permintaan yang sama untuk memastikan hasilnya tanpa membuat data ganda.',
+            'Hasil penyimpanan belum diketahui. Tutup form dan periksa daftar sebelum menambahkan kayu kembali.',
         conflictHint:
             'Data telah berubah. Tutup form lalu buka kembali untuk memuat versi terbaru. Draft Anda belum disimpan.',
         errors: {

@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { canReadPrices } from '@/core/domain/record-policy'
 import { useSessionStore } from '@/stores/session'
 import { useI18n } from 'vue-i18n'
 import { useTimberProductList } from './composables/useTimberProductList'
+import TimberProductEditor from './components/TimberProductEditor.vue'
 import TimberProductTable from './components/TimberProductTable.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppTextInput from '@/components/ui/AppTextInput.vue'
@@ -13,8 +14,31 @@ import AppPanel from '@/components/ui/AppPanel.vue'
 const { t } = useI18n()
 const session = useSessionStore()
 const canReadPrice = computed(() => canReadPrices(session.user))
-const { response, query, search, loading, error, refresh, searchTimberProducts, changePage } =
-    useTimberProductList()
+const {
+    response,
+    query,
+    search,
+    loading,
+    error,
+    refresh,
+    searchTimberProducts,
+    changePage,
+    canCreate,
+} = useTimberProductList()
+const editing = ref(false)
+const success = ref(false)
+function saved(): void {
+    editing.value = false
+    success.value = true
+    void refresh()
+}
+watch(
+    () => session.user,
+    () => {
+        editing.value = false
+        success.value = false
+    },
+)
 </script>
 <template>
     <section class="space-y-6">
@@ -23,12 +47,19 @@ const { response, query, search, loading, error, refresh, searchTimberProducts, 
             :description="t('timber-products.subtitle')"
         >
             <template #actions
-                ><AppButton disabled :title="t('ui.writeUnavailable')">{{
-                    t('timber-products.add')
-                }}</AppButton></template
+                ><AppButton
+                    v-if="canCreate && canReadPrice"
+                    @click="
+                        editing = true
+                        success = false
+                    "
+                    >{{ t('timber-products.add') }}</AppButton
+                ></template
             >
         </AppPageHeader>
-        <p role="status" class="text-sm text-muted">{{ t('ui.writeUnavailable') }}</p>
+        <p v-if="success" role="status" class="text-sm text-primary">
+            {{ t('timber-products.saved') }}
+        </p>
         <p class="text-sm text-muted">{{ t('timber-products.unitsUnconfirmed') }}</p>
         <AppPanel :title="t('timber-products.list')" class="space-y-5">
             <template #actions
@@ -75,5 +106,10 @@ const { response, query, search, loading, error, refresh, searchTimberProducts, 
                     @update:page="changePage"
             /></template>
         </AppPanel>
+        <TimberProductEditor
+            v-if="editing && canCreate && canReadPrice"
+            @close="editing = false"
+            @saved="saved"
+        />
     </section>
 </template>
