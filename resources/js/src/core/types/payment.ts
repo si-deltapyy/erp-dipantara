@@ -35,8 +35,19 @@ export interface PaymentQuery extends MasterListQuery {
     readonly direction?: Payment['direction']
     readonly status?: Payment['status']
 }
+export interface PaymentRecord {
+    readonly id: string
+    readonly purchaseOrderNumber: string | null
+    readonly buyerName: string | null
+    readonly paymentDate: string
+    readonly dueDate: string
+    readonly amount: string
+    readonly buyerTerm: string
+    readonly mitraTerm: string
+    readonly status: 'pending' | 'completed' | 'cancelled'
+}
 export interface PaymentsApi {
-    list(query: PaymentQuery, signal: AbortSignal): Promise<readonly Payment[]>
+    list(query: PaymentQuery, signal: AbortSignal): Promise<readonly PaymentRecord[]>
     get(id: string, signal: AbortSignal): Promise<Payment>
     create(input: PaymentInput, options: WorkflowWriteOptions): Promise<Payment>
     update(
