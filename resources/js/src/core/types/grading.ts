@@ -42,9 +42,18 @@ export interface GradingRevisionInput {
     readonly gradingDate: string
     readonly rows: readonly GradingRow[]
 }
+export interface GradingRecord {
+    readonly id: string
+    readonly purchaseOrderNumber: string | null
+    readonly mitraName: string | null
+    readonly graderGroup: string | null
+    readonly productName: string | null
+    readonly gradingDate: string
+    readonly notes: string | null
+}
 export interface GradingsApi extends WorkflowApi<Grading> {
     revise(id: string, input: GradingRevisionInput, options: WorkflowWriteOptions): Promise<Grading>
-    list(query: GradingQuery, signal: AbortSignal): Promise<readonly Grading[]>
+    list(query: GradingQuery, signal: AbortSignal): Promise<readonly GradingRecord[]>
     get(id: string, signal: AbortSignal): Promise<Grading>
     create(input: GradingInput, options: WorkflowWriteOptions): Promise<Grading>
     update(
